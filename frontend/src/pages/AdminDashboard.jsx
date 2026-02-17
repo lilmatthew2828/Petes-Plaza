@@ -9,9 +9,9 @@ const MOCK_METRICS = {
 }
 
 const MOCK_LISTINGS = [
-  { id: 1, title: 'Graphic T-Shirt', price: 12.99, status: 'active', seller_id: 5 },
-  { id: 2, title: 'Blue Jeans', price: 29.99, status: 'active', seller_id: 8 },
-  { id: 3, title: 'Running Shoes', price: 45.00, status: 'sold', seller_id: 3 },
+  { id: 1, title: 'Graphic T-Shirt', price: 12.99, status: 'active', seller_email: "daye.karibiwhyte" },
+  { id: 2, title: 'Blue Jeans', price: 29.99, status: 'active', seller_email: "jania.southall" },
+  { id: 3, title: 'Running Shoes', price: 45.00, status: 'sold', seller_email: "anthony.powell" },
 ]
 
 export default function AdminDashboard() {
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
                 <th>Title</th>
                 <th>Price</th>
                 <th>Status</th>
-                <th>Seller</th>
+                <th>Seller Email</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
                   <td>{listing.title}</td>
                   <td>${listing.price.toFixed(2)}</td>
                   <td>{listing.status}</td>
-                  <td>{listing.seller_id}</td>
+                  <td>{listing.seller_email}</td>
                   <td>
                     <button onClick={() => handleMarkSold(listing.id)}>Mark Sold</button>
                     <button onClick={() => handleDelete(listing.id)}>Delete</button>
