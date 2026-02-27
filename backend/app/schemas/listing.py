@@ -8,6 +8,7 @@ class ListingCreate(BaseModel): # Define the schema for creating a new listing
     price: Decimal
     pickup_location: str
     image_url: Optional[str] = None
+    category: Optional[str] = "Other" # Default category if not provided
 
 
 class ListingResponse(BaseModel): # Define the schema for the response when fetching a listing
@@ -17,6 +18,8 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     price: Decimal
     status: str
     seller_id: int
+    image_url: Optional[str] = None
+    category: Optional[str] = None
     
     class Config:
         orm_mode = True # This allows Pydantic to work with SQLAlchemy models and convert them to the response format correctly
