@@ -14,15 +14,40 @@ from dotenv import load_dotenv
 
 load_dotenv() # Load environment variables from .env file
 
-DATABASE_URL = os.getenv("DATABASE_URL") # loads the url for our Pete's Plaza database from the .env file
+DATABASE_URL = os.getenv("DATABASE_URL")  # loads the url for our Pete's Plaza database from the .env file
 
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set. Please check your .env file.")
 
-engine = create_engine(DATABASE_URL, 
-                       pool_pre_ping=True, # helps avoid the stale connections
-                       echo=True
-                       ) # Create the SQLAlchemy engine with the database URL
+# If the URL refers to a specific sslrootcert file that doesn't exist on this machine,
+# fall back to using the system trusted roots by replacing sslrootcert=<path> with sslrootcert=system.
+if "sslrootcert=" in DATABASE_URL:
+    try:
+        # extract the value of sslrootcert (handles end-of-string or additional params)
+        parts = DATABASE_URL.split("sslrootcert=")
+        prefix = parts[0]
+        remainder = parts[1]
+        # the file path is either until the next '&' or the end
+        if "&" in remainder:
+            cert_path, suffix = remainder.split("&", 1)
+            suffix = "&" + suffix
+        else:
+            cert_path = remainder
+            suffix = ""
+
+        cert_path_unquoted = cert_path
+        # check local file exists
+        if not os.path.exists(cert_path_unquoted):
+            DATABASE_URL = prefix + "sslrootcert=system" + suffix
+    except Exception:
+        # if parsing fails, leave DATABASE_URL unchanged
+        pass
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,  # helps avoid the stale connections
+    echo=True,
+)
 
 SessionLocal = sessionmaker(
     autocommit=False, # we want to control when transactions are committed

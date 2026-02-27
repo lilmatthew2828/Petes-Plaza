@@ -1,21 +1,23 @@
-// Placeholder for API calls to your backend
-// Example:
-// export async function fetchMetrics() {
-//   const res = await fetch('/api/admin/metrics')
-//   return res.json()
-// }
+const BASE_URL = "http://localhost:8000";
 
-// export async function fetchAllListings() {
-//   const res = await fetch('/api/admin/listings')
-//   return res.json()
-// }
-
-export async function fetchMetrics() {
-  // TODO: Replace with actual API call
-  return { totalUsers: 42, totalListings: 127 }
+export async function getAdminDashboard(){
+    const res = await fetch(`${BASE_URL}/api/admin/dashboard`);
+    if (!res.ok){
+        throw new Error("Failed to fetch dashboard data");
+    }
+    return res.json();
 }
 
-export async function fetchAllListings() {
-  // TODO: Replace with actual API call
-  return []
+export async function moderateListing(listingID, action) {
+    const res = await fetch(`${BASE_URL}/api/admin/listings/${listingID}/moderate`, {
+        method: 'POST',
+        headers: { 
+            "Content-Type": "application/json",
+},
+        body: JSON.stringify({action}),
+    });
+    if (!res.ok){
+        throw new Error("Failed to moderate listing");
+    }
+    return res.json();
 }

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from user import UserResponse
+from .user import UserResponse
 
 class AdminUserResponse(UserResponse):
     pass

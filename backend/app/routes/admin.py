@@ -1,13 +1,22 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session # Import Session from SQLAlchemy
-from app.database import get_db # Import the get_db function to get a database session
+from sqlalchemy.orm import Session
+from app.database import get_db
 from app.schemas.admin import ListingModeration, AdminUserResponse
+from app.schemas.listing import ListingResponse
 from app.services.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
+from app.models.listing import Listing
 
-router = APIRouter(prefix="/admin", tags=["admin"]) # Create an APIRouter instance with a prefix of /admin and a tag of admin
+# expose endpoints under /api/admin to match frontend expectations
+router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 @router.get("/dashboard") # Endpoint to get admin dashboard metrics
 def get_admin_dashboard(db: Session = Depends(get_db)):
+    return get_dashboard_metrics(db)
+
+
+@router.get("/metrics")
+def get_metrics(db: Session = Depends(get_db)):
     return get_dashboard_metrics(db)
 
 @router.post("/listings/{listing_id}/moderate") # Endpoint to moderate a listing (approve, deny, archive, mark as sold)
@@ -16,3 +25,9 @@ def moderate_listing_endpoint(listing_id: int, moderation: ListingModeration, db
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
     return result
+
+
+@router.get("/listings", response_model=List[ListingResponse])
+def list_listings(db: Session = Depends(get_db)):
+    listings = db.query(Listing).all()
+    return listings

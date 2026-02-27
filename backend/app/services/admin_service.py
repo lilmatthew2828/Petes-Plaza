@@ -1,8 +1,8 @@
-from fastapi import fastAPI
+# package-qualified imports so module works when running as package
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from models.user import User
-from models.listing import Listing
+from app.models.user import User
+from app.models.listing import Listing
 # from models.order import Order
 
 

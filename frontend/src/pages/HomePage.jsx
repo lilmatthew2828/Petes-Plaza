@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/index.css'
@@ -23,6 +24,8 @@ const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', '
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('Home')
+  const [listings, setListings] = useState([])
+  const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
@@ -31,9 +34,9 @@ export default function HomePage() {
     ? `Showing listings for: ${selectedCategory}`
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
-  const filteredListings = selectedCategory 
-    ? SAMPLE_LISTINGS.filter(item => item.category === selectedCategory)
-    : SAMPLE_LISTINGS
+  const filteredListings = selectedCategory
+  ? listings.filter(item => item.category === selectedCategory)
+  : listings
 
   const handleTabClick = (tab) => {
     setActiveTab(tab)
@@ -51,7 +54,21 @@ export default function HomePage() {
   const handleSettings = () => {
     alert('Settings clicked! (Next step: theme/account settings.)')
   }
+  useEffect(() => {
+  const fetchListings = async () => {
+    try {
+      const res = await fetch('/api/listings')
+      const data = await res.json()
+      setListings(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
+  fetchListings()
+}, [])
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
