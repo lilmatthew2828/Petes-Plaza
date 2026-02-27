@@ -21,9 +21,10 @@ if not DATABASE_URL:
 
 engine = create_engine(DATABASE_URL, 
                        pool_pre_ping=True, # helps avoid the stale connections
-                       echo=True) # Create the SQLAlchemy engine with the database URL
+                       echo=True
+                       ) # Create the SQLAlchemy engine with the database URL
 
-SesionLocal = sessionmaker(
+SessionLocal = sessionmaker(
     autocommit=False, # we want to control when transactions are committed
     autoflush=False, # we want to control when changes are flushed to the database
     bind=engine # bind the session to our engine so it knows how to connect to the database
@@ -32,7 +33,7 @@ SesionLocal = sessionmaker(
 Base = declarative_base() # Base class for our ORM models, we will inherit from this in our models.py file to define our database tables as Python classes
 
 def get_db():
-    db = SesionLocal() # create a new database session
+    db = SessionLocal() # create a new database session
     try:
         yield db # yield the session to be used in our API endpoints
     finally:
