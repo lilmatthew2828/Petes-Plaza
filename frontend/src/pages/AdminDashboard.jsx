@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/admin.css'
 
+const PLACEHOLDER_IMAGE = '/assets/images/listing_placeholder.png'
+
 export default function AdminDashboard() {
-  const [metrics, setMetrics] = useState({ totalUsers: 0, totalListings: 0 })
+  const [metrics, setMetrics] = useState({ total_users: 0, total_listings: 0, active_listings: 0 }) // Metrics for dashboard summary
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -85,7 +87,7 @@ export default function AdminDashboard() {
                 src="/assets/images/icon.png"
                 alt="Pete's Plaza Logo"
                 className="header-image"
-                onError={(e) => e.target.style.display = 'none'}
+                onError={(e) => e.target.src = PLACEHOLDER_IMAGE}
               />
               <div className="create-title site-title">
                 Pete's Plaza
@@ -98,11 +100,15 @@ export default function AdminDashboard() {
       <section className="metrics">
         <div className="card">
           <h3>Total Users</h3>
-          <span>{metrics.totalUsers}</span>
+          <span>{metrics.total_users}</span>
         </div>
         <div className="card">
           <h3>Total Listings</h3>
-          <span>{metrics.totalListings}</span>
+          <span>{metrics.total_listings}</span>
+        </div>
+        <div className="card">
+          <h3>Active Listings</h3>
+          <span>{metrics.active_listings}</span>
         </div>
       </section>
 
@@ -115,7 +121,7 @@ export default function AdminDashboard() {
               <th>Title</th>
               <th>Price</th>
               <th>Status</th>
-              <th>Seller Email</th>
+              <th>User ID</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -126,7 +132,7 @@ export default function AdminDashboard() {
                 <td>{listing.title}</td>
                 <td>${Number(listing.price).toFixed(2)}</td>
                 <td>{listing.status}</td>
-                <td>{listing.seller_email}</td>
+                <td>{listing.seller_id}</td>
                 <td>
                   {listing.status !== 'sold' && (
                     <button onClick={() => handleMarkSold(listing.id)}>
@@ -136,6 +142,8 @@ export default function AdminDashboard() {
                   <button onClick={() => handleDelete(listing.id)}>
                     Delete
                   </button>
+                 { /*Future: Add Edit button here to open a modal for editing listing details -->*/}
+                  <button onClick={() => alert(`Viewing full details for listing ID: ${listing.id}`)}>View Full Listing</button>
                 </td>
               </tr>
             ))}

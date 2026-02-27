@@ -20,7 +20,10 @@ const PAGE_DESC_MAP = {
   'Contact Us': 'Contact/support section — add a form or email info here.',
 }
 
-const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', 'Furniture']
+const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', 'Furniture', 'Accessories', 'Other']
+const PLACEHOLDER_IMAGE = '/assets/images/listing_placeholder.png'
+
+const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('Home')
@@ -28,6 +31,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [error, setError] = useState(null)
 
   const pageTitle = selectedCategory || activeTab
   const pageDesc = selectedCategory 
@@ -35,40 +39,45 @@ export default function HomePage() {
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
   const filteredListings = selectedCategory
-  ? listings.filter(item => item.category === selectedCategory)
-  : listings
+    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory) // Filter listings by selected category
+    : listings
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab) => { // Handle Contact Us tab separately if needed
     setActiveTab(tab)
     setSelectedCategory(null)
   }
 
-  const handleCategoryClick = (cat) => {
+  const handleCategoryClick = (cat) => { // When a category is clicked, we want to show that category's listings and update the title/description
     setSelectedCategory(cat)
   }
 
-  const handleCreateListing = () => {
+  const handleCreateListing = () => { // Placeholder for create listing action
     alert('Create a Listing clicked! (Next step: add a form here.)')
   }
 
   const handleSettings = () => {
     alert('Settings clicked! (Next step: theme/account settings.)')
   }
-  useEffect(() => {
-  const fetchListings = async () => {
-    try {
-      const res = await fetch('/api/listings')
-      const data = await res.json()
-      setListings(data)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+  useEffect(() => { // Fetch listings from backend API
+    const fetchListings = async () => {
+      try {
+        setLoading(true) // Reset loading and error state before fetching
+        setError(null) // Clear previous errors
+        const res = await fetch('/api/admin/listings') // This endpoint should return a list of all listings for the homepage
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+        const data = await res.json()
+        setListings(data)
+      } catch (err) {
+        console.error('Fetch error:', err)
+        setError(`Failed to load listings: ${err.message}`)
+        setListings(SAMPLE_LISTINGS)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  fetchListings()
-}, [])
+    fetchListings()
+  }, [])
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
@@ -135,14 +144,20 @@ export default function HomePage() {
             <h1>{pageTitle}</h1>
             <p>{pageDesc}</p>
 
+            {error && <div style={{ color: 'red', marginBottom: '1rem' }}>⚠ {error} (showing sample data)</div>}
+            {loading && <p>Loading listings...</p>}
+
             <div className="cards">
-              {filteredListings.map(listing => (
-                <div key={listing.id} className="card">
-                  <img src={listing.image} alt={listing.title} className="img" onError={(e) => e.target.style.display = 'none'} />
-                  <h3>{listing.title}</h3>
-                  <p>${listing.price.toFixed(2)} • {listing.category}</p>
-                </div>
-              ))}
+              {filteredListings.map(listing => {
+                const category = getCategoryForListing(listing.id)
+                return (
+                  <div key={listing.id} className="card">
+                    <img src={listing.image || PLACEHOLDER_IMAGE} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
+                    <h3>{listing.title}</h3>
+                    <p>${Number(listing.price).toFixed(2)} • {category}</p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </main>
