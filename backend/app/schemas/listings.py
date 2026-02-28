@@ -1,12 +1,27 @@
-# LISTINGS VALIDATION
+# EMMANUELLA OBIDIKE
+# LISTINGS SCHEMA (VALIDATION)
 
-# fields expected:
-# - title (required)
-# - description (required)
-# - price (must be >= 0)
-# - category
-# - user_id
+# Used for input validation (checks data types automatically)
+from pydantic import BaseModel
 
-# validation rules:
-# - required fields check
-# - price cannot be negative
+# data required to create a listing
+class ListingCreate(BaseModel):
+
+    # title of listing
+    listing_title: str
+
+    # user id who created listing
+    user_id: int
+
+    # category name
+    category: str
+
+    # description of listing
+    listing_description: str
+
+    # price of item
+    price: float
+
+    
+
+    
