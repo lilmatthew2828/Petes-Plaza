@@ -1,14 +1,38 @@
+from fastapi import Body
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.admin import ListingModeration, AdminUserResponse
-from app.schemas.listing import ListingResponse
-from app.services.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
-from app.models.listing import Listing
+from app.schemas import ListingModeration, AdminUserResponse
+from app.schemas import ListingResponse
+from app.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
+from app.models import Listing
 
+# package-qualified imports so module works when running as package - Daye Karibi-Whyte
 # expose endpoints under /api/admin to match frontend expectations
+
 router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+# PATCH endpoint to update listing status (e.g., mark as sold)
+@router.patch("/listings/{listing_id}")
+def update_listing_status(listing_id: int, status: str = Body(...), db: Session = Depends(get_db)):
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    listing.status = status
+    db.commit()
+    db.refresh(listing)
+    return {"id": listing.id, "status": listing.status}
+
+# DELETE endpoint to delete a listing
+@router.delete("/listings/{listing_id}")
+def delete_listing(listing_id: int, db: Session = Depends(get_db)):
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    db.delete(listing)
+    db.commit()
+    return {"id": listing_id, "deleted": True}
 
 @router.get("/dashboard") # Endpoint to get admin dashboard metrics
 def get_admin_dashboard(db: Session = Depends(get_db)):

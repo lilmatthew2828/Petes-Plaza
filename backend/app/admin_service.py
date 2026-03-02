@@ -1,11 +1,11 @@
 # package-qualified imports so module works when running as package
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from app.models.user import User
-from app.models.listing import Listing
+from app.models import User
+from app.models import Listing
 # from models.order import Order
 
-
+# Admin service to handle admin-related operations like fetching dashboard metrics, managing listings, etc. - Daye Karibi-Whyte
 def moderate_listing(db: Session, listing_id: int, action: str):
     
     listing = db.query(Listing).filter(Listing.id == listing_id).first() #Grab the listing given its ID

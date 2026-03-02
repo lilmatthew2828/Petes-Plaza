@@ -5,37 +5,36 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
+import AdminDashboard from "./pages/AdminDashboard";
 import "./App.css";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <Navbar /> {/* Removed onOpenAuth handler to use standard links */}
+        <Navbar />
         <Routes>
-          {/* Public Routes without logging in */}
+          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Home Route - Must be logged in to access */}
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            } 
-          />
+          {/* Marketplace HomePage after login/register */}
+          <Route path="/homepage" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
-          {/* Redirect any unknown routes to Home */}
+          {/* Welcome screen with button to homepage */}
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+
+          {/* Admin dashboard route */}
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+
+          {/* Redirect unknown routes to Welcome */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
   );
 }
-
-export default App;
 // import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // import HomePage from './pages/HomePage'
 // import './App.css'
@@ -51,5 +50,7 @@ export default App;
 //     </BrowserRouter>
 //   )
 // }
+export default App;
 
-// export default App
+
+

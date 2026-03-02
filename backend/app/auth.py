@@ -2,10 +2,11 @@
 # for user registration, login, logout, and session management. 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
-
+from typing import Optional
+from app.schemas import AdminUserResponse
 from app.database import get_db
-from app.models import User
-from app.schemas import RegisterIn, LoginIn, UserOut
+from .models import User
+from .schemas import RegisterIn, LoginIn, UserOut
 from app.config import settings
 from app.services import (
     create_user,
@@ -17,10 +18,10 @@ from app.services import (
 )
 from fastapi.responses import JSONResponse
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | None:
+def get_current_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
     """
     Extract session token from cookie and return current user.
     Returns None if no valid session.
@@ -158,9 +159,18 @@ def logout(
 
 
 @router.get("/me", response_model=UserOut, status_code=200)
+
+
+@router.get("/me", response_model=AdminUserResponse, status_code=200)
 def get_me(current_user: User = Depends(require_login)):
     """
-    Get current authenticated user.
+    Get current authenticated user, including admin status.
     Returns 401 if not logged in.
     """
-    return current_user
+    return AdminUserResponse(
+        email=current_user.email,
+        username=current_user.username,
+        student_id=current_user.student_id,
+        created_at=current_user.created_at,
+        is_admin=current_user.is_admin,
+    )

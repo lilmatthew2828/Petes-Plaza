@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+from typing import Optional
 from app.db.session import get_db
 from app.services.auth_service import get_session_user
 from app.models.user import User
@@ -9,7 +10,7 @@ from backend.app.config import settings
 async def get_current_user(
     request: Request,
     db: Session = Depends(get_db),
-) -> User | None:
+) -> Optional[User]:
     """
     Extract session token from cookie and return current user.
     Returns None if no valid session.

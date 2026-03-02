@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import '../styles/index.css'
 
 const SAMPLE_LISTINGS = [
@@ -21,7 +22,7 @@ const PAGE_DESC_MAP = {
 }
 
 const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', 'Furniture', 'Accessories', 'Other']
-const PLACEHOLDER_IMAGE = '/assets/images/listing_placeholder.png'
+const PLACEHOLDER_IMAGE = '/assets/images/image.png';
 
 const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
 
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [error, setError] = useState(null)
+  const { user } = useAuth();
 
   const pageTitle = selectedCategory || activeTab
   const pageDesc = selectedCategory 
@@ -84,7 +86,7 @@ export default function HomePage() {
       <header className="topbar">
         <div className="top-center">
           <div className="site-header">
-            <img src="/assets/images/icon.png" alt="Pete's Plaza Logo" className="header-image" onError={(e) => e.target.style.display = 'none'} />
+            <img src="/assets/images/logo.png" alt="Pete's Plaza Logo" className="header-image" onError={(e) => e.target.style.display = 'none'} />
             <div className="create-title site-title">
               Pete's Plaza
             </div>
@@ -94,9 +96,11 @@ export default function HomePage() {
             <button className="pill" onClick={() => alert('Wishlist clicked!')}>Wishlist</button>
             <button className="pill" onClick={() => alert('Cart clicked!')}>Cart</button>
             <button className="pill" onClick={() => handleTabClick('Contact Us')}>Contact</button>
-            <Link to="/admin">
-              <button className="pill">Admin Dashboard</button>
-            </Link>
+            {user?.is_admin && (
+              <Link to="/admin">
+                <button className="pill">Admin Dashboard</button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -144,15 +148,17 @@ export default function HomePage() {
             <h1>{pageTitle}</h1>
             <p>{pageDesc}</p>
 
+
             {error && <div style={{ color: 'red', marginBottom: '1rem' }}>⚠ {error} (showing sample data)</div>}
             {loading && <p>Loading listings...</p>}
 
             <div className="cards">
               {filteredListings.map(listing => {
                 const category = getCategoryForListing(listing.id)
+                const imgSrc = listing.image && listing.image !== '' ? listing.image : PLACEHOLDER_IMAGE;
                 return (
                   <div key={listing.id} className="card">
-                    <img src={listing.image || PLACEHOLDER_IMAGE} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
+                    <img src={imgSrc} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
                     <h3>{listing.title}</h3>
                     <p>${Number(listing.price).toFixed(2)} • {category}</p>
                   </div>

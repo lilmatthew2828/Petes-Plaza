@@ -21,6 +21,11 @@ def hash_password(password: str) -> str:
     Returns:
         bcrypt hash
     """
+    # Ensure password is a string and truncate to 72 characters for bcrypt
+    if not isinstance(password, str):
+        password = str(password)
+    password = password[:72]
+    print("password length after truncation:", len(password.encode('utf-8')))  # Debug: print byte length of password
     return pwd_context.hash(password)
 
 

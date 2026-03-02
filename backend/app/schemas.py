@@ -2,6 +2,7 @@
 # Schemas for user registration, login, and responses using Pydantic
 # PYDANTIC is a data validation library that allows us to define data models with type annotations and validation rules. 
 # It is commonly used in FastAPI to define request and response schemas.
+from decimal import Decimal
 from pydantic import BaseModel, EmailStr, Field
 # Datetime is used to represent the created_at field in UserOut schema
 from datetime import datetime
@@ -113,3 +114,33 @@ class ErrorOut(BaseModel):
                 "detail": "Invalid credentials"
             }
         }
+        
+# ======= Daye Karibi-Whyte - Added admin and listing schemas for admin moderation endpoints =======
+class AdminUserResponse(UserOut):
+    is_admin: bool = Field(..., description="Whether user is admin")
+
+class ListingModeration(BaseModel):
+    action: str # approve | deny | archive | mark_sold
+
+class ListingCreate(BaseModel): # Define the schema for creating a new listing
+    title: str
+    description: Optional[str] = None
+    price: Decimal
+    pickup_location: str
+    image_url: Optional[str] = None
+    category: Optional[str] = "Other" # Default category if not provided
+
+
+class ListingResponse(BaseModel): # Define the schema for the response when fetching a listing
+    id: int
+    title: str
+    description: Optional[str]
+    price: Decimal
+    status: str
+    seller_id: int
+    image_url: Optional[str] = None
+    category: Optional[str] = None
+    
+    class Config:
+        orm_mode = True # This allows Pydantic to work with SQLAlchemy models and convert them to the response format correctly
+        from_attributes = True # This allows Pydantic to read data from SQLAlchemy model attributes when creating the response object

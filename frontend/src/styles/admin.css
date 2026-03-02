@@ -5,12 +5,18 @@
   margin-bottom: 30px;
 }
 
+/* use primary navy for metrics cards to match auth theme */
 .metrics .card {
-  background-color: #f4f4f4;
+  background-color: #003366;
+  color: #fff;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
   flex: 1;
+}
+
+.metrics .card h3 {
+  margin: 0 0 8px;
 }
 
 .listings-table {
@@ -37,13 +43,14 @@
   margin-right: 5px;
   padding: 5px 10px;
   cursor: pointer;
-  border: 1px solid #d1d5db;
+  border: 1px solid #003366;
   border-radius: 4px;
-  background: #fff;
+  background: #003366;
+  color: #fff;
 }
 
 .listings-table button:hover {
-  background: #f9fafb;
+  background: #002244;
 }
 
 .error {

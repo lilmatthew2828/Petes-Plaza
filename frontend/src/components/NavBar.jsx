@@ -31,9 +31,9 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <a href="/admin" className="navbar-link">
+              <button className="navbar-link" onClick={() => window.location.href = '/admin'}>
                 Admin Login
-              </a>
+              </button>
             </>
           )}
         </div>

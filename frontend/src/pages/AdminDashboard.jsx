@@ -40,12 +40,13 @@ export default function AdminDashboard() {
 
   const handleMarkSold = async (listingId) => {
     try {
-      const res = await fetch(`/api/admin/listings/${listingId}`, {
-        method: 'PATCH',
+      // Use moderation endpoint for status changes
+      const res = await fetch(`/api/admin/listings/${listingId}/moderate`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'sold' })
+        body: JSON.stringify({ action: 'sold' })
       })
 
       if (!res.ok) throw new Error('Failed to update listing')
@@ -84,7 +85,7 @@ export default function AdminDashboard() {
           <Link to="/" style={{ textDecoration: 'none' }}>
             <div className="site-header">
               <img
-                src="/assets/images/icon.png"
+                src="/assets/images/logo.png"
                 alt="Pete's Plaza Logo"
                 className="header-image"
                 onError={(e) => e.target.src = PLACEHOLDER_IMAGE}

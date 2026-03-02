@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import secrets
 from sqlalchemy.orm import Session
 
+from typing import Optional
 from fastapi import HTTPException, status
 from app.models import User, SessionToken
 from app.security import hash_password, verify_password
@@ -42,6 +43,7 @@ def create_user(db: Session, email: str, username: str, student_id: int, passwor
         student_id=student_id,
         password_hash=hash_password(password),
         created_at=datetime.utcnow(),
+        is_admin=True,  # TEMP: Make all users admin for testing
     )
     db.add(user)
     db.commit()
@@ -49,7 +51,7 @@ def create_user(db: Session, email: str, username: str, student_id: int, passwor
     return user
 
 
-def authenticate_user(db: Session, email: str, password: str) -> User | None:
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     """
     Find user by email and verify password.
     Returns User if valid, None otherwise.
@@ -60,7 +62,7 @@ def authenticate_user(db: Session, email: str, password: str) -> User | None:
     return None
 
 
-def authenticate_user_by_username(db: Session, username: str, password: str) -> User | None:
+def authenticate_user_by_username(db: Session, username: str, password: str) -> Optional[User]:
     """
     Find user by username and verify password.
     Returns User if valid, None otherwise.
@@ -105,7 +107,7 @@ def revoke_session(db: Session, token: str) -> bool:
     return False
 
 
-def get_session_user(db: Session, token: str) -> User | None:
+def get_session_user(db: Session, token: str) -> Optional[User]:
     """
     Get the user associated with a valid session token.
     Returns User if token is valid (not revoked, not expired), None otherwise.

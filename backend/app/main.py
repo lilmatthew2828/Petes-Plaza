@@ -5,7 +5,7 @@ from app.routes import admin
 
 from app.config import settings
 from app.database import engine
-from app.models import Base
+from app.database import Base
 from app.auth import router as auth_router
 
 # Create tables on startup
