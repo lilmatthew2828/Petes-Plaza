@@ -172,5 +172,5 @@ def get_me(current_user: User = Depends(require_login)):
         username=current_user.username,
         student_id=current_user.student_id,
         created_at=current_user.created_at,
-        is_admin=current_user.is_admin,
+        is_admin=bool(getattr(current_user, 'is_admin', False)),
     )

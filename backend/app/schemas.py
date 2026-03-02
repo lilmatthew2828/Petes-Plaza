@@ -117,7 +117,7 @@ class ErrorOut(BaseModel):
         
 # ======= Daye Karibi-Whyte - Added admin and listing schemas for admin moderation endpoints =======
 class AdminUserResponse(UserOut):
-    is_admin: bool = Field(..., description="Whether user is admin")
+    is_admin: bool = Field(False, description="Whether user is admin")
 
 class ListingModeration(BaseModel):
     action: str # approve | deny | archive | mark_sold

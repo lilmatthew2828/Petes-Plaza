@@ -43,7 +43,7 @@ def create_user(db: Session, email: str, username: str, student_id: int, passwor
         student_id=student_id,
         password_hash=hash_password(password),
         created_at=datetime.utcnow(),
-        is_admin=True,  # TEMP: Make all users admin for testing
+        is_admin=False,
     )
     db.add(user)
     db.commit()
