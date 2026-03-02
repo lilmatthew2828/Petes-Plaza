@@ -1,12 +1,15 @@
+from datetime import datetime, timedelta
+
 from fastapi import Body
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.database import get_db
 from app.schemas import ListingModeration, AdminUserResponse
 from app.schemas import ListingResponse
 from app.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
-from app.models import Listing
+from app.models import Listing, User
 
 # package-qualified imports so module works when running as package - Daye Karibi-Whyte
 # expose endpoints under /api/admin to match frontend expectations
@@ -55,3 +58,16 @@ def moderate_listing_endpoint(listing_id: int, moderation: ListingModeration, db
 def list_listings(db: Session = Depends(get_db)):
     listings = db.query(Listing).all()
     return listings
+
+# Endpoint to get user growth for last 30 days
+@router.get("/user_growth")
+def user_growth(db: Session = Depends(get_db)):
+    today = datetime.now()
+    start_date = today - timedelta(days=30)
+    # Query users created in last 30 days, group by day
+    results = db.query(func.date(User.created_at), func.count(User.id)).filter(User.created_at >= start_date.isoformat()).group_by(func.date(User.created_at)).all()
+    # Format for frontend chart
+    growth = []
+    for day, count in results:
+        growth.append({"date": str(day), "count": count})
+    return growth
