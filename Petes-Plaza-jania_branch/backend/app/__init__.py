@@ -1,1 +1,0 @@
-"""Petes Plaza API."""

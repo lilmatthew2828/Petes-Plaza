@@ -47,6 +47,7 @@ engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,  # helps avoid the stale connections
     echo=True,
+    pool_recycle=3600,  # recycle connections after 1 hour to prevent timeouts
 )
 
 SessionLocal = sessionmaker(
