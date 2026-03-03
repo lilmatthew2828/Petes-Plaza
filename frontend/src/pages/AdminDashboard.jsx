@@ -33,9 +33,9 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const metricsRes = await fetch('/api/admin/metrics');
-        const listingsRes = await fetch('/api/admin/listings');
-        const userGrowthRes = await fetch('/api/admin/user_growth');
+        const metricsRes = await fetch('/api/admin/metrics'); // This endpoint should return an object like { total_users: number, total_listings: number, active_listings: number } for the top metrics cards
+        const listingsRes = await fetch('/api/admin/listings'); // This endpoint should return a list of all listings with their status for the admin table. This routes to the same endpoint as the homepage. The difference is that the homepage only shows active listings, while this endpoint returns all listings for moderation purposes.
+        const userGrowthRes = await fetch('/api/admin/user_growth'); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for user signups over the last 30 days
         if (!metricsRes.ok || !listingsRes.ok) {
           throw new Error('Failed to fetch admin data');
         }
@@ -172,8 +172,8 @@ export default function AdminDashboard() {
               {listings.map((listing, idx) => (
                 <tr key={idx}>
                   <td>{listing.title}</td>
-                  <td>{listing.email || listing.seller_email || ''}</td>
-                  <td>{listing.category || listing.description || ''}</td>
+                  <td>{listing.email || listing.seller_email || ''}</td> {/* Show email if available, fallback to seller_email for older listings, otherwise empty string */}
+                  <td>{listing.category|| ''}</td> {/* Show category if available*/}
                   <td>${listing.price}</td>
                   <td style={{ color: listing.status === 'pending' ? '#fbbf24' : listing.status === 'active' ? '#10b981' : listing.status === 'sold' ? '#2724c9' : '#6b7280', fontFamily: 'Inter, sans-serif'}}>{listing.status}</td>
                   <td>

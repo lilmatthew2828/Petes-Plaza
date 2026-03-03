@@ -53,13 +53,14 @@ class Listing(Base):
     description = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     status = Column(String, default="available") # available or sold
-    seller_id = Column(Integer, ForeignKey("users.id"), nullable=False) # foreign key to users table
+    seller_email = Column(String, ForeignKey("users.email"), nullable=False) # foreign key to users table
     image_key = Column(String, nullable=True) # S3 key for the listing image
     # use callables so defaults are evaluated at insert/update time
     created_at = Column(String, default=lambda: datetime.now().isoformat())
     updated_at = Column(String, default=lambda: datetime.now().isoformat(), onupdate=lambda: datetime.now().isoformat())
+    category = Column(String, nullable=True) # New category field for listing categorization
 
-    seller = relationship("User", back_populates="listings")    
+    seller = relationship("User", back_populates="listings") # Establish relationship to User model, allowing access to seller info from listing
     
     def __repr__(self):
-        return f"<Listing(title={self.title}, price={self.price}, status={self.status})>"
+        return f"<Listing(title={self.title}, price={self.price}, status={self.status}, category={self.category}, created_at={self.created_at}, updated_at={self.updated_at}, description={self.description[:50]}...), seller_email={self.seller_email}>" # Updated repr to include category and seller_email for easier debugging and visualization of listing details

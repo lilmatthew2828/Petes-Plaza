@@ -65,7 +65,7 @@ export default function HomePage() {
       try {
         setLoading(true) // Reset loading and error state before fetching
         setError(null) // Clear previous errors
-        const res = await fetch('/api/admin/listings') // This endpoint should return a list of all listings for the homepage
+        const res = await fetch('/api/admin/listings') // This endpoint should return a list of all listings for the homepage. The backend file referenced is admin.js because the /api/admin/listings endpoint returns all listings regardless of status, while the homepage only shows active listings. The filtering for active listings is done on the frontend by checking the listing.status field.
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
         const data = await res.json()
         setListings(data)

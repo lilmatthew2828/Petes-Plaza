@@ -127,6 +127,7 @@ class ListingCreate(BaseModel): # Define the schema for creating a new listing
     description: Optional[str] = None
     price: Decimal
     pickup_location: str
+    seller_email: str
     image_url: Optional[str] = None
     category: Optional[str] = "Other" # Default category if not provided
 
@@ -137,7 +138,7 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     description: Optional[str]
     price: Decimal
     status: str
-    seller_id: int
+    seller_email: str
     image_url: Optional[str] = None
     category: Optional[str] = None
     

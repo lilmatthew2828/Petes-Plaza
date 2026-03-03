@@ -56,7 +56,7 @@ def moderate_listing_endpoint(listing_id: int, moderation: ListingModeration, db
 
 @router.get("/listings", response_model=List[ListingResponse])
 def list_listings(db: Session = Depends(get_db)):
-    listings = db.query(Listing).all()
+    listings = db.query(Listing).all() 
     return listings
 
 # Endpoint to get user growth for last 30 days
