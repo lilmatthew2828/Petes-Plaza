@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2'; // Import chart components from react-chartjs-2 wrapper for Chart.js, This allows us to easily use Chart.js in React.
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,10 +11,10 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from 'chart.js'; // Import the necessary Chart.js components, This is required for Chart.js v4 tree shaking which is a graph optimization technique.
 import '../styles/admin.css';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend); // Register necessary Chart.js components
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({ total_users: 0, total_listings: 0, active_listings: 0, pending_review: 0 });
@@ -25,11 +25,11 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Sidebar toggle handlers
-  const handleSidebarToggle = () => setSidebarOpen((open) => !open);
-  const handleSidebarMouseEnter = () => setSidebarOpen(true);
-  const handleSidebarMouseLeave = () => setSidebarOpen(false);
+  const handleSidebarToggle = () => setSidebarOpen((open) => !open); // Toggle sidebar open state when the toggle icon is clicked
+  const handleSidebarMouseEnter = () => setSidebarOpen(true); // Open sidebar when mouse enters the toggle area
+  const handleSidebarMouseLeave = () => setSidebarOpen(false); // Close sidebar when mouse leaves the toggle area
 
-  useEffect(() => {
+  useEffect(() => { // Fetch admin metrics and listings data from backend API when component mounts
     const fetchData = async () => {
       try {
         setLoading(true);
