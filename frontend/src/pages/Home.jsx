@@ -16,6 +16,9 @@ export default function Home() {
               <p><strong>Student ID:</strong> {user.student_id}</p>
               <p><strong>Registered:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
             </div>
+            <button className="pill" style={{marginTop: '2rem'}} onClick={() => window.location.href = '/homepage'}>
+              Go to Homepage
+            </button>
           </div>
         ) : (
           <p>Please log in to get started.</p>

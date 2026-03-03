@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+// frontend runs through Vite dev server; use proxy prefix
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 export async function apiCall(endpoint, options = {}) {
   const {
@@ -9,10 +10,18 @@ export async function apiCall(endpoint, options = {}) {
     ...rest
   } = options;
 
-  const normalized =
-    endpoint.startsWith("http") ? endpoint :
-    endpoint.startsWith("/") ? `${API_URL}${endpoint}` :
-    `${API_URL}/${endpoint}`;
+  // if endpoint already absolute return as-is
+  // Avoid double /api prefix if endpoint already starts with /api
+  let normalized;
+  if (endpoint.startsWith("http")) {
+    normalized = endpoint;
+  } else if (API_URL === "/api" && endpoint.startsWith("/api")) {
+    normalized = endpoint; // already proxied
+  } else if (endpoint.startsWith("/")) {
+    normalized = `${API_URL}${endpoint}`;
+  } else {
+    normalized = `${API_URL}/${endpoint}`;
+  }
 
   const config = {
     method,

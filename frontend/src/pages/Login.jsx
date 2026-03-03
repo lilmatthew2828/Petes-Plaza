@@ -4,8 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
 
 // Assets
-import peteLogo from "../assets/logo.png";
-import hamptonCampus from "../assets/HamptonWater.png";
+import peteLogo from "/assets/images/logo.png";
+import hamptonCampus from "/assets/images/HamptonWater.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function Login() {
     try {
       setLoading(true);
       await login(formData);
-      navigate("/");
+      navigate("/homepage");
     } catch (err) {
       // Error handled by AuthContext
     } finally {

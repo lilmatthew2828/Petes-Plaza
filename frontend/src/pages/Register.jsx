@@ -4,8 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
 
 // Assets imported from your src/assets folder
-import peteLogo from "../assets/logo.png";
-import hamptonCampus from "../assets/HamptonWater.png";
+import peteLogo from "/assets/images/logo.png";
+import hamptonCampus from "/assets/images/HamptonWater.png";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Register() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setValidationError(null);
+    setValidationError(null); 
     clearError();
 
     // Validation logic
@@ -56,7 +56,7 @@ export default function Register() {
     try {
       setLoading(true);
       await registerUser(formData);
-      navigate("/");
+      navigate("/homepage");
     } catch (err) {
       // Error handled by AuthContext
     } finally {

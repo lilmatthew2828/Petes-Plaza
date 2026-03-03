@@ -4,17 +4,17 @@
 from fastapi import APIRouter
 
 # import our schema (validation)
-from app.schemas.listings import ListingCreate
+from app.listing_schemas.listings import ListingCreate
 
 # import logic functions
-from app.services.listings import (
+from app.listing_services.listings import (
     get_all_listings,
     get_single_listing,
     create_listing
 )
 
 # create router object
-listings_router = APIRouter()
+listings_router = APIRouter(prefix="/api", tags=["listings"])
 
 # Get listings (shows all listings)
 @listings_router.get("/listings")

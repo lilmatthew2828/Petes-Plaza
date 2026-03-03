@@ -9,18 +9,28 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/listings")
+    fetch("http://localhost:8000/api/listings")
       .then((res) => res.json())
-      .then((data) => setListings(data))
+      .then((data) => setListings(data.sort((a, b) => b.id - a.id)))
       .catch((err) => console.error("Error loading listings:", err));
   }, []);
 
   //Create listing
   const createListing = async () => {
+
+    if (!listing_title || !price || !category || !listing_description) {
+      alert("All fields are required.");
+      return;
+    }
+
+    if (Number(price) < 0) {
+      alert("Price must be 0 or higher.");
+      return;
+    }
+
     
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/listings/new",
+      const response = await fetch("http://localhost:8000/api/listings/new",
         {
           method: "POST",
           headers: {
@@ -52,8 +62,13 @@ export default function Listings() {
  
   return (
     <div style={{ padding: "60px", maxWidth: "900px", margin: "0 auto" }}>
+
+      <Link to="/homepage" style={{ fontSize: "18px", display: "inline-block", marginBottom: "20px" }}>
+      ← Back to Home
+      </Link>
+
       <h1 style={{ fontSize: "42px", marginBottom: "25px" }}>
-        Pete's Plaza Listings
+        Pete's Plaza Listings Details
       </h1>
 
       {/* FORM */}

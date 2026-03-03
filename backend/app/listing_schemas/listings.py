@@ -4,6 +4,7 @@
 # Used for input validation (checks data types automatically)
 from pydantic import BaseModel
 
+
 # data required to create a listing
 class ListingCreate(BaseModel):
 
@@ -22,6 +23,7 @@ class ListingCreate(BaseModel):
     # price of item
     price: float
 
-    
+
+
 
     

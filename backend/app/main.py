@@ -1,26 +1,44 @@
-#EMMANUELLA OBIDIKE
-# MAIN FILE
-# This starts our FastAPI backend
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# import listings routes
+from app.routes import admin
 from app.routes.listings import listings_router
 
+from app.config import settings
+from app.database import engine
+from app.database import Base
+from app.auth import router as auth_router
 
-# create the main app
-app = FastAPI()
+# Create tables on startup
+Base.metadata.create_all(bind=engine)
 
+# Create FastAPI app
+app = FastAPI(
+    title="Petes Plaza",
+    version="0.1.0",
+    debug=settings.debug,
+)
 
-# allow React frontend to talk to backend
+# Add CORS middleware
+# Will change in production to only allow the frontend origin
+# allow the origin that your Vite server is running on
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # later replace with frontend URL
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"] ,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# connect listings routes to the app
+# Include routers
+app.include_router(auth_router)
+app.include_router(admin.router)
 app.include_router(listings_router)
+
+@app.get("/")
+def root():
+    return {"message": "Petes Plaza API"}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
