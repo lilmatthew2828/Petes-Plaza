@@ -25,7 +25,7 @@ MarkupSafe
 mdurl
 passlib
 psycopg
-psycopg-binary=
+psycopg-binary
 psycopg2-binary
 pycparser
 pydantic
