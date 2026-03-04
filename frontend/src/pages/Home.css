@@ -36,3 +36,18 @@
 .user-info strong {
   color: #333;
 }
+
+/* Listing action row (Edit/Delete) */
+.listing-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 2;          /* keep above overlapping elements */
+  pointer-events: auto;
+}
+
+.listing-actions button {
+  cursor: pointer;
+  pointer-events: auto; /* ensure clicks are accepted */
+}

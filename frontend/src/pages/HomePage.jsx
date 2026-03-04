@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/index.css'
 
@@ -24,9 +24,8 @@ const PAGE_DESC_MAP = {
 const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', 'Furniture', 'Accessories', 'Other']
 const PLACEHOLDER_IMAGE = '/assets/images/image.png';
 
-const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
-
 export default function HomePage() {
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState('Home')
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -41,7 +40,7 @@ export default function HomePage() {
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
   const filteredListings = selectedCategory
-    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory) // Filter listings by selected category
+    ? listings.filter(item => (item.category || 'Other') === selectedCategory) // Filter listings by selected category from API/DB
     : listings
 
   const handleTabClick = (tab) => { // Handle Contact Us tab separately if needed
@@ -79,7 +78,7 @@ export default function HomePage() {
     }
 
     fetchListings()
-  }, [])
+  }, [location.key, location.state?.refreshListings])
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
@@ -154,13 +153,18 @@ export default function HomePage() {
 
             <div className="cards">
               {filteredListings.map(listing => {
-                const category = getCategoryForListing(listing.id)
+                const category = listing.category || 'Other'
                 const imgSrc = listing.image && listing.image !== '' ? listing.image : PLACEHOLDER_IMAGE;
                 return (
                   <div key={listing.id} className="card">
                     <img src={imgSrc} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
                     <h3>{listing.title}</h3>
                     <p>${Number(listing.price).toFixed(2)} • {category}</p>
+                    <div className="listing-actions">
+                      <Link to={`/listings/${listing.id}/edit`}>
+                        <button className="pill">Edit Listing</button>
+                      </Link>
+                    </div>
                   </div>
                 )
               })}
