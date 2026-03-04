@@ -1,19 +1,21 @@
 # package-qualified imports so module works when running as package
+from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models import User
 from app.models import Listing
+from app.models import SessionToken
+from datetime import datetime, timedelta
 # from models.order import Order
 
 # Admin service to handle admin-related operations like fetching dashboard metrics, managing listings, etc. - Daye Karibi-Whyte
 def moderate_listing(db: Session, listing_id: int, action: str):
-    
-    listing = db.query(Listing).filter(Listing.id == listing_id).first() #Grab the listing given its ID
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
-        return {"error": "Listing not found"} # If the listing doesn't exist, return an error message
-    
+        return {"error": "Listing not found"}  # return dict 
+    #All the possible actions for moderating a listing except for deletion.
     if action == "approve":
-        listing.status = "active" # If the action is to approve, set the listing status to active
+        listing.status = "active"
     elif action == "deny":
         listing.status = "denied"
     elif action == "archive":
@@ -21,10 +23,17 @@ def moderate_listing(db: Session, listing_id: int, action: str):
     elif action == "mark_sold":
         listing.status = "sold"
     else:
-        return {"error": "Invalid action"} # If the action is not valid, return an error message
-    
-    db.commit() # Commit the changes to the database
-    return listing # Return the updated listing object
+        return {"error": "Invalid action"}  # return dict 
+
+    db.commit()
+    db.refresh(listing)
+
+    # return a dict with the listing id, title, and new status for frontend to display in moderation queue
+    return {
+        "id": listing.id,
+        "title": listing.title,
+        "status": listing.status
+    }
 
 def suspend_user(db: Session, user_id: int):
     user = db.query(User).filter(User.id == user_id).first() #Grab the user given their ID

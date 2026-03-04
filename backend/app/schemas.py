@@ -140,6 +140,7 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     status: str
     seller_email: str
     image_url: Optional[str] = None
+    created_at: datetime
     category: Optional[str] = None
     
     class Config:

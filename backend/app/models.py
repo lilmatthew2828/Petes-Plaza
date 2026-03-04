@@ -52,7 +52,7 @@ class Listing(Base):
     title = Column(String, index=True, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Float, nullable=False)
-    status = Column(String, default="available") # available or sold
+    status = Column(String, default="draft") # draft for the default
     seller_email = Column(String, ForeignKey("users.email"), nullable=False) # foreign key to users table
     image_key = Column(String, nullable=True) # S3 key for the listing image
     # use callables so defaults are evaluated at insert/update time

@@ -9,7 +9,7 @@ from app.database import get_db
 from app.schemas import ListingModeration, AdminUserResponse
 from app.schemas import ListingResponse
 from app.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
-from app.models import Listing, User
+from app.models import Listing, User, SessionToken
 
 # package-qualified imports so module works when running as package - Daye Karibi-Whyte
 # expose endpoints under /api/admin to match frontend expectations
@@ -31,11 +31,19 @@ def update_listing_status(listing_id: int, status: str = Body(...), db: Session 
 @router.delete("/listings/{listing_id}")
 def delete_listing(listing_id: int, db: Session = Depends(get_db)):
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
-    db.delete(listing)
+
+    listing.status = "deleted"
     db.commit()
-    return {"id": listing_id, "deleted": True}
+    db.refresh(listing)
+
+    return {
+        "id": listing.id,
+        "status": listing.status,
+        "message": "Listing successfully deleted. It will no longer appear publicly."
+    }
 
 @router.get("/dashboard") # Endpoint to get admin dashboard metrics
 def get_admin_dashboard(db: Session = Depends(get_db)):
@@ -56,7 +64,7 @@ def moderate_listing_endpoint(listing_id: int, moderation: ListingModeration, db
 
 @router.get("/listings", response_model=List[ListingResponse])
 def list_listings(db: Session = Depends(get_db)):
-    listings = db.query(Listing).all() 
+    listings = db.query(Listing).order_by(Listing.created_at.desc()).all() # Order by active listings first, then by most recent
     return listings
 
 # Endpoint to get user growth for last 30 days
@@ -65,9 +73,29 @@ def user_growth(db: Session = Depends(get_db)):
     today = datetime.now()
     start_date = today - timedelta(days=30)
     # Query users created in last 30 days, group by day
-    results = db.query(func.date(User.created_at), func.count(User.id)).filter(User.created_at >= start_date.isoformat()).group_by(func.date(User.created_at)).all()
+    results = db.query(func.date(User.created_at), func.count(User.id)).filter(User.created_at >= start_date).group_by(func.date(User.created_at)).all()
     # Format for frontend chart
     growth = []
     for day, count in results:
         growth.append({"date": str(day), "count": count})
     return growth
+
+@router.get("/active_users")
+def active_users(db: Session = Depends(get_db)):
+    today = datetime.now()
+    start_date = today - timedelta(days=30)
+
+    # Query unique active users per day
+    results = (
+        db.query(
+            func.date(SessionToken.created_at),
+            func.count(func.distinct(SessionToken.user_id))
+        )
+        .filter(SessionToken.created_at >= start_date)
+        .group_by(func.date(SessionToken.created_at))
+        .all()
+    )
+
+    # Format for frontend
+    active_users_data = [{"date": str(day), "count": count} for day, count in results]
+    return active_users_data
