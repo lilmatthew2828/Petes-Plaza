@@ -75,7 +75,7 @@ export default function AdminDashboard() {
         showMessage("Listing successfully denied. It will not be displayed on the home page.")
       } else if (action === "mark_sold") {
         showMessage("Listing successfully marked as sold.")
-      } else if (action === "archive") { 
+      } else if (action === "archive") {
         showMessage("Listing successfully archived. It will be removed from the homepage but still visible in the admin panel.")
       }
 
@@ -254,18 +254,15 @@ export default function AdminDashboard() {
       },
     },
   };
-  const salesData = {
-    labels: ['Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon'],
-    datasets: [
-      {
-        label: 'Sales',
-        data: [100, 150, 180, 160, 200, 239, 320],
-        backgroundColor: '#fbbf24',
-        borderColor: '#fbbf24',
-        fill: false,
-      },
-    ],
-  };
+  const listingStatuses = [
+    { key: 'active', label: 'Active Listings' },
+    { key: 'pending', label: 'Pending Listings' },
+    { key: 'denied', label: 'Denied Listings' },
+    { key: 'archived', label: 'Archived Listings' },
+    { key: 'deleted', label: 'Deleted Listings' },
+    { key: 'sold', label: 'Sold Listings' },
+  ];
+
 
   if (loading) return <div className="page"><p>Loading...</p></div>;
   if (error) return <div className="error">Error: {error}</div>;
@@ -283,6 +280,7 @@ export default function AdminDashboard() {
           <span style={{ fontSize: 28, fontWeight: 700 }}>☰</span>
         </div>
       </div>
+
       <div
         style={{ position: 'absolute', left: 0, top: 0, height: '100%', zIndex: 100 }}
         onMouseEnter={handleSidebarMouseEnter}
@@ -290,19 +288,17 @@ export default function AdminDashboard() {
       >
         <AdminSidebar active="dashboard" open={sidebarOpen} />
       </div>
+
       <div className="admin-main" style={{ flex: 1, padding: '32px 40px' }}>
+        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h2 style={{ fontWeight: 800, fontSize: '2.2rem', color: '#1e293b', fontFamily: 'Inter, sans-serif', letterSpacing: '-1px', marginLeft: 60 }}>Admin Dashboard</h2>
           <div style={{ borderRadius: '50%', background: '#f3f4f6', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontSize: 24, color: '#888' }}>👤</span>
           </div>
         </div>
-        {/* Back to Homepage button at bottom right */}
-        <div style={{ position: 'fixed', bottom: 32, right: 48, zIndex: 50 }}>
-          <button style={{ padding: '12px 24px', fontWeight: 700, fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(37,99,235,0.12)', cursor: 'pointer' }} onClick={() => window.location.href = '/homepage'}>
-            Back to Homepage
-          </button>
-        </div>
+
+        {/* Metrics */}
         <div className="metrics" style={{ marginBottom: 32 }}>
           <div className="card">
             <h3>Total Users</h3>
@@ -318,115 +314,104 @@ export default function AdminDashboard() {
             <span style={{ display: 'block', marginTop: 8, color: '#2563eb', fontSize: 14, cursor: 'pointer' }}>View All &gt;</span>
           </div>
         </div>
+
+        {/* Charts */}
         <div style={{ display: 'flex', gap: 24, marginBottom: 32 }}>
           <div style={{ flex: 1, background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
             <h4 style={{ marginBottom: 16, fontWeight: 700, fontSize: '1.2rem', color: '#1e293b', fontFamily: 'Inter, sans-serif' }}>User Growth (Last 30 Days)</h4>
-            <div
-              style={{
-                flex: 1,
-                background: '#fff',
-                borderRadius: 12,
-                padding: 24,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                minHeight: 250,   // fixed minimum height
-                maxHeight: 300,   // optional maximum height
-              }}
-            >
-              <Line
-                data={userGrowthChartData}
-                options={{
-                  ...userGrowthChartOptions,
-                  responsive: true,
-                  maintainAspectRatio: false, // safe now because parent has fixed height
-                }}
-              />
+            <div style={{ flex: 1, minHeight: 250, maxHeight: 300 }}>
+              <Line data={userGrowthChartData} options={{ ...userGrowthChartOptions, maintainAspectRatio: false }} />
             </div>
           </div>
           <div style={{ flex: 1, background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-            <h4 style={{ marginBottom: 16, fontWeight: 700, fontSize: '1.2rem', color: '#1e293b', fontFamily: 'Inter, sans-serif' }}>
-              Daily Active Users (Last 30 Days)
-            </h4>
-            <div
-              style={{
-                flex: 1,
-                background: '#fff',
-                borderRadius: 12,
-                padding: 24,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                minHeight: 250,
-                maxHeight: 300,
-              }}
-            >
-              <Line
-                data={activeUsersChartData}
-                options={{
-                  ...activeUsersChartOptions,
-                  responsive: true,
-                  maintainAspectRatio: false,
-                }}
-              />
+            <h4 style={{ marginBottom: 16, fontWeight: 700, fontSize: '1.2rem', color: '#1e293b', fontFamily: 'Inter, sans-serif' }}>Daily Active Users (Last 30 Days)</h4>
+            <div style={{ flex: 1, minHeight: 250, maxHeight: 300 }}>
+              <Line data={activeUsersChartData} options={{ ...activeUsersChartOptions, maintainAspectRatio: false }} />
             </div>
           </div>
         </div>
-        {message && (
-          <div style={{ marginBottom: 16, color: '#2563eb', fontWeight: 600 }}>
-            {message}
-          </div>
-        )}
-        <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-          <h4 style={{ marginBottom: 16, fontWeight: 700, fontFamily: 'Inter, sans-serif', fontSize: '1.2rem', color: '#1e293b' }}>Listings</h4>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Listing Date</th>
-                <th>Email</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Listing Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {listings.map((listing, idx) => (
-                <tr key={idx}>
-                  <td>{listing.title}</td>
-                  {/* Format created_at date to MM/DD/YYYY format for display in the table. Also make sure its in EST time instead of whatever timezone its in.*/}
-                  <td>{new Date(listing.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}</td>
-                  <td>{listing.email || listing.seller_email || ''}</td> {/* Show email if available, fallback to seller_email for older listings, otherwise empty string */}
-                  <td>{listing.category || ''}</td> {/* Show category if available*/}
-                  <td>${parseFloat(listing.price).toFixed(2)}</td> {/* Format price with dollar sign  and have two leading zeros after the decimal point if not already present*/}
-                  <td style={{ color: listing.status === 'pending' ? '#fbbf24' : listing.status === 'active' ? '#10b981' : listing.status === 'sold' ? '#2724c9' : listing.status === 'deleted' ? '#8f0e0e' : listing.status === 'denied' ? '#c54e23' : '#000000', fontFamily: 'Inter, sans-serif' }}>{listing.status}</td>
-                  <td>
-                    {listing.status === 'pending' || listing.status === 'review' ? (
-                      <>
-                        <button style={{ marginRight: 6, backgroundColor: '#38b169', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleModerate(listing.id, 'approve')}>Accept</button> {/* Approve Button should be green and more prominent than the archive button since accepting a listing is a more positive action than archiving. Archive button is going to be yellow. */}
-                        <button style={{ marginRight: 6, backgroundColor: '#f56565', color: '#1e293b', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleModerate(listing.id, 'deny')}>Deny</button> {/* Deny Button should be a simple text button since denying a listing is a softer action than deleting. Delete button is going to be red and more prominent than the deny button since deleting is a more severe action than denying. */}
-                      </>
-                    ) : null}
-                    {listing.status === 'active' ? (
-                      <><><button style={{ marginRight: 6, backgroundColor: '#e53e3e', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleDelete(listing.id)}>Delete</button>
-                        <button style={{
-                          marginRight: 6,
-                          backgroundColor: '#f1f5f9', // Light gray 
-                          color: '#475569',           // Dark slate text
-                          border: '1px solid #cbd5e1',
-                          borderRadius: 4,
-                          padding: '6px 12px',
-                          cursor: 'pointer'
-                        }} onClick={() => handleModerate(listing.id, 'archive')}>
-                          Archive</button></>
-                        <button style={{ marginRight: 6, backgroundColor: '#38a169', color: '#1e293b', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleModerate(listing.id, 'mark_sold')}>Mark Sold</button></>) : null} {/* Delete Button should be red and more prominent than the archive button since archiving is a softer action than deleting. Archive button is going to be yellow. */}
-                    {/*There should be another button that allows you to view the full listing details in a modal or separate page. This is important for the admin to be able to see the full listing information, description, and image before making a decision to approve or deny. The button can be a simple "View Full Lisiting" button that opens a modal with the listing details.*/}
-                    {listing.status == 'denied' ? (
-                      <button style={{ marginRight: 6, backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleModerate(listing.id, 'approve')}>Reactivate</button>
-                    ) : null}
-                    <button style={{ marginRight: 6, backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleViewDetails(listing.id)}>View Full Listing</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {message && <div style={{ marginBottom: 16, color: '#2563eb', fontWeight: 600 }}>{message}</div>}
+
+        {/* Listings Tables by Status */}
+        {['active', 'pending', 'denied', 'archived', 'deleted', 'sold'].map((status, key) => {
+          const statusLabels = { // dictionary to map the listing status to a human readable version of the status.
+            active: 'Active Listings',
+            pending: 'Pending Listings',
+            denied: 'Denied Listings',
+            archived: 'Archived Listings',
+            deleted: 'Deleted Listings',
+            sold: 'Sold Listings'
+          };
+          const filteredListings = listings.filter(l => l.status === status);
+          return (
+            <div key={key} style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)', marginBottom: 32 }}>
+              <h4 style={{ marginBottom: 16, fontWeight: 700, fontFamily: 'Inter, sans-serif', fontSize: '1.2rem', color: '#1e293b' }}>
+                {statusLabels[status]} ({filteredListings.length})
+              </h4>
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Listing Date</th>
+                    <th>Email</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredListings.map((listing, idx) => (
+                    <tr key={idx}>
+                      <td>{listing.title}</td>
+                      <td>{new Date(listing.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}</td>
+                      <td>{listing.email || listing.seller_email || ''}</td>
+                      <td>{listing.category || ''}</td>
+                      <td>${parseFloat(listing.price).toFixed(2)}</td>
+                      <td style={{
+                        color: listing.status === 'pending' ? '#fbbf24' :
+                          listing.status === 'active' ? '#10b981' :
+                            listing.status === 'sold' ? '#2724c9' :
+                              listing.status === 'deleted' ? '#8f0e0e' :
+                                listing.status === 'denied' ? '#c54e23' :
+                                  '#000000',
+                        fontFamily: 'Inter, sans-serif'
+                      }}>{listing.status}</td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <button className="btn btn-view" onClick={() => handleViewDetails(listing.id)}>View Full Listing</button>
+                          {listing.status === 'pending' || listing.status === 'review' ? (
+                            <>
+                              <button className="btn btn-primary" onClick={() => handleModerate(listing.id, 'approve')}>Accept</button>
+                              <button className="btn btn-danger" onClick={() => handleModerate(listing.id, 'deny')}>Deny</button>
+                            </>
+                          ) : null}
+                          {listing.status === 'active' ? (
+                            <>
+                              <button className="btn btn-primary" onClick={() => handleModerate(listing.id, 'mark_sold')}>Mark Sold</button>
+                              <button className="btn btn-secondary" onClick={() => handleModerate(listing.id, 'archive')}>Archive</button>
+                              <button className="btn btn-danger" onClick={() => handleDelete(listing.id)}>Delete</button>
+                            </>
+                          ) : null}
+                          {listing.status === 'denied' ? (
+                            <button className="btn btn-neutral" onClick={() => handleModerate(listing.id, 'approve')}>Reactivate</button>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+
+        {/* Back to Homepage Button */}
+        <div style={{ position: 'fixed', bottom: 32, right: 48, zIndex: 50 }}>
+          <button style={{ padding: '12px 24px', fontWeight: 700, fontSize: 16, borderRadius: 8, background: '#2563eb', color: '#fff', border: 'none', boxShadow: '0 2px 8px rgba(37,99,235,0.12)', cursor: 'pointer' }} onClick={() => window.location.href = '/homepage'}>
+            Back to Homepage
+          </button>
         </div>
       </div>
     </div>
