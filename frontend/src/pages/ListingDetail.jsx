@@ -47,9 +47,21 @@ export default function ListingDetail() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
         }}
       >
-        <p><strong>Category:</strong> {listing.category}</p>
-        <p><strong>Description:</strong> {listing.listing_description}</p>
-        <p><strong>Price:</strong> ${listing.price}</p>
+        {listing.image_key && (
+        <img
+          src={listing.image_key}
+          alt={listing.listing_title}
+          style={{
+            width: "300px",
+            borderRadius: "10px",
+            marginBottom: "20px"
+          }}
+        />
+      )}
+
+      <p><strong>Category:</strong> {listing.category}</p>
+      <p><strong>Description:</strong> {listing.listing_description}</p>
+      <p><strong>Price:</strong> ${listing.price}</p>
       </div>
 
     </div>

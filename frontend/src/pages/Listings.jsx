@@ -6,6 +6,7 @@ export default function Listings() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [listing_description, setListingDescription] = useState("");
+  const [image_key, setImageKey] = useState("");
 
   // Get listing
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function Listings() {
       console.error("Error loading listings:", err);
     });
 }, []);
+
 
   //Create listing
   const createListing = async () => {
@@ -52,6 +54,7 @@ export default function Listings() {
             category,
             listing_description,
             price: Number(price),
+            image_key
           }),
         }
       );
@@ -64,6 +67,7 @@ export default function Listings() {
       setPrice("");
       setCategory("");
       setListingDescription("");
+      setImageKey("");
     } catch (error) {
       console.error("Error creating listing:", error);
     }
@@ -136,6 +140,19 @@ export default function Listings() {
             width: "260px",
             border: "2px solid #1e3a8a",
             borderRadius: "6px",
+          }}
+        />
+
+        <input
+          placeholder="Image URL"
+          value={image_key}
+          onChange={(e) => setImageKey(e.target.value)}
+          style={{ 
+            padding: "10px", 
+            border: "2px solid #1e3a8a",
+            borderRadius: "6px",
+            marginBottom: "10px",
+            width: "100%" 
           }}
         />
 

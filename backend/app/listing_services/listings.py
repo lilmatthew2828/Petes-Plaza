@@ -19,6 +19,7 @@ def get_all_listings():
                 "listing_description": l.description,
                 "price": float(l.price),
                 "category": l.category,  
+                "image_key": l.image_key,
             }
             for l in listings
         ]
@@ -41,6 +42,7 @@ def get_single_listing(listing_id: int):
             "listing_description": listing.description,
             "price": listing.price,
             "category": listing.category,
+            "image_key": listing.image_key,
         }
     finally:
         db.close()
@@ -57,6 +59,7 @@ def create_listing(listing_data: ListingCreate, seller_email: str):
             price=listing_data.price,
             seller_email=seller_email,
             category=listing_data.category,
+            image_key=listing_data.image_key,
             status="active"
         )
 
@@ -69,7 +72,8 @@ def create_listing(listing_data: ListingCreate, seller_email: str):
             "listing_title": new_listing.title,
             "listing_description": new_listing.description,
             "price": new_listing.price,
-            "category": new_listing.category
+            "category": new_listing.category,
+            "image_key": new_listing.image_key,
         }
     finally:
         db.close()
