@@ -1,35 +1,75 @@
 # EMMANUELLA OBIDIKE
-# LISTINGS LOGIC / SERVICES
+# LISTINGS LOGIC / SERVICES 
 
-# TEMP fake data (for debugging)
-# this will be replaced with real database later
-fake_listings_db = []
+from sqlalchemy.orm import Session
+from app.database import SessionLocal
+from app.models import Listing
+from app.listing_schemas.listings import ListingCreate
 
 
+# Get all listings
 def get_all_listings():
-    return fake_listings_db
+    db: Session = SessionLocal()
+    try:
+        listings = db.query(Listing).order_by(Listing.id.desc()).all()
+        return [
+            {
+                "id": l.id,
+                "listing_title": l.title,
+                "listing_description": l.description,
+                "price": float(l.price),
+                "category": l.category,  
+            }
+            for l in listings
+        ]
+    finally:
+        db.close()
 
 
-def get_single_listing(listing_id):
 
-    for listing in fake_listings_db:
-        if listing["id"] == listing_id:
-            return listing
+# Get single listing by ID
+def get_single_listing(listing_id: int):
+    db: Session = SessionLocal()
+    try:
+        listing = db.query(Listing).filter(Listing.id == listing_id).first()
+        if not listing:
+            return {"message": "listing not found"}
 
-    return {"message": "listing not found"}
+        return {
+            "id": listing.id,
+            "listing_title": listing.title,
+            "listing_description": listing.description,
+            "price": listing.price,
+            "category": listing.category,
+        }
+    finally:
+        db.close()
 
 
-def create_listing(listing_data):
 
-    new_listing = {
-        "id": len(fake_listings_db) + 1,
-        "listing_title": listing_data.listing_title,
-        "listing_description": listing_data.listing_description,
-        "price": listing_data.price,
-        "category": listing_data.category,
-        "user_id": listing_data.user_id
-    }
+# Create a new listing
+def create_listing(listing_data: ListingCreate, seller_email: str):
+    db: Session = SessionLocal()
+    try:
+        new_listing = Listing(
+            title=listing_data.listing_title,
+            description=listing_data.listing_description,
+            price=listing_data.price,
+            seller_email=seller_email,
+            category=listing_data.category,
+            status="active"
+        )
 
-    fake_listings_db.append(new_listing)
+        db.add(new_listing)
+        db.commit()
+        db.refresh(new_listing)
 
-    return new_listing
+        return {
+            "id": new_listing.id,
+            "listing_title": new_listing.title,
+            "listing_description": new_listing.description,
+            "price": new_listing.price,
+            "category": new_listing.category
+        }
+    finally:
+        db.close()

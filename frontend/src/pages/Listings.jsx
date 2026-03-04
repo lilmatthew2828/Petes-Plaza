@@ -9,11 +9,21 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-    fetch("http://localhost:8000/api/listings")
-      .then((res) => res.json())
-      .then((data) => setListings(data.sort((a, b) => b.id - a.id)))
-      .catch((err) => console.error("Error loading listings:", err));
-  }, []);
+  fetch("http://localhost:8001/api/listings")
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Server response not OK");
+      }
+      return res.json();
+    })
+    .then((data) => {
+      console.log("Listings received:", data);
+      setListings(data.sort((a, b) => b.id - a.id));
+    })
+    .catch((err) => {
+      console.error("Error loading listings:", err);
+    });
+}, []);
 
   //Create listing
   const createListing = async () => {
@@ -30,15 +40,15 @@ export default function Listings() {
 
     
     try {
-      const response = await fetch("http://localhost:8000/api/listings/new",
+      const response = await fetch("http://localhost:8001/api/listings/new",
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             listing_title,
-            user_id: 1, // keep fixed for now
             category,
             listing_description,
             price: Number(price),
@@ -68,44 +78,77 @@ export default function Listings() {
       </Link>
 
       <h1 style={{ fontSize: "42px", marginBottom: "25px" }}>
-        Pete's Plaza Listings Details
+        CREATE A LISTING
       </h1>
 
       {/* FORM */}
-      <div style={{ marginBottom: "30px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "15px",
+          marginBottom: "40px",
+          alignItems: "center",
+        }}
+      >
         <input
           placeholder="Listing title"
           value={listing_title}
           onChange={(e) => setListingTitle(e.target.value)}
-          style={{ padding: "10px", marginRight: "10px", width: "250px" }}
+          style={{
+            padding: "12px",
+            width: "220px",
+            border: "2px solid #1e3a8a",
+            borderRadius: "6px",
+          }}
         />
 
         <input
           placeholder="Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          style={{ padding: "10px", marginRight: "10px", width: "120px" }}
+          style={{
+            padding: "12px",
+            width: "120px",
+            border: "2px solid #1e3a8a",
+            borderRadius: "6px",
+          }}
         />
 
         <input
           placeholder="Category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          style={{ padding: "10px", marginRight: "10px", width: "150px" }}
+          style={{
+            padding: "12px",
+            width: "160px",
+            border: "2px solid #1e3a8a",
+            borderRadius: "6px",
+          }}
         />
 
         <input
           placeholder="Description"
           value={listing_description}
           onChange={(e) => setListingDescription(e.target.value)}
-          style={{ padding: "10px", marginRight: "10px", width: "250px" }}
+          style={{
+            padding: "12px",
+            width: "260px",
+            border: "2px solid #1e3a8a",
+            borderRadius: "6px",
+          }}
         />
 
         <button
           onClick={createListing}
           style={{
-            padding: "10px 16px",
+            padding: "12px 18px",
+            backgroundColor: "#1e3a8a",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
             cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
           Create Listing
@@ -131,8 +174,6 @@ export default function Listings() {
           <h3>{listing.listing_title}</h3>
           </Link>
           <p><strong>Category:</strong> {listing.category}</p>
-          <p>{listing.listing_description}</p>
-          <p><strong>${listing.price}</strong></p>
         </div>
       ))}
     </div>

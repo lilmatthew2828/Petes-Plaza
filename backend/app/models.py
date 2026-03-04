@@ -21,7 +21,7 @@ class User(Base):
     created_at = Column(String, default=datetime.now)
     is_suspended = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
-    listings = relationship("Listing", back_populates="seller")
+    #listings = relationship("Listing", back_populates="seller")
     def __repr__(self):
         return f"<User(email={self.email}, username={self.username})>"
 
@@ -53,13 +53,14 @@ class Listing(Base):
     description = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     status = Column(String, default="available") # available or sold
-    seller_id = Column(Integer, ForeignKey("users.id"), nullable=False) # foreign key to users table
+    seller_email = Column(String, nullable=False)    
     image_key = Column(String, nullable=True) # S3 key for the listing image
+    category = Column(String)
     # use callables so defaults are evaluated at insert/update time
     created_at = Column(String, default=lambda: datetime.now().isoformat())
     updated_at = Column(String, default=lambda: datetime.now().isoformat(), onupdate=lambda: datetime.now().isoformat())
 
-    seller = relationship("User", back_populates="listings")    
+    #seller = relationship("User", back_populates="listings")    
     
     def __repr__(self):
         return f"<Listing(title={self.title}, price={self.price}, status={self.status})>"

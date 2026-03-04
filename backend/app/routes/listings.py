@@ -1,7 +1,8 @@
 # EMMANUELLA OBIDIKE
 # LISTINGS ROUTES
+from fastapi import APIRouter, Depends
+from app.auth import get_current_user
 
-from fastapi import APIRouter
 
 # import our schema (validation)
 from app.listing_schemas.listings import ListingCreate
@@ -29,5 +30,8 @@ def view_listing(listing_id: int):
 
 # Create a new listing
 @listings_router.post("/listings/new")
-def create_new_listing(listing_data: ListingCreate):
-    return create_listing(listing_data)
+def create_new_listing(
+    listing_data: ListingCreate,
+    current_user = Depends(get_current_user)
+):
+    return create_listing(listing_data, current_user.email)

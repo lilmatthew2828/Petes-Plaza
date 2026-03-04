@@ -11,8 +11,8 @@ class ListingCreate(BaseModel):
     # title of listing
     listing_title: str
 
-    # user id who created listing
-    user_id: int
+    #  seller_email who created listing
+    # seller_email: str
 
     # category name
     category: str
@@ -22,6 +22,7 @@ class ListingCreate(BaseModel):
 
     # price of item
     price: float
+    image_key: str | None = None
 
 
 
