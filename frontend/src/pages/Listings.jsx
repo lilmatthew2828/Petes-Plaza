@@ -10,7 +10,7 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-  fetch("http://localhost:8001/api/listings")
+  fetch("http://localhost:8000/api/listings")
     .then((res) => {
       if (!res.ok) {
         throw new Error("Server response not OK");
@@ -42,7 +42,7 @@ export default function Listings() {
 
     
     try {
-      const response = await fetch("http://localhost:8001/api/listings/new",
+      const response = await fetch("http://localhost:8000/api/listings/new",
         {
           method: "POST",
           credentials: "include",

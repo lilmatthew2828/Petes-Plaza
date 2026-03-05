@@ -1,7 +1,7 @@
 // Anthony Powell
 import { apiCall } from "./client";
 
-const LISTINGS_BASE = "/listings";
+const LISTINGS_BASE = "/api/listings";
 
 /**
  * Fetch one listing by ID.
@@ -38,3 +38,4 @@ export async function updateListing(id, payload) {
 export async function deleteListing(id) {
   await apiCall(`${LISTINGS_BASE}/${id}`, { method: "DELETE" });
 }
+

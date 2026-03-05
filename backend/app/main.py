@@ -9,6 +9,7 @@ from app.config import settings
 from app.database import engine
 from app.database import Base
 from app.auth import router as auth_router
+ 
 
 # Create tables on startup
 Base.metadata.create_all(bind=engine)
@@ -25,7 +26,7 @@ app = FastAPI(
 # allow the origin that your Vite server is running on
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"] ,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://127.0.0.1:3000"] ,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,6 +37,7 @@ app.include_router(auth_router)
 app.include_router(admin.router)
 app.include_router(listings.router)
 app.include_router(wishlist_router)
+app.include_router(listings_router)
 
 @app.get("/")
 def root():

@@ -15,10 +15,13 @@ def get_all_listings():
         return [
             {
                 "id": l.id,
+                "title": l.title,
                 "listing_title": l.title,
+                "description": l.description,
                 "listing_description": l.description,
                 "price": float(l.price),
                 "category": l.category,  
+                "image_url": l.image_key,
                 "image_key": l.image_key,
             }
             for l in listings
@@ -38,10 +41,13 @@ def get_single_listing(listing_id: int):
 
         return {
             "id": listing.id,
+            "title": listing.title,
             "listing_title": listing.title,
+            "description": listing.description,
             "listing_description": listing.description,
             "price": listing.price,
             "category": listing.category,
+            "image_url": listing.image_key,
             "image_key": listing.image_key,
         }
     finally:
@@ -69,10 +75,13 @@ def create_listing(listing_data: ListingCreate, seller_email: str):
 
         return {
             "id": new_listing.id,
+            "title": new_listing.title,
             "listing_title": new_listing.title,
+            "description": new_listing.description,
             "listing_description": new_listing.description,
             "price": new_listing.price,
             "category": new_listing.category,
+            "image_url": new_listing.image_key,
             "image_key": new_listing.image_key,
         }
     finally:

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useLocation, useNavigate } from 'react-router-dom'
 import '../styles/index.css'
 import WishlistModal from '../components/WishlistModal'
 import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
@@ -29,6 +30,8 @@ const PLACEHOLDER_IMAGE = '/assets/images/image.png';
 const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('Home')
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -46,15 +49,15 @@ export default function HomePage() {
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
   const filteredListings = selectedCategory
-    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory) // Filter listings by selected category
+    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory)
     : listings
 
-  const handleTabClick = (tab) => { // Handle Contact Us tab separately if needed
+  const handleTabClick = (tab) => {
     setActiveTab(tab)
     setSelectedCategory(null)
   }
 
-  const handleCategoryClick = (cat) => { // When a category is clicked, we want to show that category's listings and update the title/description
+  const handleCategoryClick = (cat) => {
     setSelectedCategory(cat)
   }
 
@@ -65,12 +68,13 @@ export default function HomePage() {
   const handleSettings = () => {
     alert('Settings clicked! (Next step: theme/account settings.)')
   }
-  useEffect(() => { // Fetch listings from backend API
+
+  useEffect(() => {
     const fetchListings = async () => {
       try {
-        setLoading(true) // Reset loading and error state before fetching
-        setError(null) // Clear previous errors
-        const res = await fetch('/api/admin/listings', { credentials: "include" }) // This endpoint should return a list of all listings for the homepage. The backend file referenced is admin.js because the /api/admin/listings endpoint returns all listings regardless of status, while the homepage only shows active listings. The filtering for active listings is done on the frontend by checking the listing.status field.
+        setLoading(true)
+        setError(null)
+        const res = await fetch('/api/admin/listings', { credentials: "include" })
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
         const data = await res.json()
         setListings(data)
@@ -85,7 +89,7 @@ export default function HomePage() {
 
     fetchListings()
   }, [location.key, location.state?.refreshListings])
-  /* ---------- LOAD USER WISHLIST ---------- */
+
   useEffect(() => {
     const loadWishlist = async () => {
       try {
@@ -95,8 +99,6 @@ export default function HomePage() {
         }
 
         const items = await fetchWishlist();
-
-        // convert listings to a Set of listing IDs
         setWishlistIds(new Set(items.map((x) => x.id)));
       } catch (e) {
         console.log("Wishlist load skipped:", e.message);
@@ -105,6 +107,7 @@ export default function HomePage() {
 
     loadWishlist();
   }, [user]);
+
   const isWishlisted = (id) => wishlistIds.has(id);
 
   const setLoadingFor = (id, on) => {
@@ -125,14 +128,11 @@ export default function HomePage() {
     if (isWishlisted(listingId)) return;
 
     setLoadingFor(listingId, true);
-
-    // optimistic UI
     setWishlistIds((prev) => new Set(prev).add(listingId));
 
     try {
       await addToWishlist(listingId);
     } catch (e) {
-      // rollback
       setWishlistIds((prev) => {
         const next = new Set(prev);
         next.delete(listingId);
@@ -146,8 +146,6 @@ export default function HomePage() {
 
   const handleRemoveWishlist = async (listingId) => {
     setLoadingFor(listingId, true);
-
-    // optimistic UI
     setWishlistIds((prev) => {
       const next = new Set(prev);
       next.delete(listingId);
@@ -157,13 +155,13 @@ export default function HomePage() {
     try {
       await removeFromWishlist(listingId);
     } catch (e) {
-      // rollback
       setWishlistIds((prev) => new Set(prev).add(listingId));
       alert(e.message);
     } finally {
       setLoadingFor(listingId, false);
     }
   };
+
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
@@ -232,7 +230,6 @@ export default function HomePage() {
             <h1>{pageTitle}</h1>
             <p>{pageDesc}</p>
 
-
             {error && <div style={{ color: 'red', marginBottom: '1rem' }}>⚠ {error} (showing sample data)</div>}
             {loading && <p>Loading listings...</p>}
 
@@ -259,12 +256,10 @@ export default function HomePage() {
                         flexWrap: "wrap",
                       }}
                     >
-                      {/* EDIT LISTING BUTTON */}
                       <Link to={`/listings/${listing.id}/edit`}>
                         <button className="pill">Edit Listing</button>
                       </Link>
 
-                      {/* WISHLIST BUTTON */}
                       {!isWishlisted(listing.id) ? (
                         <button
                           className="pill"
@@ -287,9 +282,6 @@ export default function HomePage() {
                         </button>
                       )}
                     </div>
-                    <img src={imgSrc} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
-                    <h3>{listing.title}</h3>
-                    <p>${Number(listing.price).toFixed(2)} • {category}</p>
                   </div>
                 )
               })}
@@ -297,13 +289,12 @@ export default function HomePage() {
           </div>
         </main>
       </div>
-      {/* WISHLIST MODAL */}
+
       <WishlistModal
         open={showWishlist}
         onClose={() => setShowWishlist(false)}
       />
 
-      {/* AUTH MODAL */}
       {showAuthModal && (
         <div className="modal" onClick={() => setShowAuthModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

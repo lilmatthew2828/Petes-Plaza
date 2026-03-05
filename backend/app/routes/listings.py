@@ -12,6 +12,7 @@ from app import schemas, services, models
 from app.database import get_db
 from app.auth import require_login
 
+
 # Expose listings routes under /api/listings to match frontend proxy/config
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
@@ -60,6 +61,7 @@ def remove_listing(
     """
     services.delete_listing(db, listing_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 # EMMANUELLA OBIDIKE
 # LISTINGS ROUTES
 from fastapi import APIRouter, Depends
