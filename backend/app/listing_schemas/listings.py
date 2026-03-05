@@ -3,6 +3,7 @@
 
 # Used for input validation (checks data types automatically)
 from pydantic import BaseModel
+from typing import Optional
 
 
 # data required to create a listing
@@ -22,7 +23,7 @@ class ListingCreate(BaseModel):
 
     # price of item
     price: float
-    image_key: str | None = None
+    image_key: Optional[str] = None
 
 
 
