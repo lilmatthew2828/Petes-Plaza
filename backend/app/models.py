@@ -1,13 +1,10 @@
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float, UniqueConstraint
 from sqlalchemy.types import Boolean
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-
-Base = declarative_base()
 
 # Models for SQLAlchemy ORM mapping to database tables.
 class User(Base):
