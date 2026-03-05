@@ -61,7 +61,7 @@ export default function HomePage() {
     setSelectedCategory(cat)
   }
 
-  const handleCreateListing = () => { 
+  const handleCreateListing = () => {
     navigate("/listings");
   }
 
@@ -232,9 +232,9 @@ export default function HomePage() {
 
             {error && <div style={{ color: 'red', marginBottom: '1rem' }}>⚠ {error} (showing sample data)</div>}
             {loading && <p>Loading listings...</p>}
-
+            {/* LISTING GRID. The listings should only show if the listing.status === 'active' */}
             <div className="cards">
-              {filteredListings.map(listing => {
+              {filteredListings.filter(listing => listing.status === "active").map(listing => {
                 const category = getCategoryForListing(listing.id)
                 const imgSrc = listing.image && listing.image !== '' ? listing.image : PLACEHOLDER_IMAGE;
                 return (
