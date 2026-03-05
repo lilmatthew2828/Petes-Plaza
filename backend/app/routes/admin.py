@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 # PATCH endpoint to update listing status (e.g., mark as sold)
 @router.patch("/listings/{listing_id}")
-def update_listing_status(listing_id: int, status: str = Body(...), db: Session = Depends(get_db)):
+def update_listing_status(listing_id: int, status: str = Body(...), db: Session = Depends(get_db)): # Accept status in request body for flexibility (approve, deny, archive, mark_sold)
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
