@@ -10,6 +10,17 @@ import EditListing from "./pages/EditListing";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import "./App.css";
+import Navbar from "./components/NavBar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import "./App.css";
+import Listings from "./pages/Listings";
+import ListingDetail from "./pages/ListingDetail";
+import HomePage from "./pages/HomePage";
+import AdminDashboard from "./pages/AdminDashboard";
+
 
 function App() {
   return (
@@ -55,7 +66,15 @@ function App() {
             }
           />
 
-          {/* Fallback */}
+          {/* Listings routes */}
+          <Route path="/listings" element={<ProtectedRoute><Listings /></ProtectedRoute>} />
+
+          <Route path="/listings/:id" element={<ProtectedRoute><ListingDetail /></ProtectedRoute>} />
+
+          {/* Redirect create-listing to Listings page */}
+          <Route path="/create-listing" element={<Navigate to="/listings" replace />} />
+
+          {/* Redirect unknown routes to Welcome */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

@@ -280,7 +280,6 @@ export default function AdminDashboard() {
           <span style={{ fontSize: 28, fontWeight: 700 }}>☰</span>
         </div>
       </div>
-
       <div
         style={{ position: 'absolute', left: 0, top: 0, height: '100%', zIndex: 100 }}
         onMouseEnter={handleSidebarMouseEnter}

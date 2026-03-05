@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/index.css'
-
 import WishlistModal from '../components/WishlistModal'
-import '../styles/index.css'
 import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
+import { Link } from 'react-router-dom'
+
 const SAMPLE_LISTINGS = [
   { id: 1, title: 'Graphic T-Shirt', price: 12.99, category: 'T-Shirts', image: '/assets/images/graphic_tshirt.png' },
   { id: 2, title: 'Blue Jeans', price: 29.99, category: 'Jeans', image: '/assets/images/jeans.png' },
@@ -59,8 +58,8 @@ export default function HomePage() {
     setSelectedCategory(cat)
   }
 
-  const handleCreateListing = () => { // Placeholder for create listing action
-    alert('Create a Listing clicked! (Next step: add a form here.)')
+  const handleCreateListing = () => { 
+    navigate("/listings");
   }
 
   const handleSettings = () => {
@@ -274,7 +273,7 @@ export default function HomePage() {
                         >
                           {wishlistLoadingIds.has(listing.id)
                             ? "Adding..."
-                            : "❤️ Add to Wishlist"}
+                            : "Add to Wishlist"}
                         </button>
                       ) : (
                         <button
@@ -284,10 +283,13 @@ export default function HomePage() {
                         >
                           {wishlistLoadingIds.has(listing.id)
                             ? "Removing..."
-                            : "✅ Wishlisted"}
+                            : "Wishlisted"}
                         </button>
                       )}
                     </div>
+                    <img src={imgSrc} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
+                    <h3>{listing.title}</h3>
+                    <p>${Number(listing.price).toFixed(2)} • {category}</p>
                   </div>
                 )
               })}
@@ -328,4 +330,3 @@ export default function HomePage() {
     </div>
   )
 }
-
