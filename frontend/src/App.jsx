@@ -27,10 +27,10 @@ function App() {
 
           {/* Protected Routes */}
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
-                <HomePage />
+                <Home />
               </ProtectedRoute>
             }
           />
@@ -38,7 +38,7 @@ function App() {
             path="/homepage"
             element={
               <ProtectedRoute>
-                <Navigate to="/" replace />
+                <HomePage/>
               </ProtectedRoute>
             }
           />

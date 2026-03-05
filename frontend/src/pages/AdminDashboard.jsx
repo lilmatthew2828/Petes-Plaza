@@ -106,7 +106,9 @@ export default function AdminDashboard() {
   };
   const handleViewDetails = (listingId) => {
     // For simplicity, we'll just alert the listing ID. In a real implementation, this would open a modal with the listing details fetched from the backend.
-    alert(`View details for listing ID: ${listingId}`);
+    //This should go to the ListingDetails.jsx page for that listing.
+    
+    //alert(`View details for listing ID: ${listingId}`);
   };
 
   useEffect(() => { // Fetch admin metrics and listings data from backend API when component mounts
