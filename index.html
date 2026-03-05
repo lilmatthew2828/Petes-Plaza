@@ -1,4 +1,5 @@
 <!-- Pete's Plaza Marketplace Web App Homepage -->
+ 
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,14 +16,13 @@
     <!-- TOP UTILITY BAR -->
     <header class="topbar">
       <div class="top-center">
-        <!-- SITE HEADER -->
+      <!-- SITE HEADER -->
         <div class="site-header">
           <img src="assets/IMG_0269 (1).png" alt="Pete's Plaza Logo" class="header-image">
           <div class="create-title site-title">
             Pete’s Plaza
           </div>
         </div>
-
         <!-- TOP RIGHT BUTTONS -->
         <div class="top-buttons">
           <button class="pill" id="btnProfile">Profile</button>
@@ -30,8 +30,12 @@
           <button class="pill" id="btnCart">Cart</button>
           <button class="pill" id="btnContactTop">Contact</button>
         </div>
+
       </div>
     </header>
+
+    
+    
 
     <!-- NAVIGATION ROW -->
     <nav class="navrow">
@@ -72,50 +76,47 @@
       <main class="main">
         <div class="canvas">
           <h1 id="pageTitle">Home</h1>
-          <p id="pageDesc">Listings</p>
+          <p id="pageDesc">
+            Listings
+          </p>
+          
 
           <div class="cards" id="cards">
 
-            <div class="card" data-id="L1" data-cat="T-Shirts" data-img="assets/tshirt.png">
+            <div class="card" data-cat="T-Shirts">
               <div class="img"></div>
               <h3>Graphic T-Shirt</h3>
               <p>$12.99 • T-Shirts</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
-            <div class="card" data-id="L2" data-cat="Jeans" data-img="assets/jeans.jpg">
+            <div class="card" data-cat="Jeans">
               <div class="img"></div>
               <h3>Blue Jeans</h3>
               <p>$29.99 • Jeans</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
-            <div class="card" data-id="L3" data-cat="Shoes" data-img="assets/shoes.png">
+            <div class="card" data-cat="Shoes">
               <div class="img"></div>
               <h3>Running Shoes</h3>
               <p>$45.00 • Shoes</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
-            <div class="card" data-id="L4" data-cat="Furniture" data-img="assets/officechair.png">
+            <div class="card" data-cat="Furniture">
               <div class="img"></div>
               <h3>Office Chair</h3>
               <p>$60.00 • Furniture</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
-            <div class="card" data-id="L5" data-cat="Accessories" data-img="assets/backpack.jpg">
+            <div class="card" data-cat="Accessories">
               <div class="img"></div>
               <h3>Backpack</h3>
               <p>$22.00 • Accessories</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
-            <div class="card" data-id="L6" data-cat="Appliances" data-img="assets/71PUboQ47oL._AC_SY300_SX300_QL70_FMwebp_.jpg">
+            <div class="card" data-cat="Appliances">
               <div class="img"></div>
               <h3>Mini Blender</h3>
               <p>$18.50 • Appliances</p>
-              <button class="pill wishlist-btn">♡ Wishlist</button>
             </div>
 
           </div>
@@ -124,48 +125,48 @@
 
     </div>
   </div>
-
+  
   <!-- LOGIN / SIGNUP MODAL -->
-  <div class="modal hidden" id="authModal">
-    <div class="modal-content">
+<div class="modal hidden" id="authModal">
+  <div class="modal-content">
 
-      <button class="close-btn" id="closeModal">×</button>
+    <button class="close-btn" id="closeModal">×</button>
 
-      <h2>User Account</h2>
+    <h2>User Account</h2>
 
-      <div class="auth-forms">
+    <div class="auth-forms">
 
-        <!-- LOGIN -->
-        <div class="auth-box">
-          <h3>Login</h3>
-          <input id="loginUsername" type="text" placeholder="Username" />
-          <input id="loginPassword" type="password" placeholder="Password" />
-          <button class="pill auth-btn" id="btnLoginSubmit">Login</button>
-          <p id="loginStatus" style="margin:10px 0 0; font-weight:bold;"></p>
-        </div>
-
-        <!-- SIGN UP -->
-        <div class="auth-box">
-          <h3>Sign Up</h3>
-          <input id="signupUsername" type="text" placeholder="Username" />
-          <input id="signupEmail" type="email" placeholder="Email" />
-          <input id="signupPassword" type="password" placeholder="Password" />
-          <button class="pill auth-btn" id="btnSignupSubmit">Create Account</button>
-          <p id="signupStatus" style="margin:10px 0 0; font-weight:bold;"></p>
-        </div>
-
+      <!-- LOGIN -->
+      <div class="auth-box">
+        <h3>Login</h3>
+        <input type="text" placeholder="Username" />
+        <input type="password" placeholder="Password" />
+        <button class="pill auth-btn">Login</button>
       </div>
+
+      <!-- SIGN UP -->
+      <div class="auth-box">
+        <h3>Sign Up</h3>
+        <input type="text" placeholder="Username" />
+        <input type="email" placeholder="Email" />
+        <input type="password" placeholder="Password" />
+        <button class="pill auth-btn">Create Account</button>
+      </div>
+
     </div>
   </div>
-    <!-- WISHLIST MODAL -->
-  <div class="modal hidden" id="wishlistModal">
-    <div class="modal-content">
-      <button class="close-btn" id="closeWishlist">×</button>
+</div>
+<!-- WISHLIST MODAL -->
+<div class="modal hidden" id="wishlistModal">
+  <div class="modal-content wishlist-content">
+    <button class="close-btn" id="closeWishlist">×</button>
 
-      <h2>Your Wishlist</h2>
+    <h2>My Wishlist</h2>
+    <p class="muted" id="wishlistHint"></p>
 
-      <div id="wishlistItems"></div>
-    </div>
+    <div id="wishlistList" class="wishlist-list"></div>
   </div>
+</div>
+
 </body>
 </html>
