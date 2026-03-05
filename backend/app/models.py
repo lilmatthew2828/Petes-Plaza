@@ -1,9 +1,9 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.types import Boolean
 from datetime import datetime
-from app.database import Base
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float, UniqueConstraint
+from sqlalchemy.types import Boolean
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from app.database import Base
 
 
 
@@ -63,4 +63,30 @@ class Listing(Base):
     seller = relationship("User", back_populates="listings") # Establish relationship to User model, allowing access to seller info from listing
     
     def __repr__(self):
-        return f"<Listing(title={self.title}, price={self.price}, status={self.status}, category={self.category}, created_at={self.created_at}, updated_at={self.updated_at}, description={self.description[:50]}...), seller_email={self.seller_email}>" # Updated repr to include category and seller_email for easier debugging and visualization of listing details
+        return f"<Listing(title={self.title}, price={self.price}, status={self.status}, category={self.category}, created_at={self.created_at}, updated_at={self.updated_at}, description={self.description[:50]}...), seller_email={self.seller_email}>" # Updated repr to include category and seller_email for easier debugging and visualization of listing details# from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float
+
+
+
+
+
+
+
+# ✅ Wishlist model (NEW)
+class Wishlist(Base):
+    __tablename__ = "wishlist"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "listing_id", name="uq_user_listing_wishlist"),
+        Index("idx_wishlist_user", "user_id"),
+    )
+
+    user = relationship("User")
+    listing = relationship("Listing")
+
+    def __repr__(self):
+        return f"<Wishlist(user_id={self.user_id}, listing_id={self.listing_id})>"

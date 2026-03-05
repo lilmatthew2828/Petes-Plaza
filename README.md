@@ -90,5 +90,63 @@ Frontend runs on **http://localhost:5173**
 - Pydantic warning about `orm_mode` is safe to ignore (using `from_attributes` as fallback)
 - Database connection uses `sslmode=require` for RDS compatibility
 
+Commands to start everything: 
+- From backend: 
+Open a terminal and go to the backend folder.
 
+    cd Petes-Plaza-Experiment/backend
 
+Activate your virtual environment:
+
+    source .venv/bin/activate
+
+If you’re on Windows:
+
+    .venv\Scripts\activate
+
+Now start the FastAPI server:
+
+    uvicorn app.main:app --reload --port 8000
+
+You should see something like:
+
+    Uvicorn running on http://127.0.0.1:8000
+
+Start the Frontend (React + Vite)
+
+Open another terminal.
+
+Go to the frontend folder:
+
+    cd Petes-Plaza-Experiment/frontend
+
+Install dependencies (only needed if you haven’t before):
+
+    npm install
+
+Start the dev server:
+
+    npm run dev
+
+You should see something like:
+
+    VITE v5.x
+    Local: http://localhost:5173/
+
+- For Database: 
+- psql --version
+- psql 'postgresql://postgres:HamptonSeniors2026%21@petes-plaza-db.c2lca2oiye1q.us-east-1.rds.amazonaws.com:5432/petes_plaza_db?sslmode=require'
+- If it connects you’ll see something like: petes_plaza_db=#
+- Show all tables
+    \dt
+Look inside tables (your main ones)
+    SELECT * FROM users LIMIT 10;
+    SELECT * FROM listings LIMIT 10;
+    SELECT * FROM wishlist LIMIT 10;
+    SELECT * FROM session_tokens LIMIT 10;
+Describe table columns
+    \d users
+    \d listings
+    \d wishlist
+Exit
+    \q

@@ -97,3 +97,137 @@ document.addEventListener("keydown", (e) => {
     modal.classList.add("hidden");
   }
 });
+// ---------- WISHLIST (Backend API version) ----------
+const btnWishlist = document.getElementById("btnWishlist");
+const wishlistModal = document.getElementById("wishlistModal");
+const closeWishlist = document.getElementById("closeWishlist");
+const wishlistList = document.getElementById("wishlistList");
+const wishlistHint = document.getElementById("wishlistHint");
+
+// If your backend is on a different origin, set BASE_URL = "http://localhost:8000"
+// If you use Vite proxy or serve from same origin, "" is fine.
+const BASE_URL = ""; // "" means same origin
+const API = `${BASE_URL}/api`;
+
+function getAuthToken() {
+  // adjust these keys to match your login code
+  return (
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("access_token") ||
+    ""
+  );
+}
+
+async function apiFetch(path, options = {}) {
+  const token = getAuthToken();
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${API}${path}`, { ...options, headers });
+
+  // Try to parse JSON body (if any)
+  let body = null;
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    body = await res.json().catch(() => null);
+  } else {
+    body = await res.text().catch(() => null);
+  }
+
+  if (!res.ok) {
+    const msg =
+      (body && body.detail) ||
+      (typeof body === "string" && body) ||
+      `Request failed (${res.status})`;
+
+    const err = new Error(msg);
+    err.status = res.status;
+    err.body = body;
+    throw err;
+  }
+
+  return body;
+}
+
+function openWishlist() {
+  wishlistModal.classList.remove("hidden");
+  loadWishlistFromBackend();
+}
+
+function closeWishlistModal() {
+  wishlistModal.classList.add("hidden");
+}
+
+async function loadWishlistFromBackend() {
+  wishlistHint.textContent = "Loading...";
+  wishlistList.innerHTML = "";
+
+  try {
+    // EXPECTED response shape:
+    // [{ listingId, title, price, category, imageUrl }, ...]
+    const items = await apiFetch("/wishlist", { method: "GET" });
+
+    if (!items || items.length === 0) {
+      wishlistHint.textContent = "";
+      wishlistList.innerHTML = `
+        <div class="wishlist-item">
+          <div>
+            <h4>No items yet</h4>
+            <p>Your wishlist is empty.</p>
+          </div>
+        </div>`;
+      return;
+    }
+
+    wishlistHint.textContent = "";
+    wishlistList.innerHTML = items
+      .map(
+        (it) => `
+        <div class="wishlist-item">
+          <div>
+            <h4>${it.title}</h4>
+            <p>$${it.price} • ${it.category}</p>
+          </div>
+          <button class="wishlist-remove" data-id="${it.listingId}">Remove</button>
+        </div>
+      `
+      )
+      .join("");
+
+    wishlistList.querySelectorAll(".wishlist-remove").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const listingId = btn.dataset.id;
+        await removeWishlistItem(listingId);
+      });
+    });
+  } catch (e) {
+    if (e.status === 401) {
+      wishlistHint.textContent = "Please log in to view your wishlist.";
+    } else {
+      wishlistHint.textContent = `Error loading wishlist: ${e.message}`;
+    }
+  }
+}
+
+async function removeWishlistItem(listingId) {
+  try {
+    await apiFetch(`/wishlist/${encodeURIComponent(listingId)}`, {
+      method: "DELETE",
+    });
+    await loadWishlistFromBackend();
+  } catch (e) {
+    alert(`Could not remove item: ${e.message}`);
+  }
+}
+
+// Button wiring
+btnWishlist?.addEventListener("click", openWishlist);
+closeWishlist?.addEventListener("click", closeWishlistModal);
+wishlistModal?.addEventListener("click", (e) => {
+  if (e.target === wishlistModal) closeWishlistModal();
+});

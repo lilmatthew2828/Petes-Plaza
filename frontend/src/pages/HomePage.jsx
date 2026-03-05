@@ -4,6 +4,9 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/index.css'
 
+import WishlistModal from '../components/WishlistModal'
+import '../styles/index.css'
+import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
 const SAMPLE_LISTINGS = [
   { id: 1, title: 'Graphic T-Shirt', price: 12.99, category: 'T-Shirts', image: '/assets/images/graphic_tshirt.png' },
   { id: 2, title: 'Blue Jeans', price: 29.99, category: 'Jeans', image: '/assets/images/jeans.png' },
@@ -24,23 +27,27 @@ const PAGE_DESC_MAP = {
 const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', 'Furniture', 'Accessories', 'Other']
 const PLACEHOLDER_IMAGE = '/assets/images/image.png';
 
+const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
+
 export default function HomePage() {
-  const location = useLocation()
   const [activeTab, setActiveTab] = useState('Home')
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showWishlist, setShowWishlist] = useState(false)
   const [error, setError] = useState(null)
+  const [wishlistIds, setWishlistIds] = useState(new Set());
+  const [wishlistLoadingIds, setWishlistLoadingIds] = useState(new Set());
   const { user } = useAuth();
 
   const pageTitle = selectedCategory || activeTab
-  const pageDesc = selectedCategory 
+  const pageDesc = selectedCategory
     ? `Showing listings for: ${selectedCategory}`
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
   const filteredListings = selectedCategory
-    ? listings.filter(item => (item.category || 'Other') === selectedCategory) // Filter listings by selected category from API/DB
+    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory) // Filter listings by selected category
     : listings
 
   const handleTabClick = (tab) => { // Handle Contact Us tab separately if needed
@@ -64,7 +71,7 @@ export default function HomePage() {
       try {
         setLoading(true) // Reset loading and error state before fetching
         setError(null) // Clear previous errors
-        const res = await fetch('/api/admin/listings') // This endpoint should return a list of all listings for the homepage. The backend file referenced is admin.js because the /api/admin/listings endpoint returns all listings regardless of status, while the homepage only shows active listings. The filtering for active listings is done on the frontend by checking the listing.status field.
+        const res = await fetch('/api/admin/listings', { credentials: "include" }) // This endpoint should return a list of all listings for the homepage. The backend file referenced is admin.js because the /api/admin/listings endpoint returns all listings regardless of status, while the homepage only shows active listings. The filtering for active listings is done on the frontend by checking the listing.status field.
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
         const data = await res.json()
         setListings(data)
@@ -79,6 +86,85 @@ export default function HomePage() {
 
     fetchListings()
   }, [location.key, location.state?.refreshListings])
+  /* ---------- LOAD USER WISHLIST ---------- */
+  useEffect(() => {
+    const loadWishlist = async () => {
+      try {
+        if (!user) {
+          setWishlistIds(new Set());
+          return;
+        }
+
+        const items = await fetchWishlist();
+
+        // convert listings to a Set of listing IDs
+        setWishlistIds(new Set(items.map((x) => x.id)));
+      } catch (e) {
+        console.log("Wishlist load skipped:", e.message);
+      }
+    };
+
+    loadWishlist();
+  }, [user]);
+  const isWishlisted = (id) => wishlistIds.has(id);
+
+  const setLoadingFor = (id, on) => {
+    setWishlistLoadingIds((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+
+  const handleAddWishlist = async (listingId) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    if (isWishlisted(listingId)) return;
+
+    setLoadingFor(listingId, true);
+
+    // optimistic UI
+    setWishlistIds((prev) => new Set(prev).add(listingId));
+
+    try {
+      await addToWishlist(listingId);
+    } catch (e) {
+      // rollback
+      setWishlistIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listingId);
+        return next;
+      });
+      alert(e.message);
+    } finally {
+      setLoadingFor(listingId, false);
+    }
+  };
+
+  const handleRemoveWishlist = async (listingId) => {
+    setLoadingFor(listingId, true);
+
+    // optimistic UI
+    setWishlistIds((prev) => {
+      const next = new Set(prev);
+      next.delete(listingId);
+      return next;
+    });
+
+    try {
+      await removeFromWishlist(listingId);
+    } catch (e) {
+      // rollback
+      setWishlistIds((prev) => new Set(prev).add(listingId));
+      alert(e.message);
+    } finally {
+      setLoadingFor(listingId, false);
+    }
+  };
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
@@ -92,7 +178,7 @@ export default function HomePage() {
           </div>
           <div className="top-buttons">
             <button className="pill" onClick={() => setShowAuthModal(true)}>Profile</button>
-            <button className="pill" onClick={() => alert('Wishlist clicked!')}>Wishlist</button>
+            <button className="pill" onClick={() => setShowWishlist(true)}>Wishlist</button>
             <button className="pill" onClick={() => alert('Cart clicked!')}>Cart</button>
             <button className="pill" onClick={() => handleTabClick('Contact Us')}>Contact</button>
             {user?.is_admin && (
@@ -153,17 +239,54 @@ export default function HomePage() {
 
             <div className="cards">
               {filteredListings.map(listing => {
-                const category = listing.category || 'Other'
+                const category = getCategoryForListing(listing.id)
                 const imgSrc = listing.image && listing.image !== '' ? listing.image : PLACEHOLDER_IMAGE;
                 return (
                   <div key={listing.id} className="card">
-                    <img src={imgSrc} alt={listing.title} className="img" onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
+                    <img
+                      src={imgSrc}
+                      alt={listing.title}
+                      className="img"
+                      onError={(e) => (e.target.src = PLACEHOLDER_IMAGE)}
+                    />
                     <h3>{listing.title}</h3>
                     <p>${Number(listing.price).toFixed(2)} • {category}</p>
-                    <div className="listing-actions">
+
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        marginTop: 10,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {/* EDIT LISTING BUTTON */}
                       <Link to={`/listings/${listing.id}/edit`}>
                         <button className="pill">Edit Listing</button>
                       </Link>
+
+                      {/* WISHLIST BUTTON */}
+                      {!isWishlisted(listing.id) ? (
+                        <button
+                          className="pill"
+                          disabled={wishlistLoadingIds.has(listing.id)}
+                          onClick={() => handleAddWishlist(listing.id)}
+                        >
+                          {wishlistLoadingIds.has(listing.id)
+                            ? "Adding..."
+                            : "❤️ Add to Wishlist"}
+                        </button>
+                      ) : (
+                        <button
+                          className="pill"
+                          disabled={wishlistLoadingIds.has(listing.id)}
+                          onClick={() => handleRemoveWishlist(listing.id)}
+                        >
+                          {wishlistLoadingIds.has(listing.id)
+                            ? "Removing..."
+                            : "✅ Wishlisted"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )
@@ -172,6 +295,11 @@ export default function HomePage() {
           </div>
         </main>
       </div>
+      {/* WISHLIST MODAL */}
+      <WishlistModal
+        open={showWishlist}
+        onClose={() => setShowWishlist(false)}
+      />
 
       {/* AUTH MODAL */}
       {showAuthModal && (
@@ -200,3 +328,4 @@ export default function HomePage() {
     </div>
   )
 }
+

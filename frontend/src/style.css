@@ -307,3 +307,47 @@ body {
   .cards { grid-template-columns: 1fr; }
   .topbar { flex-wrap: wrap; }
 }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.hidden { display: none; }
+
+.modal-content {
+  background: white;
+  border-radius: 14px;
+  width: min(520px, 92vw);
+  max-height: 80vh;
+  overflow: auto;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+.wishlist-list { display: grid; gap: 10px; margin-top: 12px; }
+
+.wishlist-item {
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.wishlist-item h4 { margin: 0 0 4px; }
+.wishlist-item p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+
+.wishlist-remove {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}

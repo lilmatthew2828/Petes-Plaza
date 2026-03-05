@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import admin
 from app.routes import listings
+from app.routes.wishlist import router as wishlist_router
 
 from app.config import settings
 from app.database import engine
@@ -18,6 +19,9 @@ app = FastAPI(
     debug=settings.debug,
 )
 
+# Add CORS middleware
+# Will change in production to only allow the frontend origin
+# allow the origin that your Vite server is running on
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://localhost:5173"],  
@@ -30,6 +34,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(admin.router)
 app.include_router(listings.router)
+app.include_router(wishlist_router)
 
 @app.get("/")
 def root():
