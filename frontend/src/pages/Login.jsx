@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
 
 // Assets
+// Jania Southall - whole file
 import peteLogo from "/assets/images/logo.png";
 import hamptonCampus from "/assets/images/HamptonWater.png";
 

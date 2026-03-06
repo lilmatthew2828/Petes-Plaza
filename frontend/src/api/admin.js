@@ -1,5 +1,5 @@
 // Use Vite proxy for API calls; do not hardcode backend URL
-
+// Daye Karibi-Whyte - whole file
 export async function getAdminDashboard() { // Fetch admin dashboard metrics and listings
     const res = await fetch('/api/admin/dashboard'); // File referenced is admin.js because the /api/admin/dashboard endpoint returns all the necessary data for the admin dashboard in one call, including metrics and listings. This simplifies the frontend code by reducing the number of API calls needed to populate the dashboard.
     if (!res.ok) {

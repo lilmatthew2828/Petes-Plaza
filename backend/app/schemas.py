@@ -1,4 +1,4 @@
-# Jania Southall
+# Jania Southall Lines(1 - 117)
 # Schemas for user registration, login, and responses using Pydantic
 # PYDANTIC is a data validation library that allows us to define data models with type annotations and validation rules. 
 # It is commonly used in FastAPI to define request and response schemas.

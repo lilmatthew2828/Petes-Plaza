@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/admin.css";
 
+// Daye Karibi-Whyte - whole file
 // Sidebar component for admin dashboard with navigation links and icons for Dashboard, Users, Orders, and Announcements.
 export default function AdminSidebar({ active, open }) {
   return (
