@@ -1,0 +1,20 @@
+.env
+.venv/
+<<<<<<< HEAD
+__pycache__/*
+=======
+__pycache__/
+>>>>>>> eadcdc4ceabe7367ec1f13cdf729321e0c2638fd
+*.pyc
+.DS_Store
+*.sqlite3
+*.log
+*.db
+*.env
+*.env.*
+*.local
+build/
+dist/
+node_modules/
+frontend/node_modules/
+frontend/dist/
