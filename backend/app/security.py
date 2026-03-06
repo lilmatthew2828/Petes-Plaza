@@ -1,4 +1,4 @@
-#Jania Southall 
+#Jania Southall - whole file
 # Using passlib to use bycrypt for secure password hashing
 from passlib.context import CryptContext
 import os

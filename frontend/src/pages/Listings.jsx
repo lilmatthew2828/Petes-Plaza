@@ -7,6 +7,7 @@ export default function Listings() {
   const [category, setCategory] = useState("");
   const [listing_description, setListingDescription] = useState("");
   const [image_key, setImageKey] = useState("");
+// Emmanuella Obidike - whole file
 
   // Get listing
   useEffect(() => {

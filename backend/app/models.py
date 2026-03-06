@@ -8,7 +8,7 @@ from app.database import Base
 
 
 Base = declarative_base()
-
+# Jania Southall - Lines (11 - 44)
 # Models for SQLAlchemy ORM mapping to database tables.
 class User(Base):
     __tablename__ = "users"
@@ -71,7 +71,7 @@ class Listing(Base):
 
 
 
-# ✅ Wishlist model (NEW)
+# Wishlist model (NEW)
 class Wishlist(Base):  # Matthew Kilpatrick
     __tablename__ = "wishlist"
 

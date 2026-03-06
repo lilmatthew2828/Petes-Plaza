@@ -1,6 +1,9 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getListing } from "../api/listings";
+
+// Emmanuella Obidike - whole file
 
 export default function ListingDetail() {
   const { id } = useParams();
