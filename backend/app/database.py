@@ -1,3 +1,5 @@
+#Daye Karibi-Whyte Code: Setting up the database
+
 """
     This module sets up the database connection and session management 
     for the Pete's Plaza application using SQLAlchemy.

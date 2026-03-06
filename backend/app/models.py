@@ -72,7 +72,7 @@ class Listing(Base):
 
 
 # ✅ Wishlist model (NEW)
-class Wishlist(Base):
+class Wishlist(Base):  # Matthew Kilpatrick
     __tablename__ = "wishlist"
 
     id = Column(Integer, primary_key=True, index=True)
