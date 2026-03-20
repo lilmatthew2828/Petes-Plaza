@@ -154,3 +154,15 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     class Config:
         orm_mode = True # This allows Pydantic to work with SQLAlchemy models and convert them to the response format correctly
         from_attributes = True # This allows Pydantic to read data from SQLAlchemy model attributes when creating the response object
+        
+# Daye Karibi-Whyte - Added transaction response schema for purchase endpoint
+class TransactionResponse(BaseModel): #Defining the schema for transaction response when a purchase is made
+    id: int
+    listing_id: int
+    buyer_email: str
+    seller_email: str
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True

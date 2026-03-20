@@ -90,3 +90,16 @@ class Wishlist(Base):  # Matthew Kilpatrick
 
     def __repr__(self):
         return f"<Wishlist(user_id={self.user_id}, listing_id={self.listing_id})>"
+
+# Daye Karibi-Whyte - Added transactions model to represent completed purchases in the marketplace, linking buyers, sellers, and listings together for record-keeping and potential future features like order history or dispute resolution.
+class Transactions(Base):
+    __tablename__ = "transactions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
+    seller_email = Column(String, ForeignKey("users.email"), nullable=False)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    transaction_date = Column(String, default=datetime.now().isoformat())
+    
+    def __repr__(self):
+        return f"<Transaction(buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_date={self.transaction_date})>"
