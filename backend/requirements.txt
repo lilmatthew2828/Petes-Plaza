@@ -53,3 +53,4 @@ uvicorn
 uvloop
 watchfiles
 websockets
+boto3

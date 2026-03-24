@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 import os
+from typing import Optional
 
 # Jania Southall - Configuration settings for the application, loaded from environment variables or .env file.
 class Settings(BaseSettings):
@@ -10,6 +11,13 @@ class Settings(BaseSettings):
     secret_key: str = os.getenv("SECRET_KEY", "change-in-production")
     environment: str = os.getenv("ENVIRONMENT", "development")
     debug: bool = environment == "development"
+
+    # AWS S3 settings - Emmanuella Obidike
+    aws_access_key_id: Optional[str] = None
+    aws_secret_access_key: Optional[str] = None
+    aws_region: Optional[str] = None
+    aws_s3_bucket: Optional[str] = None
+
     
     # Cookie settings
     session_cookie_name: str = "session_id"
@@ -25,7 +33,13 @@ class Settings(BaseSettings):
     ]
     
     class Config:
-        env_file = ".env"
+       env_file = ".env"
+
+    # model_config = { # Emmanuella Obidike
+       # "env_file": ".env", # Emmanuella Obidike
+       # "extra": "allow" # Emmanuella Obidike
+   #
+   #  }
 
 
 settings = Settings()

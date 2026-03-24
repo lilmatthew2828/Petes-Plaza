@@ -11,10 +11,44 @@ from app import schemas, services, models
 # DB dependency
 from app.database import get_db
 from app.auth import require_login
+from app.models import Listing, User, Transactions  # Add Transactions
 
 
 # Expose listings routes under /api/listings to match frontend proxy/config
 router = APIRouter(prefix="/api/listings", tags=["listings"])
+
+@router.get("/my-sold")
+def view_my_sold_listings(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_login)
+):
+    # Get listings that have a transaction (meaning they were sold)
+    listings = db.query(
+        models.Listing,
+        models.Transactions.buyer_email,
+        models.Transactions.transaction_timestamp.label('sold_at')  # Changed from created_at
+    ).join(
+        models.Transactions, 
+        models.Listing.id == models.Transactions.listing_id
+    ).filter(
+        models.Listing.seller_email == current_user.email
+    ).all()
+
+    sold_listings = []
+    for listing, buyer_email, sold_at in listings:
+        sold_listings.append({
+            "id": listing.id,
+            "title": listing.title,
+            "description": listing.description,
+            "price": listing.price,
+            "status": listing.status,
+            "seller_email": listing.seller_email,
+            "image_key": listing.image_key,
+            "buyer_email": buyer_email,
+            "sold_at": sold_at  # This is already a string from the model
+        })
+    
+    return sold_listings
 
 
 @router.get("/{listing_id}", response_model=schemas.ListingResponse)
@@ -62,6 +96,7 @@ def remove_listing(
     services.delete_listing(db, listing_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
+
 # EMMANUELLA OBIDIKE
 # LISTINGS ROUTES
 from fastapi import APIRouter, Depends
@@ -87,10 +122,12 @@ def view_listings():
     return get_all_listings()
 
 
+
 # Get listing by id (shows one listing)
-@listings_router.get("/listings/{listing_id}")
+@listings_router.get("/my-listings/{listing_id}")
 def view_listing(listing_id: int):
     return get_single_listing(listing_id)
+
 
 # Create a new listing
 @listings_router.post("/listings/new")
@@ -99,3 +136,5 @@ def create_new_listing(
     current_user = Depends(get_current_user)
 ):
     return create_listing(listing_data, current_user.email)
+
+
