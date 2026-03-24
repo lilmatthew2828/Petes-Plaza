@@ -187,7 +187,6 @@ export default function HomePage() {
         </div>
       </header>
 
-
       {/* NAVIGATION ROW */}
       <nav className="navrow">
         <div className="tabs">
@@ -201,6 +200,8 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+        
+        {/* Right side navigation buttons */}
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="pill create-btn" onClick={handleCreateListing}>
             Create a Listing
@@ -212,6 +213,12 @@ export default function HomePage() {
               </button>
             </Link>
           )}
+          {/* EMMANUELLA OBIDIKE */}
+          <Link to="/my-sold">
+            <button className="pill">
+              Sold Items
+            </button>
+          </Link>
         </div>
       </nav>
 
@@ -242,6 +249,7 @@ export default function HomePage() {
 
             {error && <div style={{ color: 'red', marginBottom: '1rem' }}>⚠ {error} (showing sample data)</div>}
             {loading && <p>Loading listings...</p>}
+            
             {/* LISTING GRID. The listings should only show if the listing.status === 'active' */}
             <div className="cards">
               {filteredListings.filter(listing => listing.status === "active").map(listing => {
@@ -285,7 +293,7 @@ export default function HomePage() {
                           className="pill"
                           disabled={wishlistLoadingIds.has(listing.id)} //Matthew Kilpatrick
                           onClick={() => handleRemoveWishlist(listing.id)}
-                        >
+                        > 
                           {wishlistLoadingIds.has(listing.id)
                             ? "Removing..."
                             : "Wishlisted"}

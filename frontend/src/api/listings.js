@@ -1,7 +1,7 @@
 // Anthony Powell
 import { apiCall } from "./client";
 
-const LISTINGS_BASE = "/api/listings";
+const LISTINGS_BASE = "/api/my-listings";
 
 /**
  * Fetch one listing by ID.
