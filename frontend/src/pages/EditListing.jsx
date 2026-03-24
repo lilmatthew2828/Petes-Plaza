@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getListing, updateListing } from "../api/listings";
+import { getListing, updateListing, deleteListing } from "../api/listings";
 
 export default function EditListing() {
   // listingId comes from route: /listings/:listingId/edit
@@ -26,6 +26,7 @@ export default function EditListing() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   // Load listing once page mounts / listingId changes
   useEffect(() => {
@@ -93,6 +94,24 @@ export default function EditListing() {
       setError(e?.message || "Failed to update listing");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const onDelete = async () => {
+    setError("");
+    setDeleting(true);
+    try {
+      await deleteListing(listingId);
+      navigate("/homepage", {
+        state: {
+          refreshListings: true,
+          refreshedAt: Date.now(),
+        },
+      });
+    } catch (e) {
+      setError(e?.message || "Failed to delete listing");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -172,10 +191,13 @@ export default function EditListing() {
         />
 
         <div style={{ display: "flex", gap: 8 }}>
-          <button type="submit" disabled={saving || loading}>
+          <button type="submit" disabled={saving || loading || deleting}>
             {saving ? "Saving..." : "Save Changes"}
           </button>
-          <button type="button" onClick={() => navigate("/homepage")} disabled={saving}>
+          <button type="button" onClick={onDelete} disabled={saving || loading || deleting}>
+            {deleting ? "Deleting..." : "Delete Listing"}
+          </button>
+          <button type="button" onClick={() => navigate("/homepage")} disabled={saving || deleting}>
             Cancel
           </button>
         </div>

@@ -23,6 +23,10 @@ def get_all_listings():
                 "category": l.category,  
                 "image_url": l.image_key,
                 "image_key": l.image_key,
+                # Anthony Powell
+                # Seller & Status fields added to listing
+                "seller_email": l.seller_email,
+                "status": l.status,
             }
             for l in listings
         ]
@@ -49,6 +53,8 @@ def get_single_listing(listing_id: int):
             "category": listing.category,
             "image_url": listing.image_key,
             "image_key": listing.image_key,
+            "seller_email": listing.seller_email,
+            "status": listing.status,
         }
     finally:
         db.close()
@@ -83,6 +89,8 @@ def create_listing(listing_data: ListingCreate, seller_email: str):
             "category": new_listing.category,
             "image_url": new_listing.image_key,
             "image_key": new_listing.image_key,
+            "seller_email": new_listing.seller_email,
+            "status": new_listing.status,
         }
     finally:
         db.close()

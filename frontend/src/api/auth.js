@@ -23,6 +23,17 @@ export async function login(payload) {
   });
 }
 
+/*
+Anthony Powell
+adminLogin API method
+*/
+export async function adminLogin(payload) {
+  return apiCall("/api/auth/admin/login", {
+    method: "POST",
+    body: payload,
+  });
+}
+
 /**
  * Logout and revoke session
  */

@@ -6,6 +6,7 @@ import '../styles/index.css'
 import WishlistModal from '../components/WishlistModal'
 import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
 import { Link } from 'react-router-dom'
+import { deleteListing } from "../api/listings";
 
 const SAMPLE_LISTINGS = [
   { id: 1, title: 'Graphic T-Shirt', price: 12.99, category: 'T-Shirts', image: '/assets/images/graphic_tshirt.png' },
@@ -29,6 +30,23 @@ const PLACEHOLDER_IMAGE = '/assets/images/image.png';
 
 const getCategoryForListing = (id) => CATEGORIES[(id - 1) % CATEGORIES.length]
 
+function normalizeListing(raw) {
+  const title = raw.title || raw.listing_title || "Untitled Listing";
+  const category = raw.category || getCategoryForListing(raw.id);
+  const image = raw.image || raw.image_url || raw.image_key || "";
+  const status = raw.status || "active";
+  const sellerEmail = (raw.seller_email || "").toLowerCase();
+
+  return {
+    ...raw,
+    title,
+    category,
+    image,
+    status,
+    seller_email: sellerEmail,
+  };
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,7 +67,7 @@ export default function HomePage() {
     : PAGE_DESC_MAP[activeTab] || 'Listings'
 
   const filteredListings = selectedCategory
-    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory)
+    ? listings.filter((item) => item.category === selectedCategory)
     : listings
 
   const handleTabClick = (tab) => {
@@ -74,14 +92,21 @@ export default function HomePage() {
       try {
         setLoading(true)
         setError(null)
-        const res = await fetch('/api/admin/listings', { credentials: "include" })
+        const res = await fetch('/api/listings', { credentials: "include" })
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
         const data = await res.json()
-        setListings(data)
+        setListings(Array.isArray(data) ? data.map(normalizeListing) : [])
       } catch (err) {
         console.error('Fetch error:', err)
-        setError(`Failed to load listings: ${err.message}`)
-        setListings(SAMPLE_LISTINGS)
+        try {
+          const fallbackRes = await fetch('/api/admin/listings', { credentials: "include" })
+          if (!fallbackRes.ok) throw new Error(`HTTP ${fallbackRes.status}: ${fallbackRes.statusText}`)
+          const fallbackData = await fallbackRes.json()
+          setListings(Array.isArray(fallbackData) ? fallbackData.map(normalizeListing) : [])
+        } catch (fallbackErr) {
+          setError(`Failed to load listings: ${fallbackErr.message}`)
+          setListings(SAMPLE_LISTINGS.map(normalizeListing))
+        }
       } finally {
         setLoading(false)
       }
@@ -162,11 +187,29 @@ export default function HomePage() {
     }
   };
 
+  const canManageListing = (listing) => {
+    if (!user) return false;
+    if (user.is_admin) return true;
+    return (listing.seller_email || "") === (user.email || "").toLowerCase();
+  };
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      await deleteListing(listingId);
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
+    } catch (e) {
+      alert(e.message || "Failed to delete listing");
+    }
+  };
+
   return (
     <div className="page">
       {/* TOP UTILITY BAR */}
       <header className="topbar">
         <div className="top-center">
+          {user?.is_admin && (
+            <div style={{ fontWeight: 700 }}>Logged in as Administrator</div>
+          )}
           <div className="site-header">
             <img src="/assets/images/logo.png" alt="Pete's Plaza Logo" className="header-image" onError={(e) => e.target.style.display = 'none'} />
             <div className="create-title site-title">
@@ -234,8 +277,8 @@ export default function HomePage() {
             {loading && <p>Loading listings...</p>}
             {/* LISTING GRID. The listings should only show if the listing.status === 'active' */}
             <div className="cards">
-              {filteredListings.filter(listing => listing.status === "active").map(listing => {
-                const category = getCategoryForListing(listing.id)
+              {filteredListings.filter((listing) => listing.status !== "deleted").map((listing) => {
+                const category = listing.category || getCategoryForListing(listing.id)
                 const imgSrc = listing.image && listing.image !== '' ? listing.image : PLACEHOLDER_IMAGE;
                 return (
                   <div key={listing.id} className="card">
@@ -256,9 +299,20 @@ export default function HomePage() {
                         flexWrap: "wrap",
                       }}
                     >
-                      <Link to={`/listings/${listing.id}/edit`}>
-                        <button className="pill">Edit Listing</button>
-                      </Link>
+                      {canManageListing(listing) && (
+                        <Link to={`/listings/${listing.id}/edit`}>
+                          <button className="pill">Edit Listing</button>
+                        </Link>
+                      )}
+
+                      {canManageListing(listing) && (
+                        <button
+                          className="pill"
+                          onClick={() => handleDeleteListing(listing.id)}
+                        >
+                          Delete Listing
+                        </button>
+                      )}
 
                       {!isWishlisted(listing.id) ? (
                         <button
@@ -286,6 +340,9 @@ export default function HomePage() {
                 )
               })}
             </div>
+            {!loading && filteredListings.filter((listing) => listing.status !== "deleted").length === 0 && (
+              <p style={{ marginTop: '1rem' }}>No listings available yet. Click "Create a Listing" to add one.</p>
+            )}
           </div>
         </main>
       </div>

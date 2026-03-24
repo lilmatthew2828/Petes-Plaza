@@ -1,4 +1,12 @@
 {
+  "name": "petes-plaza",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend run build"
+  },
   "devDependencies": {
     "nodemon": "^3.1.14"
     

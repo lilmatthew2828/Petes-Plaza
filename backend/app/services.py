@@ -163,7 +163,7 @@ def get_listing_or_404(db: Session, listing_id: int):
 def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate, current_user: User):
     listing = get_listing_or_404(db, listing_id)
 
-    if not _is_owner(listing, current_user):
+    if not _can_manage_listing(listing, current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="403 Forbidden --> Logged in but not the owner",
@@ -181,7 +181,7 @@ def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate,
 def delete_listing(db: Session, listing_id: int, current_user: User):
     listing = get_listing_or_404(db, listing_id)
 
-    if not _is_owner(listing, current_user):
+    if not _can_manage_listing(listing, current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="403 Forbidden --> Logged in but not the owner",
@@ -199,3 +199,8 @@ def _is_owner(listing: Listing, current_user: User) -> bool:
     if hasattr(listing, "seller_email"):
         return str(listing.seller_email).lower() == str(current_user.email).lower()
     return False
+
+# Anthony Powell
+# Admin-or-owner listing management 
+def _can_manage_listing(listing: Listing, current_user: User) -> bool:
+    return bool(getattr(current_user, "is_admin", False)) or _is_owner(listing, current_user)
