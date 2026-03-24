@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) console.warn("VITE_API_URL is not defined!");
 import { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/admin.css';
@@ -12,7 +14,7 @@ export default function Transactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/admin/transactions');
+        const res = await fetch(`${API_URL}/admin/transactions`);
         if (!res.ok) throw new Error('Failed to fetch transactions');
         const data = await res.json();
         setTransactions(data);

@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) console.warn("VITE_API_URL is not defined!");
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 export default function Listings() {
@@ -10,7 +12,7 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-  fetch("http://localhost:8000/api/listings")
+  fetch(`${API_URL}/listings`)
     .then((res) => {
       if (!res.ok) {
         throw new Error("Server response not OK");
@@ -42,7 +44,7 @@ export default function Listings() {
 
     
     try {
-      const response = await fetch("http://localhost:8000/api/listings/new",
+      const response = await fetch(`${API_URL}/listings/new`,
         {
           method: "POST",
           credentials: "include",

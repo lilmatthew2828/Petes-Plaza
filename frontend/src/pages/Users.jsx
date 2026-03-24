@@ -1,118 +1,142 @@
-import React, { useEffect, useState } from "react";
-import AdminSidebar from "../components/AdminSidebar";
-import "../styles/admin.css";
+const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) console.warn("VITE_API_URL is not defined!");
+import { useState, useEffect } from 'react';
+import AdminSidebar from '../components/AdminSidebar';
+import '../styles/admin.css';
 
 export default function Users() {
   const [users, setUsers] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [emailSearch, setEmailSearch] = useState('');
 
+  // Fetch all users from backend
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(`${API_URL}/admin/users`);
+        if (!res.ok) throw new Error('Failed to fetch users');
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchUsers();
   }, []);
 
-  const fetchUsers = async () => {
+  // Sidebar toggle handlers
+  const handleSidebarToggle = () => setSidebarOpen(open => !open);
+  const handleSidebarMouseEnter = () => setSidebarOpen(true);
+  const handleSidebarMouseLeave = () => setSidebarOpen(false);
+
+  // Suspend user
+  const suspendUser = async (email) => {
+    if (!window.confirm(`Suspend user ${email}?`)) return;
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/admin/users");
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-
-      const data = await response.json();
-      setUsers(data);
-    } catch (err) {
-      setError("Could not load users.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSuspendUser = async (email) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/admin/suspend/${email}`, {
-        method: "PUT",
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/suspend/${email}`, {
+        method: 'PUT'
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to suspend user");
-      }
-
-      alert("User suspended successfully");
-      fetchUsers();
+      if (!res.ok) throw new Error('Failed to suspend user');
+      setUsers(prev => prev.map(u => u.email === email ? { ...u, is_suspended: true } : u));
+      alert('User suspended');
     } catch (err) {
-      console.error(err);
-      alert("Failed to suspend user");
+      alert(err.message);
     }
   };
 
-  const handleViewListings = (email) => {
-    alert(`View listings for ${email} coming next`);
-  };
+  if (loading) return <div className="page"><p>Loading...</p></div>;
+  if (error) return <div className="error">Error: {error}</div>;
+
+  // Filter users by search
+  const filteredUsers = users.filter(u =>
+    u.email.toLowerCase().includes(emailSearch.toLowerCase())
+  );
 
   return (
-    <div className="admin-dashboard-root">
-      <AdminSidebar active="users" open={sidebarOpen} />
-
-      <div className="admin-dashboard-main">
-        <div className="admin-dashboard-header">
-          <button
-            className="sidebar-toggle"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
-
-          <h1>Users</h1>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#e7ecf4', position: 'relative' }}>
+      {/* Sidebar toggle icon */}
+      <div
+        style={{ position: 'absolute', top: 24, left: 24, zIndex: 110 }}
+        onClick={handleSidebarToggle}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
+      >
+        <div style={{
+          cursor: 'pointer',
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#fff',
+          borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+        }}>
+          <span style={{ fontSize: 28, fontWeight: 700 }}>☰</span>
         </div>
+      </div>
 
-        <div className="admin-card">
-          {loading ? (
-            <p>Loading users...</p>
-          ) : error ? (
-            <p style={{ color: "red" }}>{error}</p>
-          ) : users.length === 0 ? (
-            <p>No users found.</p>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>School</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+      {/* Sidebar */}
+      <div
+        style={{ position: 'absolute', left: 0, top: 0, height: '100%', zIndex: 100 }}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
+      >
+        <AdminSidebar active="users" open={sidebarOpen} />
+      </div>
 
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.email}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.school}</td>
-                    <td>
-                      <button
-                        className="admin-action-btn"
-                        onClick={() => handleViewListings(user.email)}
-                      >
-                        View Listings
-                      </button>
+      {/* Main content */}
+      <div style={{ flex: 1, padding: '32px 40px' }}>
+        <h2 style={{ marginBottom: 24 }}>Users</h2>
 
-                      <button
-                        className="admin-action-btn suspend"
-                        onClick={() => handleSuspendUser(user.email)}
-                      >
-                        Suspend
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        {/* Search input */}
+        <input
+          type="text"
+          placeholder="Search by email..."
+          value={emailSearch}
+          onChange={(e) => setEmailSearch(e.target.value)}
+          style={{ marginBottom: 16, padding: 8, width: '300px', borderRadius: 6, border: '1px solid #ccc' }}
+        />
+
+        {/* Users table */}
+        <table className="admin-table" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Created At</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map(user => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.email}</td>
+                <td>{user.name || '-'}</td>
+                <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                <td>{user.is_suspended ? 'Suspended' : 'Active'}</td>
+                <td>
+                  {!user.is_suspended && (
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => suspendUser(user.email)}
+                      style={{ padding: '4px 8px', fontSize: 14 }}
+                    >
+                      Suspend
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
