@@ -13,6 +13,8 @@ import "./App.css";
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
+import Transactions from "./pages/Transactions";
+import Users from "./pages/Users";
 
 
 function App() {
@@ -38,7 +40,7 @@ function App() {
             path="/homepage"
             element={
               <ProtectedRoute>
-                <HomePage/>
+                <HomePage />
               </ProtectedRoute>
             }
           />
@@ -58,6 +60,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <Transactions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Listings routes */}
           <Route path="/listings" element={<ProtectedRoute><Listings /></ProtectedRoute>} />
@@ -68,7 +86,7 @@ function App() {
           <Route path="/create-listing" element={<Navigate to="/listings" replace />} />
 
           {/* Redirect unknown routes to Welcome */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </AuthProvider>
     </Router>

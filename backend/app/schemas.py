@@ -157,7 +157,7 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
         
 # Daye Karibi-Whyte - Added transaction response schema for purchase endpoint
 class TransactionResponse(BaseModel): #Defining the schema for transaction response when a purchase is made
-    id: int
+    transaction_id: int
     listing_id: int
     buyer_email: str
     seller_email: str
@@ -172,7 +172,7 @@ class TransactionCreate(BaseModel): # Define the schema for creating a new trans
     buyer_email: str
     seller_email: str
     transaction_timestamp: datetime = Field(default_factory=datetime.now) # Set default to current time when transaction is created
-    
+
 class UserListResponse(BaseModel):
     email: str
     username: str

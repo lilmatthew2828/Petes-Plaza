@@ -126,7 +126,7 @@ export default function AdminDashboard() {
         if (!metricsRes.ok || !listingsRes.ok) {
           throw new Error('Failed to fetch admin data');
         }
-        const usersRes = await fetch('/api/admin/users');
+        const usersRes = await fetch('/api/admin/active_user_emails'); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for daily active users over the last 30 days
         let usersData = [];
 
         if (usersRes.ok) {
@@ -281,8 +281,7 @@ export default function AdminDashboard() {
   if (loading) return <div className="page"><p>Loading...</p></div>;
   if (error) return <div className="error">Error: {error}</div>;
   const filteredUsers = allUsers.filter(user =>
-    user.email?.toLowerCase().includes(emailSearch.toLowerCase()) &&
-    !user.is_suspended
+    user.email.toLowerCase().includes(emailSearch.toLowerCase())
   );
   const handleConfirmSold = async () => {
     if (!buyerEmail || !selectedListing) {

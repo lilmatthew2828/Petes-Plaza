@@ -32,8 +32,8 @@ def moderate_listing(db: Session, listing_id: int, action: str) -> dict: # Speci
         "status": listing.status
     }
 
-def suspend_user(db: Session, user_id: int) -> dict: # Specify that the function returns a dictionary
-    user = db.query(User).filter(User.id == user_id).first() #Grab the user given their ID
+def suspend_user(db: Session, user_email: str) -> dict: # Specify that the function returns a dictionary
+    user = db.query(User).filter(User.email == user_email).first() #Grab the user given their email
     if not user:
         return {"error": "User not found"} # If the user doesn't exist, return an error message
     

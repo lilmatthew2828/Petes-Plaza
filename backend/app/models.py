@@ -1,13 +1,8 @@
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float, UniqueConstraint
 from sqlalchemy.types import Boolean
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from app.database import Base
-
-
-
-Base = declarative_base()
 
 # Models for SQLAlchemy ORM mapping to database tables.
 class User(Base):
@@ -95,11 +90,11 @@ class Wishlist(Base):  # Matthew Kilpatrick
 class Transactions(Base):
     __tablename__ = "transactions"
     
-    id = Column(Integer, primary_key=True, index=True)
+    transaction_id = Column(Integer, primary_key=True, index=True)
     buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
     seller_email = Column(String, ForeignKey("users.email"), nullable=False)
     listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
-    transaction_timestamp = Column(String, default=datetime.now().isoformat())
+    transaction_timestamp = Column(DateTime, default=datetime.now, nullable=False)
     
     def __repr__(self):
         return f"<Transaction(buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"
