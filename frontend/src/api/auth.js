@@ -7,7 +7,7 @@ import { apiCall } from "./client";
  * Register a new user
  */
 export async function register(payload) {
-  return apiCall("/api/auth/register", {
+  return apiCall("/auth/register", {
     method: "POST",
     body: payload,
   });
@@ -17,7 +17,7 @@ export async function register(payload) {
  * Login with email or username
  */
 export async function login(payload) {
-  return apiCall("/api/auth/login", {
+  return apiCall("/auth/login", {
     method: "POST",
     body: payload,
   });
@@ -27,7 +27,7 @@ export async function login(payload) {
  * Logout and revoke session
  */
 export async function logout() {
-  return apiCall("/api/auth/logout", {
+  return apiCall("/auth/logout", {
     method: "POST",
   });
 }
@@ -36,7 +36,7 @@ export async function logout() {
  * Get current authenticated user
  */
 export async function getMe() {
-  return apiCall("/api/auth/me", {
+  return apiCall("/auth/me", {
     method: "GET",
   });
 }
