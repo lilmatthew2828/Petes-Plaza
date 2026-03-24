@@ -19,6 +19,9 @@ export default function AdminSidebar({ active, open }) {
         <li className={active === "announcements" ? "active" : ""}>
           <span className="sidebar-icon">🔔</span> Announcements
         </li>
+        <li className={active === "transactions" ? "active" : ""}>
+          <span className="sidebar-icon">💰</span> Transactions
+        </li>
       </ul>
     </div>
   );

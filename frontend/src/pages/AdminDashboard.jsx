@@ -36,6 +36,11 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeUsers, setActiveUsers] = useState([]);
   const [message, setMessage] = useState(''); // for alerts/notifications
+  const [showSoldModal, setShowSoldModal] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [allUsers, setAllUsers] = useState([]);
+  const [buyerEmail, setBuyerEmail] = useState('');
+  const [emailSearch, setEmailSearch] = useState('');
   const showMessage = (text) => {
     setMessage(text);                // show the message
     setTimeout(() => setMessage(''), 7000);  // clear after 7 seconds
@@ -107,7 +112,7 @@ export default function AdminDashboard() {
   const handleViewDetails = (listingId) => {
     // For simplicity, we'll just alert the listing ID. In a real implementation, this would open a modal with the listing details fetched from the backend.
     //This should go to the ListingDetails.jsx page for that listing.
-    
+
     //alert(`View details for listing ID: ${listingId}`);
   };
 
@@ -120,6 +125,13 @@ export default function AdminDashboard() {
         const userGrowthRes = await fetch('/api/admin/user_growth'); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for user signups over the last 30 days
         if (!metricsRes.ok || !listingsRes.ok) {
           throw new Error('Failed to fetch admin data');
+        }
+        const usersRes = await fetch('/api/admin/users');
+        let usersData = [];
+
+        if (usersRes.ok) {
+          usersData = await usersRes.json();
+          setAllUsers(usersData);
         }
         const metricsData = await metricsRes.json();
         const listingsData = await listingsRes.json();
@@ -268,7 +280,46 @@ export default function AdminDashboard() {
 
   if (loading) return <div className="page"><p>Loading...</p></div>;
   if (error) return <div className="error">Error: {error}</div>;
+  const filteredUsers = allUsers.filter(user =>
+    user.email?.toLowerCase().includes(emailSearch.toLowerCase()) &&
+    !user.is_suspended
+  );
+  const handleConfirmSold = async () => {
+    if (!buyerEmail || !selectedListing) {
+      alert('Please select a buyer email');
+      return;
+    }
 
+    try {
+      await handleModerate(selectedListing.id, 'mark_sold');
+
+      const transactionPayload = {
+        listing_id: selectedListing.id,
+        buyer_email: buyerEmail,
+        seller_email: selectedListing.email || selectedListing.seller_email,
+        transaction_timestamp: new Date().toISOString()
+      };
+
+      const res = await fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transactionPayload)
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to create transaction');
+      }
+
+      setShowSoldModal(false);
+      setBuyerEmail('');
+      setEmailSearch('');
+      setSelectedListing(null);
+
+      showMessage('Listing marked sold and transaction recorded.');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
   return (
     <div className="admin-dashboard-wrapper" style={{ display: 'flex', minHeight: '100vh', background: '#e7ecf4', position: 'relative' }}>
       {/* Sidebar toggle icon */}
@@ -390,7 +441,13 @@ export default function AdminDashboard() {
                           ) : null}
                           {listing.status === 'active' ? (
                             <>
-                              <button className="btn btn-primary" onClick={() => handleModerate(listing.id, 'mark_sold')}>Mark Sold</button>
+                              <button className="btn btn-primary" onClick={() => {
+                                setSelectedListing(listing);
+                                setShowSoldModal(true);
+                              }}
+                              >
+                                Mark Sold
+                              </button>
                               <button className="btn btn-secondary" onClick={() => handleModerate(listing.id, 'archive')}>Archive</button>
                               <button className="btn btn-danger" onClick={() => handleDelete(listing.id)}>Delete</button>
                             </>
@@ -415,6 +472,85 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+      {showSoldModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 999
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: 24,
+            borderRadius: 12,
+            width: 450,
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16
+          }}>
+            <h3>Select Buyer Email</h3>
+
+            <input
+              type="text"
+              placeholder="Search email..."
+              value={emailSearch}
+              onChange={(e) => setEmailSearch(e.target.value)}
+              style={{
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #ccc'
+              }}
+            />
+
+            <div style={{
+              maxHeight: 250,
+              overflowY: 'auto',
+              border: '1px solid #ddd',
+              borderRadius: 8,
+              padding: 8
+            }}>
+              {filteredUsers.map(user => (
+                <div
+                  key={user.id}
+                  onClick={() => setBuyerEmail(user.email)}
+                  style={{
+                    padding: 10,
+                    cursor: 'pointer',
+                    background: buyerEmail === user.email ? '#dbeafe' : 'transparent',
+                    borderRadius: 6
+                  }}
+                >
+                  {user.email}
+                </div>
+              ))}
+            </div>
+
+            <div>
+              Selected: <strong>{buyerEmail || 'None'}</strong>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button className="btn btn-primary" onClick={handleConfirmSold}>
+                Confirm Sale
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowSoldModal(false);
+                  setBuyerEmail('');
+                  setEmailSearch('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
