@@ -87,10 +87,25 @@ def view_listings():
     return get_all_listings()
 
 
+# Get sold listings for the current user - Emmanuella Obidike
+@router.get("/my-sold")
+def view_my_sold_listings(
+    current_user = Depends(require_login),
+    db: Session = Depends(get_db)
+):
+    listings = db.query(models.Listing).filter(
+        models.Listing.seller_email == current_user.email,
+        models.Listing.sold == True
+    ).all()
+
+    return listings
+
+
 # Get listing by id (shows one listing)
-@listings_router.get("/listings/{listing_id}")
+@listings_router.get("/my-listings/{listing_id}")
 def view_listing(listing_id: int):
     return get_single_listing(listing_id)
+
 
 # Create a new listing
 @listings_router.post("/listings/new")
@@ -99,3 +114,5 @@ def create_new_listing(
     current_user = Depends(get_current_user)
 ):
     return create_listing(listing_data, current_user.email)
+
+

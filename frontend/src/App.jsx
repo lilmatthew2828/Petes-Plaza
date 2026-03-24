@@ -13,6 +13,7 @@ import "./App.css";
 import Home from "./pages/Home";
 import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
+import MySoldListings from "./pages/sold_items"; // EMMANUELLA OBIDIKE
 
 
 function App() {
@@ -49,7 +50,15 @@ function App() {
                 <EditListing />
               </ProtectedRoute>
             }
-          />
+          /> {/* EMMANUELLA OBIDIKE */}
+          <Route
+          path="/my-sold"
+          element={
+            <ProtectedRoute>
+              <MySoldListings />
+            </ProtectedRoute>
+          }
+        />
           <Route
             path="/admin"
             element={

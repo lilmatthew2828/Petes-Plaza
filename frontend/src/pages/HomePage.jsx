@@ -199,10 +199,19 @@ export default function HomePage() {
               {tab}
             </button>
           ))}
-        </div>
-        <button className="pill create-btn" onClick={handleCreateListing}>
+          </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+        <button className="tab" onClick={handleCreateListing}>
           Create a Listing
         </button>
+
+          {/* EMMANUELLA OBIDIKE */}
+        <Link to="/my-sold">
+          <button className="tab">
+            Sold Items
+          </button>
+        </Link>
+      </div>
       </nav>
 
       {/* MAIN LAYOUT */}
@@ -275,7 +284,7 @@ export default function HomePage() {
                           className="pill"
                           disabled={wishlistLoadingIds.has(listing.id)} //Matthew Kilpatrick
                           onClick={() => handleRemoveWishlist(listing.id)}
-                        >
+                        > 
                           {wishlistLoadingIds.has(listing.id)
                             ? "Removing..."
                             : "Wishlisted"}

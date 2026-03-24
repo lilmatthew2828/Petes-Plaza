@@ -29,7 +29,17 @@ def get_all_listings():
     finally:
         db.close()
 
+# Get sold listings for the current user
+def get_my_sold_listings(user_email: str):
+    db = SessionLocal()
 
+    listings = db.query(Listing).filter(
+        Listing.seller_email == user_email,
+        Listing.sold == True
+    ).all()
+
+    db.close()
+    return listings
 
 # Get single listing by ID
 def get_single_listing(listing_id: int):

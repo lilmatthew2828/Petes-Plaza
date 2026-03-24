@@ -10,5 +10,3 @@ coverage/
 *.log
 .DS_Store
 *.sqlite3
-.env
-.env*

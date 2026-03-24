@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     secret_key: str = os.getenv("SECRET_KEY", "change-in-production")
     environment: str = os.getenv("ENVIRONMENT", "development")
     debug: bool = environment == "development"
+
+    # AWS S3 settings - Emmanuella Obidike
+    aws_access_key_id: str # Emmanuella Obidike
+    aws_secret_access_key: str # Emmanuella Obidike
+    aws_region: str # Emmanuella Obidike
+    aws_s3_bucket: str # Emmanuella Obidike
+
     
     # Cookie settings
     session_cookie_name: str = "session_id"
@@ -24,8 +31,13 @@ class Settings(BaseSettings):
         "http://localhost:8000"
     ]
     
-    class Config:
-        env_file = ".env"
+    #class Config:
+    #   env_file = ".env"
+
+    model_config = { # Emmanuella Obidike
+        "env_file": ".env", # Emmanuella Obidike
+        "extra": "allow" # Emmanuella Obidike
+    }
 
 
 settings = Settings()
