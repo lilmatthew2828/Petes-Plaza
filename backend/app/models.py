@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float, UniqueConstraint
+from sqlalchemy import DECIMAL, Column, String, DateTime, ForeignKey, Integer, Index, Float, UniqueConstraint
 from sqlalchemy.types import Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -21,7 +21,9 @@ class User(Base):
     created_at = Column(String, default=datetime.now)
     is_suspended = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
-    listings = relationship("Listing", back_populates="seller")
+    listings = relationship("Listing", back_populates="seller", foreign_keys="[Listing.seller_email]") # Establish relationship to Listing model, allowing access to seller's listings from user
+    purchases = relationship("Transactions", back_populates="buyer", foreign_keys="[Transactions.buyer_email]")
+    sales = relationship("Transactions", back_populates="seller", foreign_keys="[Transactions.seller_email]")
     def __repr__(self):
         return f"<User(email={self.email}, username={self.username})>"
 
@@ -60,15 +62,11 @@ class Listing(Base):
     updated_at = Column(String, default=lambda: datetime.now().isoformat(), onupdate=lambda: datetime.now().isoformat())
     category = Column(String, nullable=True) # New category field for listing categorization
 
-    seller = relationship("User", back_populates="listings") # Establish relationship to User model, allowing access to seller info from listing
-    
+    seller = relationship("User", back_populates="listings", foreign_keys=[seller_email])
+    transaction = relationship("Transactions", back_populates="listing", uselist=False)
+
     def __repr__(self):
         return f"<Listing(title={self.title}, price={self.price}, status={self.status}, category={self.category}, created_at={self.created_at}, updated_at={self.updated_at}, description={self.description[:50]}...), seller_email={self.seller_email}>" # Updated repr to include category and seller_email for easier debugging and visualization of listing details# from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, Float
-
-
-
-
-
 
 
 # Wishlist model (NEW)
@@ -90,3 +88,20 @@ class Wishlist(Base):  # Matthew Kilpatrick
 
     def __repr__(self):
         return f"<Wishlist(user_id={self.user_id}, listing_id={self.listing_id})>"
+
+# Daye Karibi-Whyte - Added transactions model to represent completed purchases in the marketplace, linking buyers, sellers, and listings together for record-keeping and potential future features like order history or dispute resolution.
+class Transactions(Base):
+    __tablename__ = "transactions"
+    
+    transaction_id = Column(Integer, primary_key=True, index=True)
+    buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
+    seller_email = Column(String, ForeignKey("users.email"), nullable=False)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    transaction_timestamp = Column(String, default=datetime.now().isoformat())
+    
+    buyer = relationship("User", back_populates="purchases", foreign_keys=[buyer_email])
+    seller = relationship("User", back_populates="sales", foreign_keys=[seller_email])
+    listing = relationship("Listing", back_populates="transaction")
+    
+    def __repr__(self):
+        return f"<Transaction(transaction_id={self.transaction_id}, buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"

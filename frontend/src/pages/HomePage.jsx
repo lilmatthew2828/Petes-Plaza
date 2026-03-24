@@ -187,6 +187,7 @@ export default function HomePage() {
         </div>
       </header>
 
+
       {/* NAVIGATION ROW */}
       <nav className="navrow">
         <div className="tabs">
@@ -200,9 +201,18 @@ export default function HomePage() {
             </button>
           ))}
         </div>
-        <button className="pill create-btn" onClick={handleCreateListing}>
-          Create a Listing
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="pill create-btn" onClick={handleCreateListing}>
+            Create a Listing
+          </button>
+          {user && (
+            <Link to="/purchase-history">
+              <button className="pill">
+                Purchase History
+              </button>
+            </Link>
+          )}
+        </div>
       </nav>
 
       {/* MAIN LAYOUT */}

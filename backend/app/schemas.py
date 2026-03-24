@@ -154,3 +154,51 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     class Config:
         orm_mode = True # This allows Pydantic to work with SQLAlchemy models and convert them to the response format correctly
         from_attributes = True # This allows Pydantic to read data from SQLAlchemy model attributes when creating the response object
+
+
+class PurchaseHistoryCreate(BaseModel):
+    user_id: int
+    listing_id: int
+    quantity: int
+    price: Decimal
+    purchase_date: datetime = Field(default_factory=datetime.utcnow)
+
+
+class PurchaseHistory(PurchaseHistoryCreate):
+    id: int
+    listing_title: str
+    listing_image_url: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+class PurchaseHistoryItem(BaseModel):
+    id: int
+    listing_id: int
+    title: str
+    description: str
+    price: float
+    image_key: Optional[str] = None
+    purchased_at: datetime
+    seller_email: str
+    
+    class Config:
+        from_attributes = True
+
+# Daye Karibi-Whyte - Added transaction response schema for purchase endpoint
+class TransactionResponse(BaseModel): #Defining the schema for transaction response when a purchase is made
+    id: int
+    listing_id: int
+    buyer_email: str
+    seller_email: str
+    transaction_timestamp: datetime
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class TransactionCreate(BaseModel): # Define the schema for creating a new transaction when a purchase is made
+    listing_id: int
+    buyer_email: str
+    seller_email: str
+    transaction_timestamp: datetime = Field(default_factory=datetime.now) # Set default to current time when transaction is created
