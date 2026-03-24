@@ -161,8 +161,27 @@ class TransactionResponse(BaseModel): #Defining the schema for transaction respo
     listing_id: int
     buyer_email: str
     seller_email: str
-    created_at: datetime
+    transaction_timestamp: datetime
     
     class Config:
         orm_mode = True
         from_attributes = True
+
+class TransactionCreate(BaseModel): # Define the schema for creating a new transaction when a purchase is made
+    listing_id: int
+    buyer_email: str
+    seller_email: str
+    transaction_timestamp: datetime = Field(default_factory=datetime.now) # Set default to current time when transaction is created
+    
+class UserListResponse(BaseModel):
+    email: str
+    username: str
+    student_id: int
+    created_at: datetime
+    is_suspended: bool
+    is_admin: bool
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+

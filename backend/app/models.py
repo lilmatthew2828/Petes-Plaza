@@ -99,7 +99,7 @@ class Transactions(Base):
     buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
     seller_email = Column(String, ForeignKey("users.email"), nullable=False)
     listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
-    transaction_date = Column(String, default=datetime.now().isoformat())
+    transaction_timestamp = Column(String, default=datetime.now().isoformat())
     
     def __repr__(self):
-        return f"<Transaction(buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_date={self.transaction_date})>"
+        return f"<Transaction(buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"
