@@ -121,32 +121,44 @@ Go to the frontend folder:
     cd Petes-Plaza-Experiment/frontend
 
 Install dependencies (only needed if you haven’t before):
+```bash 
 
     npm install
 
-Start the dev server:
+ #Start the dev server:
 
     npm run dev
 
-You should see something like:
+#You should see something like:
 
-    VITE v5.x
-    Local: http://localhost:5173/
-
+    # VITE v5.x
+    # Local: http://localhost:5173/
+```
 - For Database: 
+```bash
 - psql --version
 - psql 'postgresql://postgres:HamptonSeniors2026%21@petes-plaza-db.c2lca2oiye1q.us-east-1.rds.amazonaws.com:5432/petes_plaza_db?sslmode=require'
+```
 - If it connects you’ll see something like: petes_plaza_db=#
 - Show all tables
     \dt
 Look inside tables (your main ones)
+```SQL
     SELECT * FROM users LIMIT 10;
     SELECT * FROM listings LIMIT 10;
     SELECT * FROM wishlist LIMIT 10;
     SELECT * FROM session_tokens LIMIT 10;
+```
 Describe table columns
     \d users
     \d listings
     \d wishlist
 Exit
     \q
+
+
+To Run tests:
+```bash
+cd Petes-Plaza/backend
+PYTHONPATH=$(pwd) pytest app/pytests/test_admin_service.py
+```
