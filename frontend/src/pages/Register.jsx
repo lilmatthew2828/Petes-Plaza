@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
-
+// Jania Southall - whole file
 // Assets imported from your src/assets folder
 import peteLogo from "/assets/images/logo.png";
 import hamptonCampus from "/assets/images/HamptonWater.png";

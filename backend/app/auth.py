@@ -1,4 +1,4 @@
-# Jania Southall - Authentication routes and dependencies 
+# Jania Southall (whole file) - Authentication routes and dependencies 
 # for user registration, login, logout, and session management. 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session

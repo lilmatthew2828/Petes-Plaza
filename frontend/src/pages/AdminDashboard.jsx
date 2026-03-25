@@ -7,6 +7,7 @@ p - A paragraph element that is used to define a block of text.
 table, thead, tbody, tr, th, td - Elements used to create tables. table is the container for the entire table, thead defines the header section, tbody defines the body section, tr defines a table row, th defines a header cell, and td defines a standard cell.
 button - An interactive element that can be clicked to perform an action.
 span - An inline container element that can be used to group text or other inline elements together.
+daye karibi-whyte - whole file
 
 */
 import { useState, useEffect } from 'react';

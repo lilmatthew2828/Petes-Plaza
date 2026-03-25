@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/navBar";
+import PurchaseHistory from './pages/PurchaseHistory';
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
@@ -15,6 +16,7 @@ import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
 import Transactions from "./pages/Transactions";
 import Users from "./pages/Users";
+import MySoldListings from "./pages/sold_items"; // EMMANUELLA OBIDIKE
 
 
 function App() {
@@ -51,7 +53,15 @@ function App() {
                 <EditListing />
               </ProtectedRoute>
             }
-          />
+          /> {/* EMMANUELLA OBIDIKE */}
+          <Route
+          path="/my-sold"
+          element={
+            <ProtectedRoute>
+              <MySoldListings />
+            </ProtectedRoute>
+          }
+        />
           <Route
             path="/admin"
             element={
@@ -85,6 +95,9 @@ function App() {
           {/* Redirect create-listing to Listings page */}
           <Route path="/create-listing" element={<Navigate to="/listings" replace />} />
 
+          {/* Purchase history route */}
+          <Route path="/purchase-history" element={<ProtectedRoute><PurchaseHistory /></ProtectedRoute>} />
+          
           {/* Redirect unknown routes to Welcome */}
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>

@@ -1,4 +1,4 @@
-# Jania Southall
+# Jania Southall Lines(1 - 117)
 # Schemas for user registration, login, and responses using Pydantic
 # PYDANTIC is a data validation library that allows us to define data models with type annotations and validation rules. 
 # It is commonly used in FastAPI to define request and response schemas.
@@ -154,10 +154,40 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     class Config:
         orm_mode = True # This allows Pydantic to work with SQLAlchemy models and convert them to the response format correctly
         from_attributes = True # This allows Pydantic to read data from SQLAlchemy model attributes when creating the response object
-        
+
+
+class PurchaseHistoryCreate(BaseModel):
+    user_id: int
+    listing_id: int
+    quantity: int
+    price: Decimal
+    purchase_date: datetime = Field(default_factory=datetime.utcnow)
+
+
+class PurchaseHistory(PurchaseHistoryCreate):
+    id: int
+    listing_title: str
+    listing_image_url: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+class PurchaseHistoryItem(BaseModel):
+    id: int
+    listing_id: int
+    title: str
+    description: str
+    price: float
+    image_key: Optional[str] = None
+    purchased_at: datetime
+    seller_email: str
+    
+    class Config:
+        from_attributes = True
+
 # Daye Karibi-Whyte - Added transaction response schema for purchase endpoint
 class TransactionResponse(BaseModel): #Defining the schema for transaction response when a purchase is made
-    transaction_id: int
+    id: int
     listing_id: int
     buyer_email: str
     seller_email: str

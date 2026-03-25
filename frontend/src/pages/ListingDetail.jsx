@@ -1,6 +1,9 @@
+// EMMANUELLA OBIDIKE
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getListing } from "../api/listings";
+
+// Emmanuella Obidike - whole file
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -13,6 +16,7 @@ export default function ListingDetail() {
       try {
         setError("");
         const data = await getListing(id);
+        console.log("DETAIL LISTING:", data);
         setListing(data);
       } catch (e) {
         setError(e?.message || "Failed to load listing");
@@ -32,12 +36,15 @@ export default function ListingDetail() {
 
   const title = listing.title ?? listing.listing_title ?? "Untitled listing";
   const description = listing.description ?? listing.listing_description ?? "";
-  const image = listing.image_url ?? listing.image_key ?? "";
+
+  const imageKey = listing.image_key || listing.image_url;
+
+  const image = imageKey
+    ? `https://petes-plaza-bucket.s3.amazonaws.com/${imageKey}`
+    : "";
 
   return (
     <div style={{ padding: "60px", maxWidth: "900px", margin: "0 auto" }}>
-
-      {/* Back button */}
       <button
         onClick={() => navigate(-1)}
         style={{
@@ -65,23 +72,25 @@ export default function ListingDetail() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
         }}
       >
-        {image && (
-        <img
-          src={image}
-          alt={title}
-          style={{
-            width: "300px",
-            borderRadius: "10px",
-            marginBottom: "20px"
-          }}
-        />
-      )}
+        {image ? (
+          <img
+            src={image}
+            alt={title}
+            style={{
+              width: "300px",
+              borderRadius: "10px",
+              marginBottom: "20px",
+              display: "block"
+            }}
+          />
+        ) : (
+          <p>No image available</p>
+        )}
 
-      <p><strong>Category:</strong> {listing.category}</p>
-  <p><strong>Description:</strong> {description}</p>
-      <p><strong>Price:</strong> ${listing.price}</p>
+        <p><strong>Category:</strong> {listing.category}</p>
+        <p><strong>Description:</strong> {description}</p>
+        <p><strong>Price:</strong> ${listing.price}</p>
       </div>
-
     </div>
   );
 }

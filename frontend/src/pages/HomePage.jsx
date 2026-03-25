@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Archive } from 'lucide-react';
 import Icon from '@mdi/react';
 import { mdiTreasureChest } from '@mdi/js';
 import { useAuth } from '../context/AuthContext';
@@ -146,6 +145,18 @@ export default function HomePage() {
         <div className="top-tabs">
           <button className="top-tab" onClick={() => setShowAuthModal(true)}>Profile</button>
           <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
+          {user && (
+            <Link to="/purchase-history">
+              <button className="top-tab">
+                Purchase History
+              </button>
+            </Link>
+          )}
+          <Link to="/my-sold">
+            <button className="top-tab">
+              Sold Items
+            </button>
+          </Link>
           <button className="top-tab" onClick={() => alert('Cart clicked!')}>Cart</button>
           <button className="top-tab" onClick={() => setActiveTab('Contact Us')}>Contact</button>
           {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
