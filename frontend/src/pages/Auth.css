@@ -1,0 +1,106 @@
+/* Layout Wrapper */
+.auth-page-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Left: Branding Styling */
+.branding-side {
+  width: 50%;
+  background-color: #003366; 
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 40px;
+}
+
+.branding-overlay {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.branding-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.branding-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Right: Form Styling with Floating Logo */
+.form-side {
+  width: 50%;
+  background-color: #f5f5f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card {
+  position: relative; /* Essential for the floating logo */
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  padding: 4rem 2.5rem 2.5rem; /* Extra top padding for the logo space */
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  margin-top: 50px; /* Space for the logo to hang over the top */
+}
+
+.card-logo-wrapper {
+  position: absolute;
+  top: -65px; /* Pulls the logo up to sit on the edge */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 130px;
+  background: rgba(249, 249, 249, 0);
+  border-radius: 50%;
+  padding: 5px;
+  box-shadow: 0 8px 20px rgba(246, 243, 243, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.card-logo {
+  width: 140%;
+  height: auto;
+}
+
+.auth-header h2 {
+  text-align: center;
+  color: #003366;
+  margin-top: 10px;
+}
+
+/* Rest of the styling remains the same */
+.divider { display: flex; align-items: center; gap: 10px; margin: 1rem 0 2rem; }
+.line { height: 1px; background-color: #ddd; flex: 1; }
+.form-group { margin-bottom: 1.25rem; }
+.input-wrapper { position: relative; }
+.form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; }
+.hu-indicator { position: absolute; right: 15px; top: 10px; color: #003366; font-weight: bold; opacity: 0.3; }
+.submit-btn { width: 100%; padding: 12px; background: #003366; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+.error-message { color: #d32f2f; background: #ffebee; padding: 10px; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; }
+.auth-link { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; }
+.auth-link a { color: #003366; font-weight: bold; text-decoration: none; }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .branding-side { display: none; }
+  .form-side { width: 100%; }
+}

@@ -1,0 +1,188 @@
+🛍️ Pete’s Plaza
+
+A full-stack marketplace web application for buying and selling secondhand items.
+Built with HTML/CSS/JavaScript, Node.js + Express, and Neo4j.
+
+📌 Features
+
+✅ User Signup & Login (JWT Authentication)
+
+✅ Neo4j Graph Database Integration
+
+✅ Wishlist Feature (Add / Remove Items)
+
+✅ Category Filtering
+
+✅ Modal-Based UI Design
+
+🚧 Cart Feature (In Progress)
+
+🚧 Create Listing (In Progress)
+
+🧱 Tech Stack
+Frontend
+
+HTML5
+
+CSS3
+
+Vanilla JavaScript
+
+LocalStorage (session persistence)
+
+Backend
+
+Node.js
+
+Express
+
+Neo4j Driver
+
+JWT (jsonwebtoken)
+
+bcryptjs
+
+CORS
+
+dotenv
+
+Database
+
+Neo4j (Aura / Local)
+
+📂 Project Structure
+petes-plaza/
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── backend/
+│   ├── server.js
+│   ├── neo4j.js
+│   ├── auth.routes.js
+│   ├── wishlist.routes.js
+│   ├── package.json
+│   └── .env
+│
+└── README.md
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone <your-repo-url>
+cd petes-plaza
+2️⃣ Backend Setup
+
+Navigate into backend:
+
+cd backend
+
+Install dependencies:
+
+npm install
+3️⃣ Create .env File (Backend)
+
+Inside /backend, create a file called .env:
+
+PORT=3001
+JWT_SECRET=your_super_secret_key
+NEO4J_URI=neo4j+s://your-uri.databases.neo4j.io
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=your_password
+NEO4J_DB=neo4j
+4️⃣ Start Backend Server
+node server.js
+
+If successful, you should see:
+
+✅ Neo4j connection verified
+🚀 API running on http://127.0.0.1:3001
+5️⃣ Start Frontend
+
+Open frontend/index.html using:
+
+VSCode Live Server
+OR
+
+Double-click the file in your browser
+
+🔐 Authentication API
+Signup
+POST /auth/signup
+
+Body:
+
+{
+  "username": "matt",
+  "email": "matt@email.com",
+  "password": "123456"
+}
+Login
+POST /auth/login
+
+Returns:
+
+{
+  "user": { "userId": "...", "username": "matt" },
+  "token": "..."
+}
+❤️ Wishlist API
+Get Wishlist
+GET /wishlist/:username
+Add Item
+POST /wishlist/:username/add
+
+Body:
+
+{
+  "itemId": "L1",
+  "title": "Graphic T-Shirt",
+  "price": 12.99,
+  "category": "T-Shirts"
+}
+Remove Item
+DELETE /wishlist/:username/remove/:itemId
+🗃️ Neo4j Data Model
+Nodes
+
+User
+
+WishlistItem
+
+Relationship
+(User)-[:WISHLISTS]->(WishlistItem)
+🧠 How Wishlist Works
+
+User logs in
+
+Username stored in localStorage
+
+Clicking "Add to Wishlist":
+
+Sends POST request to backend
+
+Backend creates or merges WishlistItem
+
+Creates WISHLISTS relationship
+
+Clicking Wishlist button:
+
+GET request loads user’s saved items
+
+Displays them in modal
+
+🚀 Future Improvements
+
+Cart system
+
+Create Listing with image uploads
+
+Protected routes with JWT middleware
+
+Pagination
+
+Search feature
+
+Deployment to AWS / Vercel
+
+Admin dashboard
