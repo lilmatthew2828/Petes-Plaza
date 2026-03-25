@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 import '../styles/index.css'
-import WishlistModal from '../components/WishlistModal'
-import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
+import WishlistModal from '../components/WishlistModal' //Matthew Kilpatrick
+import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist"; //Matthew Kilpatrick
 import { Link } from 'react-router-dom'
 import { deleteListing } from "../api/listings";
 
@@ -133,9 +133,9 @@ export default function HomePage() {
     loadWishlist();
   }, [user]);
 
-  const isWishlisted = (id) => wishlistIds.has(id);
+  const isWishlisted = (id) => wishlistIds.has(id); //Matthew Kilpatrick
 
-  const setLoadingFor = (id, on) => {
+  const setLoadingFor = (id, on) => { //Matthew Kilpatrick
     setWishlistLoadingIds((prev) => {
       const next = new Set(prev);
       if (on) next.add(id);
@@ -144,7 +144,7 @@ export default function HomePage() {
     });
   };
 
-  const handleAddWishlist = async (listingId) => {
+  const handleAddWishlist = async (listingId) => { //Matthew Kilpatrick
     if (!user) {
       setShowAuthModal(true);
       return;
@@ -169,7 +169,7 @@ export default function HomePage() {
     }
   };
 
-  const handleRemoveWishlist = async (listingId) => {
+  const handleRemoveWishlist = async (listingId) => { //Matthew Kilpatrick
     setLoadingFor(listingId, true);
     setWishlistIds((prev) => {
       const next = new Set(prev);
@@ -314,7 +314,7 @@ export default function HomePage() {
                         </button>
                       )}
 
-                      {!isWishlisted(listing.id) ? (
+                      {!isWishlisted(listing.id) ? ( //Matthew Kilpatrick
                         <button
                           className="pill"
                           disabled={wishlistLoadingIds.has(listing.id)}
@@ -327,7 +327,7 @@ export default function HomePage() {
                       ) : (
                         <button
                           className="pill"
-                          disabled={wishlistLoadingIds.has(listing.id)}
+                          disabled={wishlistLoadingIds.has(listing.id)} //Matthew Kilpatrick
                           onClick={() => handleRemoveWishlist(listing.id)}
                         >
                           {wishlistLoadingIds.has(listing.id)
@@ -347,7 +347,7 @@ export default function HomePage() {
         </main>
       </div>
 
-      <WishlistModal
+      <WishlistModal //Matthew Kilpatrick
         open={showWishlist}
         onClose={() => setShowWishlist(false)}
       />
