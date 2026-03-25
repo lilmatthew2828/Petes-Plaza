@@ -1,22 +1,23 @@
+/*
+Anthony Powell
+Dedicated Admin Login Page (Iteration 4)
+*/
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./Auth.css";
 
-// Assets
-// Jania Southall - whole file
 import peteLogo from "/assets/images/logo.png";
 import hamptonCampus from "/assets/images/HamptonWater.png";
 
-export default function Login() {
+export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login, error, clearError } = useAuth();
-  
+  const { adminLogin, error, clearError } = useAuth();
+
   const [formData, setFormData] = useState({
     identifier: "",
-    password: ""
+    password: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState(null);
 
@@ -34,17 +35,26 @@ export default function Login() {
     setValidationError(null);
     clearError();
 
-    if (!formData.identifier || !formData.password) {
-      setValidationError("Email/username and password are required");
+    const normalizedEmail = formData.identifier.trim().toLowerCase();
+
+    if (!normalizedEmail || !formData.password) {
+      setValidationError("Admin email and password are required");
+      return;
+    }
+
+    if (!normalizedEmail.endsWith("@petesplaza.com")) {
+      setValidationError("Admin login requires an @petesplaza.com email");
       return;
     }
 
     try {
       setLoading(true);
-      await login(formData);
-      navigate("/homepage");
-    } catch (err) {
-      // Error handled by AuthContext
+      await adminLogin({
+        identifier: normalizedEmail,
+        password: formData.password,
+      });
+      navigate("/admin");
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -52,32 +62,29 @@ export default function Login() {
 
   return (
     <div className="auth-page-container">
-      {/* Left Side: Campus Visual Only */}
       <div className="branding-side">
-        <div 
-          className="branding-overlay" 
+        <div
+          className="branding-overlay"
           style={{ backgroundImage: `url(${hamptonCampus})` }}
         ></div>
         <div className="branding-content">
-          <h1>Welcome to Hampton University's Marketplace</h1>
-          <p className="branding-slogan">"By Pirates, For Pirates."</p>
+          <h1>Pete's Plaza Admin</h1>
+          <p className="branding-slogan">Marketplace Administration Portal</p>
         </div>
       </div>
 
-      {/* Right Side: Form with Logo on top */}
       <div className="form-side">
         <div className="auth-card">
-          {/* Logo moved here to be on top of the card */}
           <div className="card-logo-wrapper">
             <img src={peteLogo} alt="Pete's Plaza Logo" className="card-logo" />
           </div>
 
           <div className="auth-header">
-            <h2>Log In</h2>
+            <h2>Admin Login</h2>
             <div className="divider">
-               <span className="line"></span>
-               <span className="icon">⚓</span>
-               <span className="line"></span>
+              <span className="line"></span>
+              <span className="icon">⚓</span>
+              <span className="line"></span>
             </div>
           </div>
 
@@ -87,18 +94,16 @@ export default function Login() {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Email or Username</label>
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  name="identifier"
-                  value={formData.identifier}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                />
-                <span className="hu-indicator">H</span>
-              </div>
+              <label>Admin Email</label>
+              <input
+                type="email"
+                name="identifier"
+                value={formData.identifier}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                placeholder="xyz@petesplaza.com"
+              />
             </div>
 
             <div className="form-group">
@@ -114,12 +119,12 @@ export default function Login() {
             </div>
 
             <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Logging in..." : "Login as Admin"}
             </button>
           </form>
 
           <p className="auth-link">
-            Don't have an account? <Link to="/register">Register here</Link>
+            User login: <Link to="/login">Go to default login</Link>
           </p>
         </div>
       </div>

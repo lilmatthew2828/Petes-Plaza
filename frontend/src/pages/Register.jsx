@@ -42,6 +42,15 @@ export default function Register() {
       setValidationError("All fields are required");
       return;
     }
+    /*
+    Anthony Powell
+    Hampton email validation
+    */
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    if (!normalizedEmail.endsWith("@my.hamptonu.edu")) {
+      setValidationError("Email must end with @my.hamptonu.edu");
+      return;
+    }
 
     if (formData.password.length < 8) {
       setValidationError("Password must be at least 8 characters");
@@ -55,7 +64,10 @@ export default function Register() {
 
     try {
       setLoading(true);
-      await registerUser(formData);
+      await registerUser({
+        ...formData,
+        email: normalizedEmail,
+      });
       navigate("/homepage");
     } catch (err) {
       // Error handled by AuthContext

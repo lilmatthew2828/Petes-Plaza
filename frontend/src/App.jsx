@@ -5,13 +5,13 @@ import PurchaseHistory from './pages/PurchaseHistory';
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
 import Register from "./pages/Register";
 import HomePage from "./pages/HomePage";
 import EditListing from "./pages/EditListing";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import "./App.css";
-import Home from "./pages/Home";
 import Listings from "./pages/Listings";
 import ListingDetail from "./pages/ListingDetail";
 import Transactions from "./pages/Transactions";
@@ -25,8 +25,11 @@ function App() {
       <AuthProvider>
         <NavBar />
         <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Routes */}
@@ -34,7 +37,7 @@ function App() {
             path="/home"
             element={
               <ProtectedRoute>
-                <Home />
+                <HomePage />
               </ProtectedRoute>
             }
           />
@@ -65,7 +68,7 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly>
                 <AdminDashboard />
               </ProtectedRoute>
             }

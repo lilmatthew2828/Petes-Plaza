@@ -48,7 +48,7 @@ export default function HomePage() {
   const pageDesc = selectedCategory ? `Showing listings for: ${selectedCategory}` : PAGE_DESC_MAP[activeTab] || 'Listings';
 
   const filteredListings = selectedCategory
-    ? listings.filter(item => getCategoryForListing(item.id) === selectedCategory)
+    ? listings.filter((item) => item.category === selectedCategory)
     : listings
 
   const handleTabClick = (tab) => {

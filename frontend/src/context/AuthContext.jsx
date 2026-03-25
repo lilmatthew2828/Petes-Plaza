@@ -50,6 +50,26 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }
+  /*
+  Anthony Powell - Lines 56 - 71
+  Admin login context method - Similar to regular login but calls adminLogin API and has different error messaging. 
+  */
+  async function loginAdminUser(payload) {
+    setError(null);
+    setLoading(true);
+    try {
+      await authApi.adminLogin(payload);
+      const currentUser = await authApi.getMe();
+      setUser(currentUser);
+      return currentUser;
+    } catch (err) {
+      setUser(null);
+      setError(err?.message || "Admin login failed");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function registerUser(payload) {
     setError(null);
@@ -95,6 +115,7 @@ export function AuthProvider({ children }) {
         loading,
         error,
         login: loginUser,
+        adminLogin: loginAdminUser,
         register: registerUser,
         logout: logoutUser,
         clearError,

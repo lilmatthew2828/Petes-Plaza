@@ -52,24 +52,28 @@ def create_user(db: Session, email: str, username: str, student_id: int, passwor
 
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
-    """
-    Find user by email and verify password.
-    Returns User if valid, None otherwise.
-    """
     user = db.query(User).filter(User.email == email).first()
-    if user and verify_password(password, user.password_hash):
-        return user
+    if not user:
+        return None
+    try:
+        if verify_password(password, user.password_hash):
+            return user
+    except Exception:
+        # password_hash in the database is not a valid bcrypt hash
+        # (e.g. plain text was inserted directly). Treat as wrong password.
+        pass
     return None
 
 
 def authenticate_user_by_username(db: Session, username: str, password: str) -> Optional[User]:
-    """
-    Find user by username and verify password.
-    Returns User if valid, None otherwise.
-    """
     user = db.query(User).filter(User.username == username).first()
-    if user and verify_password(password, user.password_hash):
-        return user
+    if not user:
+        return None
+    try:
+        if verify_password(password, user.password_hash):
+            return user
+    except Exception:
+        pass
     return None
 
 
@@ -163,7 +167,7 @@ def get_listing_or_404(db: Session, listing_id: int):
 def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate, current_user: User):
     listing = get_listing_or_404(db, listing_id)
 
-    if not _is_owner(listing, current_user):
+    if not _can_manage_listing(listing, current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="403 Forbidden --> Logged in but not the owner",
@@ -181,7 +185,7 @@ def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate,
 def delete_listing(db: Session, listing_id: int, current_user: User):
     listing = get_listing_or_404(db, listing_id)
 
-    if not _is_owner(listing, current_user):
+    if not _can_manage_listing(listing, current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="403 Forbidden --> Logged in but not the owner",
@@ -199,3 +203,8 @@ def _is_owner(listing: Listing, current_user: User) -> bool:
     if hasattr(listing, "seller_email"):
         return str(listing.seller_email).lower() == str(current_user.email).lower()
     return False
+
+# Anthony Powell
+# Admin-or-owner listing management 
+def _can_manage_listing(listing: Listing, current_user: User) -> bool:
+    return bool(getattr(current_user, "is_admin", False)) or _is_owner(listing, current_user)

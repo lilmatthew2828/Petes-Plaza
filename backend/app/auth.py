@@ -20,6 +20,11 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+# Anthony Powell
+# Setting email requirements for User vs Admins
+USER_EMAIL_DOMAIN = "my.hamptonu.edu"
+ADMIN_EMAIL_DOMAIN = "petesplaza.com"
+
 
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
     """
@@ -72,11 +77,18 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Passwords do not match",
         )
+
+    email = payload.email.strip().lower()
+    if not email.endswith(f"@{USER_EMAIL_DOMAIN}"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Email must end with @{USER_EMAIL_DOMAIN}",
+        )
     
     # Create user (handles uniqueness checks)
     user = create_user(
         db,
-        email=payload.email,
+        email=email,
         username=payload.username,
         student_id=payload.student_id,
         password=payload.password,
@@ -114,12 +126,18 @@ def login(payload: LoginIn, db: Session = Depends(get_db)):
     session_token = create_session(db, user_id=user.id)
     
     # Build response with user info
+    created_at = user.created_at
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+    else:
+        created_at = str(created_at)
+
     response = JSONResponse(
         content={
             "email": user.email,
             "username": user.username,
             "student_id": user.student_id,
-            "created_at": user.created_at.isoformat(),
+            "created_at": created_at,
         },
         status_code=200,
     )
@@ -135,6 +153,55 @@ def login(payload: LoginIn, db: Session = Depends(get_db)):
         max_age=7 * 24 * 60 * 60,  # 7 days
     )
     
+    return response
+
+
+@router.post("/admin/login", status_code=200)
+def admin_login(payload: LoginIn, db: Session = Depends(get_db)):
+    identifier = payload.identifier.strip().lower()
+    if "@" not in identifier or not identifier.endswith(f"@{ADMIN_EMAIL_DOMAIN}"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Admin login requires an @{ADMIN_EMAIL_DOMAIN} email",
+        )
+
+    user = authenticate_user(db, email=identifier, password=payload.password)
+
+    if not user or not bool(getattr(user, "is_admin", False)):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin credentials",
+        )
+
+    session_token = create_session(db, user_id=user.id)
+
+    created_at = user.created_at
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+    else:
+        created_at = str(created_at)
+
+    response = JSONResponse(
+        content={
+            "email": user.email,
+            "username": user.username,
+            "student_id": user.student_id,
+            "created_at": created_at,
+            "is_admin": True,
+        },
+        status_code=200,
+    )
+
+    response.set_cookie(
+        key=settings.session_cookie_name,
+        value=session_token,
+        httponly=settings.session_cookie_httponly,
+        secure=settings.session_cookie_secure,
+        samesite=settings.session_cookie_samesite,
+        path="/",
+        max_age=7 * 24 * 60 * 60,
+    )
+
     return response
 
 
@@ -156,9 +223,6 @@ def logout(
     response = JSONResponse(content=None, status_code=204)
     response.delete_cookie(key=settings.session_cookie_name, path="/")
     return response
-
-
-@router.get("/me", response_model=UserOut, status_code=200)
 
 
 @router.get("/me", response_model=AdminUserResponse, status_code=200)
