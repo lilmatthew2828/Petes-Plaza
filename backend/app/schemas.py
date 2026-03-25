@@ -1,4 +1,4 @@
-#Jania Southall
+# Jania Southall
 # Schemas for user registration, login, and responses using Pydantic
 # PYDANTIC is a data validation library that allows us to define data models with type annotations and validation rules. 
 # It is commonly used in FastAPI to define request and response schemas.
@@ -131,6 +131,14 @@ class ListingCreate(BaseModel): # Define the schema for creating a new listing
     image_url: Optional[str] = None
     category: Optional[str] = "Other" # Default category if not provided
 
+# Anthony Powell - Updating lisitng after edit
+class ListingUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[Decimal] = Field(default=None, ge=0)
+    pickup_location: Optional[str] = None
+    image_url: Optional[str] = None
+    category: Optional[str] = None
 
 class ListingResponse(BaseModel): # Define the schema for the response when fetching a listing
     id: int
@@ -140,6 +148,7 @@ class ListingResponse(BaseModel): # Define the schema for the response when fetc
     status: str
     seller_email: str
     image_url: Optional[str] = None
+    created_at: datetime
     category: Optional[str] = None
     
     class Config:

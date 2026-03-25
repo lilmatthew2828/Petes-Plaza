@@ -38,16 +38,17 @@
 //   }
 //   return res.json();
 // }
+ //Matthew Kilpatrick
 import { apiCall } from "./client";
 
 export async function fetchWishlist() {
-  return apiCall("/wishlist", { method: "GET" }); // -> /api/wishlist
+  return apiCall("api/wishlist", { method: "GET" }); // -> /api/wishlist
 }
 
 export async function addToWishlist(listingId) {
-  return apiCall(`/wishlist/${listingId}`, { method: "POST" }); // -> /api/wishlist/:id
+  return apiCall(`api/wishlist/${listingId}`, { method: "POST" }); // -> /api/wishlist/:id
 }
 
 export async function removeFromWishlist(listingId) {
-  return apiCall(`/wishlist/${listingId}`, { method: "DELETE" }); // -> /api/wishlist/:id
+  return apiCall(`api/wishlist/${listingId}`, { method: "DELETE" }); // -> /api/wishlist/:id
 }

@@ -41,7 +41,7 @@ export default function Login() {
     try {
       setLoading(true);
       await login(formData);
-      navigate("/homepage");
+      navigate("/home");
     } catch (err) {
       // Error handled by AuthContext
     } finally {

@@ -2,7 +2,7 @@
 // user greeting, and login/logout links.
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import "./NavBar.css";
 
 export default function Navbar() {
   const { user, logout } = useAuth();

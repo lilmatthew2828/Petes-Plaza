@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from typing import Optional
 from fastapi import HTTPException, status
-from app.models import User, SessionToken
+from app.models import User, SessionToken, Listing
 from app.security import hash_password, verify_password
-
+from app import schemas
 
 def create_user(db: Session, email: str, username: str, student_id: int, password: str) -> User:
     """
@@ -129,19 +129,73 @@ def get_session_user(db: Session, token: str) -> Optional[User]:
 
 def revoke_user_sessions(db: Session, email: str) -> bool:
     """
-    Revoke all active sessions for a user.
-    Useful for logout-all, password reset, etc.
+    Revoke all active sessions for a user by email.
     """
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return False
+
     sessions = db.query(SessionToken).filter(
-        SessionToken.user_id == User.id,
+        SessionToken.user_id == user.id,
         SessionToken.revoked_at.is_(None),
     ).all()
-    
+
     if not sessions:
         return False
-    
+
     for session in sessions:
         session.revoked_at = datetime.utcnow()
-    
+
     db.commit()
     return True
+
+# Anthony Powell - Used for update and delete logic
+def get_listing_or_404(db: Session, listing_id: int):
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
+    if not listing:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
+    return listing
+
+# Update listing details
+def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate, current_user: User):
+    listing = get_listing_or_404(db, listing_id)
+
+    if not _is_owner(listing, current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="403 Forbidden --> Logged in but not the owner",
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(listing, field, value)
+
+    db.commit()
+    db.refresh(listing)
+    return listing
+
+# Delete listing with ownership check
+def delete_listing(db: Session, listing_id: int, current_user: User):
+    listing = get_listing_or_404(db, listing_id)
+
+    if not _is_owner(listing, current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="403 Forbidden --> Logged in but not the owner",
+        )
+
+    db.delete(listing)
+    db.commit()
+
+def _is_owner(listing: Listing, current_user: User) -> bool:
+    # Support whichever ownership field exists in your model
+    if hasattr(listing, "owner_id"):
+        return int(listing.owner_id) == int(current_user.id)
+    if hasattr(listing, "user_id"):
+        return int(listing.user_id) == int(current_user.id)
+    if hasattr(listing, "seller_email"):
+        return str(listing.seller_email).lower() == str(current_user.email).lower()
+    return False

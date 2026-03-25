@@ -130,3 +130,55 @@
   background: #fee2e2;
   border-radius: 4px;
 }
+
+.admin-table td button {
+  padding: 6px 12px;        /* uniform padding */
+  border-radius: 4px;       /* uniform rounded corners */
+  font-size: 0.875rem;      /* uniform font size */
+  font-family: 'Inter', sans-serif; 
+  border: 1px solid transparent; /* default border */
+  box-sizing: border-box;   /* includes padding/border in size */
+  height: 36px;             /* optional fixed height for perfect alignment */
+  cursor: pointer;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary { /* Accept / Approve */
+  background-color: #1e3a8a; /* Navy blue */
+  color: #fff;
+}
+
+.btn-secondary { /* Archive */
+  background-color: #fbbf24; /* Gold */
+  color: #000;
+}
+
+.btn-danger { /* Delete */
+  background-color: #dc2626; /* Red */
+  color: #fff;
+}
+
+.btn-neutral { /* Reactivate */
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #1e3a8a;
+}
+
+.btn-view { /* View details */
+  background-color: #fff;
+  color: #1e3a8a;
+  border: 1px solid #1e3a8a;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}

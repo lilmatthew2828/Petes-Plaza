@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import admin
-from app.routes.wishlist import router as wishlist_router
-
+from app.routes import listings
+from app.routes.wishlist import router as wishlist_router  #Matthew Kilpatrick
+from app.routes.listings import listings_router
+from app.routes import seller # Matthew Kilpatrick - new 
 from app.config import settings
 from app.database import engine
 from app.database import Base
 from app.auth import router as auth_router
+ 
 
 # Create tables on startup
 Base.metadata.create_all(bind=engine)
@@ -23,7 +26,7 @@ app = FastAPI(
 # allow the origin that your Vite server is running on
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://127.0.0.1:3000"] ,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +35,10 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router)
 app.include_router(admin.router)
+app.include_router(listings.router)
 app.include_router(wishlist_router)
+app.include_router(listings_router)
+app.include_router(seller.router) # new - matt kp
 
 @app.get("/")
 def root():
