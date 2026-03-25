@@ -52,24 +52,28 @@ def create_user(db: Session, email: str, username: str, student_id: int, passwor
 
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
-    """
-    Find user by email and verify password.
-    Returns User if valid, None otherwise.
-    """
     user = db.query(User).filter(User.email == email).first()
-    if user and verify_password(password, user.password_hash):
-        return user
+    if not user:
+        return None
+    try:
+        if verify_password(password, user.password_hash):
+            return user
+    except Exception:
+        # password_hash in the database is not a valid bcrypt hash
+        # (e.g. plain text was inserted directly). Treat as wrong password.
+        pass
     return None
 
 
 def authenticate_user_by_username(db: Session, username: str, password: str) -> Optional[User]:
-    """
-    Find user by username and verify password.
-    Returns User if valid, None otherwise.
-    """
     user = db.query(User).filter(User.username == username).first()
-    if user and verify_password(password, user.password_hash):
-        return user
+    if not user:
+        return None
+    try:
+        if verify_password(password, user.password_hash):
+            return user
+    except Exception:
+        pass
     return None
 
 

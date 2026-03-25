@@ -126,12 +126,18 @@ def login(payload: LoginIn, db: Session = Depends(get_db)):
     session_token = create_session(db, user_id=user.id)
     
     # Build response with user info
+    created_at = user.created_at
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+    else:
+        created_at = str(created_at)
+
     response = JSONResponse(
         content={
             "email": user.email,
             "username": user.username,
             "student_id": user.student_id,
-            "created_at": user.created_at.isoformat(),
+            "created_at": created_at,
         },
         status_code=200,
     )
@@ -169,12 +175,18 @@ def admin_login(payload: LoginIn, db: Session = Depends(get_db)):
 
     session_token = create_session(db, user_id=user.id)
 
+    created_at = user.created_at
+    if hasattr(created_at, "isoformat"):
+        created_at = created_at.isoformat()
+    else:
+        created_at = str(created_at)
+
     response = JSONResponse(
         content={
             "email": user.email,
             "username": user.username,
             "student_id": user.student_id,
-            "created_at": user.created_at.isoformat(),
+            "created_at": created_at,
             "is_admin": True,
         },
         status_code=200,
@@ -211,9 +223,6 @@ def logout(
     response = JSONResponse(content=None, status_code=204)
     response.delete_cookie(key=settings.session_cookie_name, path="/")
     return response
-
-
-@router.get("/me", response_model=UserOut, status_code=200)
 
 
 @router.get("/me", response_model=AdminUserResponse, status_code=200)
