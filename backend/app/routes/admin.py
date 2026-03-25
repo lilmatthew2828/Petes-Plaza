@@ -6,26 +6,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database import get_db
-from app.schemas import ListingModeration, AdminUserResponse
-from app.schemas import ListingResponse
-from app.admin_service import moderate_listing, suspend_user, get_dashboard_metrics
-from app.models import Listing, User, SessionToken
+from app.schemas import ListingModeration, ListingResponse, TransactionResponse, UserListResponse, TransactionCreate
+from app.admin_service import moderate_listing, get_dashboard_metrics, get_all_listings, get_all_users, suspend_user
+from app.models import Listing, User, SessionToken, Transactions
 
 # package-qualified imports so module works when running as package - Daye Karibi-Whyte
 # expose endpoints under /api/admin to match frontend expectations
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-# PATCH endpoint to update listing status (e.g., mark as sold)
-@router.patch("/listings/{listing_id}")
-def update_listing_status(listing_id: int, status: str = Body(...), db: Session = Depends(get_db)): # Accept status in request body for flexibility (approve, deny, archive, mark_sold)
-    listing = db.query(Listing).filter(Listing.id == listing_id).first()
-    if not listing:
-        raise HTTPException(status_code=404, detail="Listing not found")
-    listing.status = status
-    db.commit()
-    db.refresh(listing)
-    return {"id": listing.id, "status": listing.status}
 
 # DELETE endpoint to delete a listing
 @router.delete("/listings/{listing_id}")
@@ -64,8 +53,7 @@ def moderate_listing_endpoint(listing_id: int, moderation: ListingModeration, db
 
 @router.get("/listings", response_model=List[ListingResponse])
 def list_listings(db: Session = Depends(get_db)):
-    listings = db.query(Listing).order_by(Listing.created_at.desc()).all() # Order by active listings first, then by most recent
-    return listings
+    return get_all_listings(db)
 
 # Endpoint to get user growth for last 30 days
 @router.get("/user_growth")
@@ -99,3 +87,57 @@ def active_users(db: Session = Depends(get_db)):
     # Format for frontend
     active_users_data = [{"date": str(day), "count": count} for day, count in results]
     return active_users_data
+
+@router.get("/users", response_model=List[UserListResponse])
+def get_users(db: Session = Depends(get_db)):
+    return get_all_users(db)
+
+@router.post("/transactions", response_model=TransactionResponse)
+def create_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
+    new_transaction = Transactions(
+        listing_id=transaction.listing_id,
+        buyer_email=transaction.buyer_email,
+        seller_email=transaction.seller_email,
+        transaction_timestamp=transaction.transaction_timestamp
+    )
+    existing = db.query(Transactions).filter(
+    Transactions.listing_id == transaction.listing_id
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Transaction already exists for this listing")
+    db.add(new_transaction)
+    db.commit()
+    db.refresh(new_transaction)
+    return TransactionResponse.from_orm(new_transaction)
+
+@router.get("/transactions", response_model=List[TransactionResponse])
+def list_transactions(db: Session = Depends(get_db)):
+    transactions = db.query(Transactions).order_by(Transactions.transaction_timestamp.desc()).all()
+    return [TransactionResponse.from_orm(t) for t in transactions]
+
+
+@router.get("/active_user_emails")
+def get_active_user_emails(db: Session = Depends(get_db)):
+    active_users = (
+        db.query(User)
+        .join(SessionToken, User.id == SessionToken.user_id)
+        .filter(SessionToken.revoked_at == None)
+        .filter(User.is_suspended == False)
+        .distinct()
+        .all()
+    )
+
+    return [{"id": user.id, "email": user.email} for user in active_users]
+
+@router.put("/suspend/{email}")
+def suspend_user_by_email(email: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.is_suspended = True
+    db.commit()
+
+    return {"message": "User suspended"}

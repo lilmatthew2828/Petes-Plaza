@@ -38,3 +38,4 @@ export async function updateListing(id, payload) {
 export async function deleteListing(id) {
   await apiCall(`${LISTINGS_BASE}/${id}`, { method: "DELETE" });
 }
+

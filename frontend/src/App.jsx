@@ -10,6 +10,12 @@ import EditListing from "./pages/EditListing";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import "./App.css";
+import Home from "./pages/Home";
+import Listings from "./pages/Listings";
+import ListingDetail from "./pages/ListingDetail";
+import Transactions from "./pages/Transactions";
+import Users from "./pages/Users";
+
 
 function App() {
   return (
@@ -23,10 +29,10 @@ function App() {
 
           {/* Protected Routes */}
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
-                <HomePage />
+                <Home />
               </ProtectedRoute>
             }
           />
@@ -34,7 +40,7 @@ function App() {
             path="/homepage"
             element={
               <ProtectedRoute>
-                <Navigate to="/" replace />
+                <HomePage />
               </ProtectedRoute>
             }
           />
@@ -54,9 +60,33 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <Transactions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Listings routes */}
+          <Route path="/listings" element={<ProtectedRoute><Listings /></ProtectedRoute>} />
+
+          <Route path="/listings/:id" element={<ProtectedRoute><ListingDetail /></ProtectedRoute>} />
+
+          {/* Redirect create-listing to Listings page */}
+          <Route path="/create-listing" element={<Navigate to="/listings" replace />} />
+
+          {/* Redirect unknown routes to Welcome */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </AuthProvider>
     </Router>

@@ -4,8 +4,6 @@ from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 
-
-
 # Models for SQLAlchemy ORM mapping to database tables.
 class User(Base):
     __tablename__ = "users"
@@ -69,7 +67,7 @@ class Listing(Base):
 
 
 # ✅ Wishlist model (NEW)
-class Wishlist(Base):
+class Wishlist(Base):  # Matthew Kilpatrick
     __tablename__ = "wishlist"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -87,3 +85,16 @@ class Wishlist(Base):
 
     def __repr__(self):
         return f"<Wishlist(user_id={self.user_id}, listing_id={self.listing_id})>"
+
+# Daye Karibi-Whyte - Added transactions model to represent completed purchases in the marketplace, linking buyers, sellers, and listings together for record-keeping and potential future features like order history or dispute resolution.
+class Transactions(Base):
+    __tablename__ = "transactions"
+    
+    transaction_id = Column(Integer, primary_key=True, index=True)
+    buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
+    seller_email = Column(String, ForeignKey("users.email"), nullable=False)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    transaction_timestamp = Column(DateTime, default=datetime.now, nullable=False)
+    
+    def __repr__(self):
+        return f"<Transaction(buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"

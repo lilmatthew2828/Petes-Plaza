@@ -1,15 +1,12 @@
 # package-qualified imports so module works when running as package
-from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models import User
 from app.models import Listing
-from app.models import SessionToken
-from datetime import datetime, timedelta
 # from models.order import Order
 
 # Admin service to handle admin-related operations like fetching dashboard metrics, managing listings, etc. - Daye Karibi-Whyte
-def moderate_listing(db: Session, listing_id: int, action: str):
+def moderate_listing(db: Session, listing_id: int, action: str) -> dict: # Specify that the function returns a dictionary
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         return {"error": "Listing not found"}  # return dict 
@@ -35,8 +32,8 @@ def moderate_listing(db: Session, listing_id: int, action: str):
         "status": listing.status
     }
 
-def suspend_user(db: Session, user_id: int):
-    user = db.query(User).filter(User.id == user_id).first() #Grab the user given their ID
+def suspend_user(db: Session, user_email: str) -> dict: # Specify that the function returns a dictionary
+    user = db.query(User).filter(User.email == user_email).first() #Grab the user given their email
     if not user:
         return {"error": "User not found"} # If the user doesn't exist, return an error message
     
@@ -47,7 +44,7 @@ def suspend_user(db: Session, user_id: int):
         db.commit() # Commit the changes to the database
         return user # Return the updated user object    
 # Admin service to handle admin-related operations like fetching dashboard metrics, managing listings, etc.
-def get_dashboard_metrics(db):
+def get_dashboard_metrics(db: Session) -> dict: # Specify that the function returns a dictionary
     total_users = db.query(func.count(User.id)).scalar() # count the total number of users in the database
     total_listings = db.query(func.count(Listing.id)).scalar() # count the total number of listings in the database
     active_listings = db.query(func.count(Listing.id)).filter(Listing.status == "active").scalar() # count the number of active listings in the database
@@ -58,3 +55,11 @@ def get_dashboard_metrics(db):
         "active_listings": active_listings,
         # "total_orders": total_orders
     }
+
+def get_all_listings(db: Session) -> list[Listing]: # Specify that the function returns a list of Listing objects
+    listings = db.query(Listing).all() # Query all listings from the database
+    return listings # Return the list of listings to the caller
+
+def get_all_users(db: Session) -> list[User]: # Specify that the function returns a list of User objects
+    users = db.query(User).all() # Query all users from the database
+    return users # Return the list of users to the caller
