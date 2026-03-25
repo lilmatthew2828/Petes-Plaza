@@ -174,6 +174,7 @@ class TransactionCreate(BaseModel): # Define the schema for creating a new trans
     transaction_timestamp: datetime = Field(default_factory=datetime.now) # Set default to current time when transaction is created
 
 class UserListResponse(BaseModel):
+    id: int
     email: str
     username: str
     student_id: int

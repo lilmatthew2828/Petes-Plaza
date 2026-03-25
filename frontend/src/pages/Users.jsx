@@ -107,8 +107,8 @@ export default function Users() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Email</th>
               <th>Name</th>
+              <th>Email</th>
               <th>Created At</th>
               <th>Status</th>
               <th>Actions</th>
@@ -118,8 +118,8 @@ export default function Users() {
             {filteredUsers.map(user => (
               <tr key={user.id}>
                 <td>{user.id}</td>
+                <td>{user.username}</td>
                 <td>{user.email}</td>
-                <td>{user.name || '-'}</td>
                 <td>{new Date(user.created_at).toLocaleDateString()}</td>
                 <td>{user.is_suspended ? 'Suspended' : 'Active'}</td>
                 <td>
