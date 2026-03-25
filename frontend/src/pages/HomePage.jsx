@@ -17,7 +17,19 @@ const PAGE_DESC_MAP = {
   'Accessories': 'Accessories section — bags, hats, jewelry, and more.',
   'Contact Us': 'Contact/support section — add a form or email info here.',
 };
+const CATEGORIES = [
+  'T-Shirts',
+  'Jeans',
+  'Sweatshirts',
+  'Shoes',
+  'Appliances',
+  'Furniture',
+  'Accessories',
+  'Other'
+];
 
+const getCategoryForListing = (id) =>
+  CATEGORIES[(id - 1) % CATEGORIES.length];
 export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,12 +143,12 @@ export default function HomePage() {
         <div className="logo-container">
           <img src="/assets/images/logo.png" alt="Logo" className="logo" />
         </div>
-        <div className="top-buttons">
-          <button className="flat-btn" onClick={() => setShowAuthModal(true)}>Profile</button>
-          <button className="flat-btn" onClick={() => setShowWishlist(true)}>Wishlist</button>
-          <button className="flat-btn" onClick={() => alert('Cart clicked!')}>Cart</button>
-          <button className="flat-btn" onClick={() => setActiveTab('Contact Us')}>Contact</button>
-          {user?.is_admin && <Link to="/admin"><button className="flat-btn">Admin</button></Link>}
+        <div className="top-tabs">
+          <button className="top-tab" onClick={() => setShowAuthModal(true)}>Profile</button>
+          <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
+          <button className="top-tab" onClick={() => alert('Cart clicked!')}>Cart</button>
+          <button className="top-tab" onClick={() => setActiveTab('Contact Us')}>Contact</button>
+          {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
         </div>
       </header>
 
