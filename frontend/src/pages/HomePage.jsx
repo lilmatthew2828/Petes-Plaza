@@ -7,6 +7,8 @@ import Sidebar from '../components/Sidebar';
 import WishlistModal from '../components/WishlistModal';
 import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
 import '../styles/HomePage.css';
+import { deleteListing } from "../api/listings";
+
 
 const PLACEHOLDER_IMAGE = '/assets/images/placeholder.png';
 const PAGE_DESC_MAP = {
@@ -29,6 +31,7 @@ const CATEGORIES = [
 
 const getCategoryForListing = (id) =>
   CATEGORIES[(id - 1) % CATEGORIES.length];
+
 export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,6 +140,21 @@ export default function HomePage() {
     } finally { setLoadingFor(id, false); }
   };
 
+    const canManageListing = (listing) => {
+    if (!user) return false;
+    if (user.is_admin) return true;
+    return (listing.seller_email || "") === (user.email || "").toLowerCase();
+  };
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      await deleteListing(listingId);
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
+    } catch (e) {
+      alert(e.message || "Failed to delete listing");
+    }
+  };
+
   return (
     <div className="homepage">
       <header className="topbar">
@@ -192,7 +210,7 @@ export default function HomePage() {
 
           <div className="cards-grid">
             {filteredListings
-              .filter(listing => listing.status === 'active')  // Only show active
+              .filter(listing => listing.status === 'active')
               .map(listing => {
                 const imgSrc = listing.image_url || PLACEHOLDER_IMAGE;
                 return (
@@ -201,9 +219,30 @@ export default function HomePage() {
                     <h3>{listing.title}</h3>
                     <p>${Number(listing.price).toFixed(2)} • {listing.category}</p>
                     <div className="card-actions">
-                      <Link to={`/listings/${listing.id}/edit`}>
-                        <button className="pill">Edit</button>
+                      <Link to={`/listings/${listing.id}`}>
+                        <button className="pill">View Listing</button>
                       </Link>
+
+                      {canManageListing(listing) && (
+                        <Link to={`/listings/${listing.id}/edit`}>
+                          <button className="pill">Edit</button>
+                        </Link>
+                      )}
+
+                      {listing.seller_email && (
+                        <Link to={`/seller/${listing.seller_email}`}>
+                          <button className="pill">View Seller</button>
+                        </Link>
+                      )}
+
+                      {canManageListing(listing) && (
+                        <button
+                          className="pill"
+                          onClick={() => handleDeleteListing(listing.id)}
+                        >
+                          Delete Listing
+                        </button>
+                      )}
 
                       <button
                         className="wishlist-btn pill"
@@ -219,7 +258,10 @@ export default function HomePage() {
                           size={0.8}
                           className={`treasure-icon ${isWishlisted(listing.id) ? 'active' : ''}`}
                         />
-                        {isWishlisted(listing.id) ? 'Wishlisted' : 'Add to Wishlist'}
+                        {wishlistLoadingIds.has(listing.id) 
+                          ? (isWishlisted(listing.id) ? 'Removing...' : 'Adding...')
+                          : (isWishlisted(listing.id) ? 'Wishlisted' : 'Add to Wishlist')
+                        }
                       </button>
                     </div>
                   </div>

@@ -17,6 +17,7 @@ import ListingDetail from "./pages/ListingDetail";
 import Transactions from "./pages/Transactions";
 import Users from "./pages/Users";
 import MySoldListings from "./pages/sold_items"; // EMMANUELLA OBIDIKE
+import SellerPage from "./pages/SellerPage"; // new - mkp
 
 
 function App() {
@@ -86,6 +87,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Users />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seller/:sellerId"
+            element={
+              <ProtectedRoute>
+                <SellerPage />
               </ProtectedRoute>
             }
           />

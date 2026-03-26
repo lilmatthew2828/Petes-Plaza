@@ -15,7 +15,7 @@ async def get_user_purchase_history(
 ):
     """Get purchase history for the current user"""
     try:
-        # Query transactions using the correct primary key
+        # Query transactions using primary key
         transactions = db.query(Transactions).filter(
             Transactions.buyer_email == current_user.email
         ).order_by(Transactions.transaction_timestamp.desc()).all()

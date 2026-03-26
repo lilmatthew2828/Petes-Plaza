@@ -3,7 +3,7 @@ import { getPurchaseHistory } from '../api/purchaseHistory';
 import './PurchaseHistory.css';
 
 const PurchaseHistory = () => {
-  const [purchases, setPurchases] = useState([]); // Initialize as empty array
+  const [purchases, setPurchases] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

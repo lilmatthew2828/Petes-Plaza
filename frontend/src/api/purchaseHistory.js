@@ -1,7 +1,7 @@
-import { apiCall } from './client'; // Use named import, not default
+import { apiCall } from './client'; 
 
 export const getPurchaseHistory = () => {
-  return apiCall('purchase-history/'); // No leading slash, let client handle the prefix
+  return apiCall('purchase-history/'); 
 };
 
 export const purchaseItem = (listingId) => {
