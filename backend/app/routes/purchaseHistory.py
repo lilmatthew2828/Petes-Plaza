@@ -1,3 +1,4 @@
+# Jania Southall - FastAPI routes for handling purchase history and item purchases.
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -24,17 +25,21 @@ async def get_user_purchase_history(
         for transaction in transactions:
             # Get the listing separately
             listing = db.query(Listing).filter(Listing.id == transaction.listing_id).first()
+            seller = db.query(User).filter(User.email == transaction.seller_email).first()
+
             
             if listing:
                 result.append({
-                    "id": transaction.transaction_id,  # Use transaction_id from your model
+                    "id": transaction.transaction_id, 
                     "listing_id": transaction.listing_id,
                     "title": listing.title,
                     "description": listing.description,
                     "price": float(listing.price),
                     "image_key": listing.image_key,
-                    "purchased_at": transaction.transaction_timestamp,  # Already a string in your model
-                    "seller_email": transaction.seller_email
+                    "purchased_at": transaction.transaction_timestamp,  
+                    "seller_email": transaction.seller_email,
+                    "seller_name": seller.username if seller else "Unknown Seller",
+                    "seller_id": seller.student_id if seller else None
                 })
         
         return result

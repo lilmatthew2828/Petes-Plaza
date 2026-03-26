@@ -1,3 +1,4 @@
+// Jania Southall - API functions for purchase history related operations.
 import { apiCall } from './client'; 
 
 export const getPurchaseHistory = () => {

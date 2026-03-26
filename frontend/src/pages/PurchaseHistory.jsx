@@ -1,4 +1,6 @@
+// Jania Southall - PurchaseHistory component to display user's past purchases.
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getPurchaseHistory } from '../api/purchaseHistory';
 import './PurchaseHistory.css';
 
@@ -11,6 +13,23 @@ const PurchaseHistory = () => {
     console.log('PurchaseHistory component mounted');
     fetchPurchaseHistory();
   }, []);
+
+
+const handleContactSeller = (item) => {
+  const subject = encodeURIComponent(`Question about: ${item.title}`);
+  const body = encodeURIComponent(
+    `Hi ${item.seller_name},\n\n` +
+    `I purchased "${item.title}" from you on ${new Date(item.purchased_at).toLocaleDateString()}.\n\n` +
+    `I wanted to reach out about:\n` +
+    `[Please describe your question or concern here]\n\n` +
+    `Transaction ID: ${item.id}\n\n` +
+    `Thanks!`
+  );
+  
+  // Open email client
+  window.location.href = `mailto:${item.seller_email}?subject=${subject}&body=${body}`;
+};
+
 
   const fetchPurchaseHistory = async () => {
     try {
@@ -27,7 +46,7 @@ const PurchaseHistory = () => {
       console.error('Purchase history error:', err);
       console.error('Error details:', err.response?.data);
       setError('Failed to load purchase history');
-      setPurchases([]); // Ensure purchases is always an array
+      setPurchases([]); 
     } finally {
       setLoading(false);
     }
@@ -104,6 +123,19 @@ const PurchaseHistory = () => {
                 <div className="purchase-date">
                   Purchased on {formatDate(purchase.purchased_at)}
                 </div>
+              </div>
+
+              <div className="purchase-item-actions">
+                <Link to={`/listings/${purchase.listing_id}`}>
+                  <button className="pill">View Item</button>
+                </Link>
+                
+                <button 
+                  className="pill contact-seller-btn" 
+                  onClick={() => handleContactSeller(purchase)}
+                >
+                  Contact Seller
+                </button>
               </div>
             </div>
           ))}
