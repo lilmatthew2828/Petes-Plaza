@@ -21,8 +21,8 @@ def get_all_listings():
                 "listing_description": l.description,
                 "price": float(l.price),
                 "category": l.category,  
-                "image_url": l.image_key,
-                "image_key": l.image_key,
+                "image_url": f"https://petes-plaza-bucket.s3.amazonaws.com/{l.image_key}" if l.image_key else None, 
+               "image_key": l.image_key,
                 # Anthony Powell
                 # Seller & Status fields added to listing
                 "seller_email": l.seller_email,
@@ -61,7 +61,7 @@ def get_single_listing(listing_id: int):
             "listing_description": listing.description,
             "price": listing.price,
             "category": listing.category,
-            "image_url": listing.image_key,
+            "image_url": f"https://petes-plaza-bucket.s3.amazonaws.com/{listing.image_key}" if listing.image_key else None,
             "image_key": listing.image_key,
             "seller_email": listing.seller_email,
             "status": listing.status,
@@ -97,7 +97,7 @@ def create_listing(listing_data: ListingCreate, seller_email: str):
             "listing_description": new_listing.description,
             "price": new_listing.price,
             "category": new_listing.category,
-            "image_url": new_listing.image_key,
+            "image_url": f"https://petes-plaza-bucket.s3.amazonaws.com/{new_listing.image_key}" if new_listing.image_key else None,
             "image_key": new_listing.image_key,
             "seller_email": new_listing.seller_email,
             "status": new_listing.status,

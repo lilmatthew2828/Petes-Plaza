@@ -73,9 +73,10 @@ export default function HomePage() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/admin/listings', { credentials: "include" });
+        const res = await fetch('/api/listings', { credentials: "include" }); // Emmanuella Obidike 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        console.log(data);
         setListings(data);
       } catch (err) {
         console.error(err);
@@ -191,9 +192,9 @@ export default function HomePage() {
 
           <div className="cards-grid">
             {filteredListings
-              .filter(listing => listing.status === 'active')  // ✅ Only show active
+              .filter(listing => listing.status === 'active')  // Only show active
               .map(listing => {
-                const imgSrc = listing.image || PLACEHOLDER_IMAGE;
+                const imgSrc = listing.image_url || PLACEHOLDER_IMAGE;
                 return (
                   <div key={listing.id} className="card">
                     <img src={imgSrc} alt={listing.title} onError={e => e.target.src = PLACEHOLDER_IMAGE} />

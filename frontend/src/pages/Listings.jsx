@@ -60,7 +60,18 @@ export default function Listings() {
   try {
     setLoading(true);
 
-    const { image_key: uploadedKey } = await uploadImage(image_key);
+    let uploadedKey = null;
+
+    if (image_key) {
+      const res = await uploadImage(image_key);
+      console.log("UPLOAD RESPONSE:", res);
+      uploadedKey = res?.image_key;
+
+      if (!uploadedKey) {
+        alert("Image upload failed");
+        return;
+      }
+    }
 
     const response = await fetch(`${API_URL}/listings/new`, {
       method: "POST",

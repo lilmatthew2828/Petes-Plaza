@@ -17,6 +17,12 @@ from app.models import Listing, User, Transactions  # Add Transactions
 # Expose listings routes under /api/listings to match frontend proxy/config
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
+from app.listing_services.listings import get_all_listings
+
+@router.get("")
+def view_listings():
+    return get_all_listings()
+
 @router.get("/my-sold")
 def view_my_sold_listings(
     db: Session = Depends(get_db),
@@ -50,7 +56,7 @@ def view_my_sold_listings(
     
     return sold_listings
 
-
+'''
 @router.get("/{listing_id}", response_model=schemas.ListingResponse)
 def get_listing(
     listing_id: int,
@@ -61,7 +67,13 @@ def get_listing(
     Returns 404 if listing does not exist.
     """
     return services.get_listing_or_404(db, listing_id)
+'''
 
+from app.listing_services.listings import get_single_listing
+
+@router.get("/{listing_id}")
+def get_listing(listing_id: int):
+    return get_single_listing(listing_id)
 
 @router.patch("/{listing_id}", response_model=schemas.ListingResponse)
 def patch_listing(
@@ -117,7 +129,7 @@ from app.listing_services.listings import (
 listings_router = APIRouter(prefix="/api", tags=["listings"])
 
 # Get listings (shows all listings)
-@listings_router.get("/listings")
+@listings_router.get("/all-listings")
 def view_listings():
     return get_all_listings()
 

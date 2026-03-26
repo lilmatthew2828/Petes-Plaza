@@ -37,11 +37,11 @@ export default function ListingDetail() {
   const title = listing.title ?? listing.listing_title ?? "Untitled listing";
   const description = listing.description ?? listing.listing_description ?? "";
 
-  const imageKey = listing.image_key || listing.image_url;
-
-  const image = imageKey
-    ? `https://petes-plaza-bucket.s3.amazonaws.com/${imageKey}`
-    : "";
+  const image = listing.image_url
+    ? listing.image_url
+    : listing.image_key
+      ? `https://petes-plaza-bucket.s3.amazonaws.com/${listing.image_key}`
+      : "";
 
   return (
     <div style={{ padding: "60px", maxWidth: "900px", margin: "0 auto" }}>
