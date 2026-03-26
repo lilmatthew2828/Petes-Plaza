@@ -54,9 +54,9 @@ def get_seller_transactions(seller_email: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Seller not found")
 
     transactions = (
-        db.query(Transaction)
-        .filter(Transaction.seller_email == seller_email)
-        .order_by(Transaction.transaction_timestamp.desc())
+        db.query(Transactions)
+        .filter(Transactions.seller_email == seller_email)
+        .order_by(Transactions.transaction_timestamp.desc())
         .all()
     )
 
