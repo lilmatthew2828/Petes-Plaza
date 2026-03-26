@@ -103,10 +103,11 @@ const handleContactSeller = (item) => {
           {purchases.map((purchase) => (
             <div key={purchase.id} className="purchase-item">
               <div className="purchase-image">
-                {purchase.image_key ? (
+                {purchase.image_url ? (
                   <img 
-                    src={`/api/images/${purchase.image_key}`} 
+                    src={purchase.image_url || '/assets/images/placeholder.png'} 
                     alt={purchase.title}
+                    onError={e => e.target.src = '/assets/images/placeholder.png'}
                   />
                 ) : (
                   <div className="no-image">No Image</div>
@@ -118,7 +119,7 @@ const handleContactSeller = (item) => {
                 <p className="purchase-description">{purchase.description || 'No description available'}</p>
                 <div className="purchase-info">
                   <span className="price">{formatPrice(purchase.price || 0)}</span>
-                  <span className="seller">Sold by: {purchase.seller_email || 'Unknown seller'}</span>
+                  <span className="seller">Sold by: {purchase.seller_name || 'Unknown seller'}</span>
                 </div>
                 <div className="purchase-date">
                   Purchased on {formatDate(purchase.purchased_at)}

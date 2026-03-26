@@ -35,7 +35,7 @@ async def get_user_purchase_history(
                     "title": listing.title,
                     "description": listing.description,
                     "price": float(listing.price),
-                    "image_key": listing.image_key,
+                    "image_url": f"https://petes-plaza-bucket.s3.amazonaws.com/{listing.image_key}" if listing.image_key else None,
                     "purchased_at": transaction.transaction_timestamp,  
                     "seller_email": transaction.seller_email,
                     "seller_name": seller.username if seller else "Unknown Seller",
