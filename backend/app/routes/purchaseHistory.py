@@ -1,4 +1,4 @@
-# Jania Southall - FastAPI routes for handling purchase history and item purchases.
+# Jania Southall - FastAPI routes for handling purchase history
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session

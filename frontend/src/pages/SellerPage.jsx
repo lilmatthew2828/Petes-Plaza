@@ -1,3 +1,4 @@
+// Matthew - React component for displaying a seller's page with their listings and transaction history (for admins)
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getSellerPage, getSellerTransactions } from "../api/seller";

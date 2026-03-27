@@ -5,12 +5,6 @@ dist/
 frontend/dist/
 build/
 
-# Environment files
-.env*
-*.env         # .env, .env.local
-.env.*         # .env.development, .env.production
-*.local        # e.g., .env.local, *.local
-
 # Python
 __pycache__/
 *.pyc

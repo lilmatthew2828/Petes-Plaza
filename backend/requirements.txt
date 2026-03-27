@@ -54,3 +54,5 @@ uvloop; sys_platform != 'win32'
 watchfiles
 websockets
 boto3
+pillow
+pytest

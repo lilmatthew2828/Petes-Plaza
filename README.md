@@ -52,6 +52,7 @@ pip install -r requirements.txt
 # DATABASE_URL=postgresql+psycopg2://user:password@host:5432/dbname?sslmode=require
 
 # Start backend server
+cd backend
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -76,13 +77,6 @@ Frontend runs on **http://localhost:5173**
 
 - **Home Page**: Browse all listings by category
 - **Admin Dashboard**: View metrics, manage listings, mark items as sold, delete listings
-- **Responsive Design**: Works on desktop and mobile
-
-## API Endpoints
-
-- `GET /api/admin/metrics` - Dashboard metrics (total users, listings, active listings)
-- `GET /api/admin/listings` - Fetch all listings
-- `POST /api/admin/listings/{id}/moderate` - Moderate a listing
 
 ## Notes
 
