@@ -36,7 +36,7 @@ def get_seller_page(seller_email: str, db: Session = Depends(get_db)):
                 "title": l.title,
                 "price": float(l.price),
                 "description": l.description,
-                "image_url": l.image_key,
+                "image_url": f"https://petes-plaza-bucket.s3.amazonaws.com/{l.image_key}" if l.image_key else None,
                 "category": l.category,
                 "seller_email": l.seller_email,
                 "status": l.status,

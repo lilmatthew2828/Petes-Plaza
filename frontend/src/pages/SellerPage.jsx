@@ -124,7 +124,7 @@ export default function SellerPage() {
                     <tr key={tx.id}>
                       <td>{tx.id}</td>
                       <td>{tx.listing_id}</td>
-                      <td>{tx.buyer_id}</td>
+                      <td>{tx.buyer_email}</td>
                       <td>${tx.amount}</td>
                       <td>{tx.status}</td>
                       <td>
