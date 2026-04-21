@@ -18,10 +18,6 @@ export default function AdminSidebar({ active, open }) {
           onClick={() => navigate("/admin/users")}> 
           <span className="sidebar-icon">👤</span> Users
         </li>
-        <li className={active === "listings" ? "active" : ""}
-          onClick={() => navigate("/admin/listings")}> 
-          <span className="sidebar-icon">📦</span> Listings
-        </li>
         <li className={active === "transactions" ? "active" : ""}
           onClick={() => navigate("/admin/transactions")}
           style={{ cursor: "pointer" }}

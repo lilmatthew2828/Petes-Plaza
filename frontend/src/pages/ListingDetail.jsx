@@ -39,7 +39,7 @@ export default function ListingDetail() {
   return (
     <div style={{ padding: "60px", maxWidth: "900px", margin: "0 auto" }}>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => window.history.back()}
         style={{
           marginBottom: "20px",
           padding: "8px 14px",
