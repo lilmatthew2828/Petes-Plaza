@@ -11,27 +11,26 @@ export default function AdminSidebar({ active, open }) {
       <div className="sidebar-title" style={{ fontWeight: 800, fontSize: '1.4rem', fontFamily: 'Inter, sans-serif', color: '#2563eb', letterSpacing: '-1px', marginBottom: 24 }}>Pete's Plaza Admin</div>
       <ul className="sidebar-nav">
         <li className={active === "dashboard" ? "active" : ""}
-          onClick={() => navigate("/admin")}>
+          onClick={() => navigate("/admin")}> 
           <span className="sidebar-icon">📊</span> Dashboard
         </li>
         <li className={active === "users" ? "active" : ""}
-          onClick={() => navigate("/admin/users")}>
+          onClick={() => navigate("/admin/users")}> 
           <span className="sidebar-icon">👤</span> Users
         </li>
-        <li className={active === "orders" ? "active" : ""}
-          onClick={() => navigate("/admin-orders")}>
-          <span className="sidebar-icon">🛒</span> Orders
+        <li className={active === "listings" ? "active" : ""}
+          onClick={() => navigate("/admin/listings")}> 
+          <span className="sidebar-icon">📦</span> Listings
         </li>
-        <li className={active === "announcements" ? "active" : ""}
-          onClick={() => navigate("/admin-announcements")}>
-          <span className="sidebar-icon">🔔</span> Announcements
-        </li>
-        <li
-          className={active === "transactions" ? "active" : ""}
-          onClick={() => navigate("/transactions")}
+        <li className={active === "transactions" ? "active" : ""}
+          onClick={() => navigate("/admin/transactions")}
           style={{ cursor: "pointer" }}
         >
           <span className="sidebar-icon">💰</span> Transactions
+        </li>
+        <li className={active === "announcements" ? "active" : ""}
+          onClick={() => navigate("/admin/announcements")}> 
+          <span className="sidebar-icon">🔔</span> Announcements
         </li>
       </ul>
     </div>

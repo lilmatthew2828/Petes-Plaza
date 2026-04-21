@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import UserAnnouncements from './UserAnnouncements';
 import Icon from '@mdi/react';
 import { mdiTreasureChest } from '@mdi/js';
 import { useAuth } from '../context/AuthContext';
@@ -178,6 +179,7 @@ export default function HomePage() {
           </Link>
           <button className="top-tab" onClick={() => alert('Cart clicked!')}>Cart</button>
           <button className="top-tab" onClick={() => setActiveTab('Contact Us')}>Contact</button>
+          {user && <UserAnnouncements userId={user.id} />}
           {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
         </div>
       </header>

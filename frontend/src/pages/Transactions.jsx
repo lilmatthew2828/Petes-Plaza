@@ -1,5 +1,14 @@
 // Daye Karibi-Whyte - React component for admin transactions page navigation
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL
+
+// Normalize API_URL to avoid double /api/api
+function apiUrl(path) {
+  let url = API_URL;
+  if (url.endsWith("/")) url = url.slice(0, -1);
+  if (path.startsWith("/")) return url + path;
+  return url + "/" + path;
+}
+
 if (!API_URL) console.warn("VITE_API_URL is not defined!");
 import { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
@@ -15,7 +24,7 @@ export default function Transactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch(`${API_URL}/admin/transactions`);
+        const res = await fetch(apiUrl('/admin/transactions'));
         if (!res.ok) throw new Error('Failed to fetch transactions');
         const data = await res.json();
         setTransactions(data);

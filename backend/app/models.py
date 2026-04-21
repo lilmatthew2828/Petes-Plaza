@@ -29,7 +29,7 @@ class SessionToken(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     token = Column(String(255), unique=True, nullable=False, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     revoked_at = Column(DateTime, nullable=True)
     
@@ -100,3 +100,47 @@ class Transactions(Base):
     
     def __repr__(self):
         return f"<Transaction(transaction_id={self.transaction_id}, buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    body = Column(String, nullable=False)
+    recipient_type = Column(String(20), nullable=False)  # admins, users, all
+    announcement_type = Column(String(50), nullable=False)  # event, update, notice, etc.
+    send_at = Column(DateTime, nullable=False)
+    is_sent = Column(Boolean, default=False)
+    announcer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    announcer = relationship("User", foreign_keys=[announcer_id])
+    deliveries = relationship("AnnouncementDelivery", back_populates="announcement", cascade="all, delete-orphan")
+
+class AnnouncementDelivery(Base):
+    __tablename__ = "announcement_deliveries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_id = Column(Integer, ForeignKey("announcements.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    is_read = Column(Boolean, default=False)
+    read_at = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("announcement_id", "user_id", name="uq_announcement_user"),)
+
+    announcement = relationship("Announcement", back_populates="deliveries")
+    user = relationship("User")
+from sqlalchemy import Enum as PgEnum
+import enum
+# --- Announcements Feature ---
+class RecipientType(enum.Enum):
+    admins = "admins"
+    users = "users"
+    all = "all"
+
+class AnnouncementType(enum.Enum):
+    event = "event"
+    update = "update"
+    notice = "notice"

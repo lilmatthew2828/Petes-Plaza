@@ -232,6 +232,7 @@ def get_me(current_user: User = Depends(require_login)):
     Returns 401 if not logged in.
     """
     return AdminUserResponse(
+        id=current_user.id,
         email=current_user.email,
         username=current_user.username,
         student_id=current_user.student_id,
