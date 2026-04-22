@@ -4,6 +4,18 @@ if (!API_URL) console.warn("VITE_API_URL is not defined!");
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { uploadImage } from "../api/upload";
+
+const CATEGORIES = [
+  'T-Shirts',
+  'Jeans',
+  'Sweatshirts',
+  'Shoes',
+  'Appliances',
+  'Furniture',
+  'Accessories',
+  'Vehicles',
+  'Other'
+];
 export default function Listings() {
   const [listings, setListings] = useState([]);
   const [listing_title, setListingTitle] = useState("");
@@ -187,8 +199,7 @@ export default function Listings() {
           }}
         />
 
-        <input
-          placeholder="Category"
+        <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           style={{
@@ -196,8 +207,15 @@ export default function Listings() {
             width: "160px",
             border: "2px solid #1e3a8a",
             borderRadius: "6px",
+            cursor: "pointer",
+            backgroundColor: "white",
           }}
-        />
+        >
+          <option value="">Select a category</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
 
         <input
           placeholder="Description"

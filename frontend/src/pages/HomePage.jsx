@@ -27,11 +27,26 @@ const CATEGORIES = [
   'Appliances',
   'Furniture',
   'Accessories',
+  'Vehicles',
   'Other'
 ];
 
-const getCategoryForListing = (id) =>
-  CATEGORIES[(id - 1) % CATEGORIES.length];
+// Map old category names to new standardized categories
+const normalizeLegacyCategory = (category) => {
+  if (!category) return 'Other';
+  const categoryLower = category.toLowerCase();
+  
+  if (categoryLower.includes('shirt') || categoryLower.includes('tee') || categoryLower.includes('clothing') || categoryLower.includes('clothes')) return 'T-Shirts';
+  if (categoryLower.includes('jean')) return 'Jeans';
+  if (categoryLower.includes('sweatshirt') || categoryLower.includes('hoodie') || categoryLower.includes('sweater')) return 'Sweatshirts';
+  if (categoryLower.includes('shoe') || categoryLower.includes('boot')) return 'Shoes';
+  if (categoryLower.includes('appliance')) return 'Appliances';
+  if (categoryLower.includes('furniture') || categoryLower.includes('table') || categoryLower.includes('chair')) return 'Furniture';
+  if (categoryLower.includes('accessory') || categoryLower.includes('accessories') || categoryLower.includes('bag') || categoryLower.includes('hat')) return 'Accessories';
+  if (categoryLower.includes('vehicle') || categoryLower.includes('car') || categoryLower.includes('bike') || categoryLower.includes('transportation')) return 'Vehicles';
+  
+  return 'Other';
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -52,7 +67,14 @@ export default function HomePage() {
   const pageDesc = selectedCategory ? `Showing listings for: ${selectedCategory}` : PAGE_DESC_MAP[activeTab] || 'Listings';
 
   const filteredListings = selectedCategory
-    ? listings.filter((item) => item.category === selectedCategory)
+    ? listings.filter((item) => {
+        const normalizedCategory = normalizeLegacyCategory(item.category);
+        const matches = normalizedCategory === selectedCategory;
+        if (!matches && item.category) {
+          console.log(`[HomePage] Filter: "${item.category}" -> "${normalizedCategory}" !== "${selectedCategory}" for "${item.title}"`);
+        }
+        return matches;
+      })
     : listings
 
   const handleTabClick = (tab) => {
@@ -80,7 +102,8 @@ export default function HomePage() {
         const res = await fetch('/api/listings', { credentials: "include" }); // Emmanuella Obidike 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        console.log(data);
+        console.log("[HomePage] Fetched listings:", data);
+        console.log("[HomePage] Sample listing categories:", data.slice(0, 3).map(l => ({ id: l.id, title: l.title, category: l.category })));
         setListings(data);
       } catch (err) {
         console.error(err);
