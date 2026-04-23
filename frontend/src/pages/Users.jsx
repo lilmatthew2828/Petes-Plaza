@@ -17,7 +17,9 @@ export default function Users() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${API_URL}/admin/users`);
+        const res = await fetch(`${API_URL}/admin/users`, {
+          credentials: "include" // Emmanuella Obidike - Added credentials for cookie-based authentication
+        });
         if (!res.ok) throw new Error('Failed to fetch users');
         const data = await res.json();
         setUsers(data);
@@ -39,8 +41,9 @@ export default function Users() {
   const suspendUser = async (email) => {
     if (!window.confirm(`Suspend user ${email}?`)) return;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/suspend/${email}`, {
-        method: 'PUT'
+      const res = await fetch(`${API_URL}/admin/suspend/${email}`, { // Emmanuella Obidike - Updated URL to match backend endpoint
+        method: 'PUT',
+        credentials: "include" // Emmanuella Obidike - Added credentials for cookie-based authentication
       });
       if (!res.ok) throw new Error('Failed to suspend user');
       setUsers(prev => prev.map(u => u.email === email ? { ...u, is_suspended: true } : u));

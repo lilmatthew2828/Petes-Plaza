@@ -9,6 +9,7 @@ import { apiCall } from "./client";
 export async function register(payload) {
   return apiCall("/auth/register", {
     method: "POST",
+    credentials: "include", //Emmanuella Obidike - include credentials for session cookie
     body: payload,
   });
 }

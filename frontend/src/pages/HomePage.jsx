@@ -162,7 +162,6 @@ export default function HomePage() {
           <img src="/assets/images/logo.png" alt="Logo" className="logo" />
         </div>
         <div className="top-tabs">
-          <button className="top-tab" onClick={() => setShowAuthModal(true)}>Profile</button>
           <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
           {user && (
             <Link to="/purchase-history">
