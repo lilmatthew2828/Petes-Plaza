@@ -26,9 +26,10 @@ export async function login(payload) {
 /*
 Anthony Powell
 adminLogin API method
+// Drop the redundant /api prefix — client.js prepends API_URL (which already contains /api)
 */
 export async function adminLogin(payload) {
-  return apiCall("/api/auth/admin/login", {
+  return apiCall("/auth/admin/login", {
     method: "POST",
     body: payload,
   });
