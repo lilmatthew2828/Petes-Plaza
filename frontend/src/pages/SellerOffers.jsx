@@ -1,4 +1,5 @@
 // Jania Southall 
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSellerOffers, respondToOffer, completeOffer } from '../api/offers';
 import { useAuth } from '../context/AuthContext';
