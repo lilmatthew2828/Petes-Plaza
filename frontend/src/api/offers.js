@@ -1,7 +1,8 @@
+// Jania Southall (whole file) - API functions for offers, including creating offers, retrieving offers for sellers and buyers, responding to offers, and completing transactions.
 import { apiCall } from './client';
 
 export const createOffer = (listingId) => {
-  return apiCall(`/offers/${listingId}`, {  // Fixed: removed query param
+  return apiCall(`/offers/${listingId}`, { 
     method: 'POST'
   });
 };

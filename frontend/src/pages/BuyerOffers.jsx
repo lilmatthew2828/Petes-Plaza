@@ -1,3 +1,4 @@
+// Jania Southall - BuyerOffers.jsx: This component displays the offers that the logged-in buyer has sent to sellers. It fetches the offers from the backend, shows their status, and provides links to view the listing and seller details.
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getBuyerOffers } from '../api/offers';

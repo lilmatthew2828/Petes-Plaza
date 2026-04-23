@@ -101,8 +101,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Replace the old routes with these: */}
           <Route 
             path="/offers-received" 
             element={

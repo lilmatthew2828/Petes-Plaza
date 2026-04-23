@@ -1,8 +1,9 @@
+# Jania Southall (whole file) - Routes for handling offers, including creating offers, retrieving offers for sellers and buyers, responding to offers, and completing transactions.
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
-from pydantic import BaseModel  # Add this import
+from pydantic import BaseModel  
 
 from app.database import get_db
 from app.models import User, Listing, Offers, Transactions
@@ -10,11 +11,10 @@ from app.auth import require_login
 
 router = APIRouter(prefix="/api/offers", tags=["offers"])
 
-# Add this Pydantic model
 class RespondRequest(BaseModel):
     message: str
 
-@router.post("/{listing_id}")  # Fixed: added path parameter
+@router.post("/{listing_id}") 
 def create_offer(
     listing_id: int,
     db: Session = Depends(get_db),
@@ -30,7 +30,7 @@ def create_offer(
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found or not available")
     
-    # Can't be interested in your own listing
+    # Makes sure that you can't be interested in your own listing
     if listing.seller_email == current_user.email:
         raise HTTPException(status_code=400, detail="Cannot express interest in your own listing")
     

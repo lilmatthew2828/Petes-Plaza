@@ -162,12 +162,18 @@ export default function HomePage() {
           <img src="/assets/images/logo.png" alt="Logo" className="logo" />
         </div>
         <div className="top-tabs">
-          <button className="top-tab" onClick={() => setShowAuthModal(true)}>Profile</button>
           <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
           {user && (
             <Link to="/purchase-history">
               <button className="top-tab">
                 Purchase History
+              </button>
+            </Link>
+          )}
+          {user && (
+            <Link to="/my-sold">
+              <button className="top-tab">
+                Sold Items
               </button>
             </Link>
           )}
@@ -185,8 +191,6 @@ export default function HomePage() {
               </Link>
             </>
           )}
-          <button className="top-tab" onClick={() => alert('Cart clicked!')}>Cart</button>
-          <button className="top-tab" onClick={() => setActiveTab('Contact Us')}>Contact</button>
           {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
         </div>
       </header>
