@@ -67,6 +67,11 @@ export default function SellerPage() {
 
       <div className="seller-actions">
         <Link to="/listings" className="back-link">← Back to Listings</Link>
+        <Link to={`/seller-offers/${seller?.email}`}>
+          <button className="admin-btn">
+            View Offers
+          </button>
+        </Link>
 
         {isAdmin && (
           <button className="admin-btn" onClick={handleViewTransactions}>

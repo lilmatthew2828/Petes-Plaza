@@ -3,6 +3,8 @@ import { AuthProvider } from "./context/AuthContext";
 import NavBar from "./components/navBar";
 import PurchaseHistory from './pages/PurchaseHistory';
 import ProtectedRoute from "./components/ProtectedRoute";
+import SellerOffers from "./pages/SellerOffers";
+import BuyerOffers from "./pages/BuyerOffers";
 
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
@@ -32,6 +34,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
+
 
           {/* Protected Routes */}
           <Route
@@ -99,6 +102,24 @@ function App() {
             }
           />
 
+          {/* Replace the old routes with these: */}
+          <Route 
+            path="/offers-received" 
+            element={
+              <ProtectedRoute>
+                <SellerOffers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/offers-sent" 
+            element={
+              <ProtectedRoute>
+                <BuyerOffers />
+              </ProtectedRoute>
+            } 
+          />
+
           {/* Listings routes */}
           <Route path="/listings" element={<ProtectedRoute><Listings /></ProtectedRoute>} />
 
@@ -112,6 +133,7 @@ function App() {
           
           {/* Redirect unknown routes to Welcome */}
           <Route path="*" element={<Navigate to="/home" replace />} />
+
         </Routes>
       </AuthProvider>
     </Router>

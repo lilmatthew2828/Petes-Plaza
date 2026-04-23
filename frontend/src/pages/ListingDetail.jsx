@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getListing } from "../api/listings";
+import { createOffer } from "../api/offers";
+import { useAuth } from "../context/AuthContext";
 
 export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [listing, setListing] = useState(null);
   const [error, setError] = useState("");
+  const [offerLoading, setOfferLoading] = useState(false);
+  const [offerMessage, setOfferMessage] = useState("");
 
   useEffect(() => {
     const loadListing = async () => {
@@ -22,7 +27,25 @@ export default function ListingDetail() {
     loadListing();
   }, [id]);
 
-  if (error) {
+  const handleExpressInterest = async () => {
+    if (!user) {
+      setError("Please log in to express interest");
+      return;
+    }
+
+    try {
+      setOfferLoading(true);
+      setError("");
+      await createOffer(parseInt(id));
+      setOfferMessage("Interest expressed successfully! The seller will be notified.");
+    } catch (e) {
+      setError(e?.message || "Failed to express interest");
+    } finally {
+      setOfferLoading(false);
+    }
+  };
+
+  if (error && !listing) {
     return <h2 style={{ padding: "40px", color: "crimson" }}>{error}</h2>;
   }
 
@@ -35,6 +58,7 @@ export default function ListingDetail() {
   const image = listing.image_url ?? listing.image_key ?? "";
   const sellerId = listing.seller_email ?? null;
   const sellerName = listing.seller_name ?? "Seller";
+  const isOwnListing = user && user.email === sellerId;
 
   return (
     <div style={{ padding: "60px", maxWidth: "900px", margin: "0 auto" }}>
@@ -55,6 +79,30 @@ export default function ListingDetail() {
       <h1 style={{ fontSize: "42px", marginBottom: "25px" }}>
         {title}
       </h1>
+
+      {error && (
+        <div style={{ 
+          padding: "12px", 
+          background: "#fee", 
+          color: "#c00", 
+          borderRadius: "6px", 
+          marginBottom: "20px" 
+        }}>
+          {error}
+        </div>
+      )}
+
+      {offerMessage && (
+        <div style={{ 
+          padding: "12px", 
+          background: "#efe", 
+          color: "#080", 
+          borderRadius: "6px", 
+          marginBottom: "20px" 
+        }}>
+          {offerMessage}
+        </div>
+      )}
 
       <div
         style={{
@@ -88,13 +136,32 @@ export default function ListingDetail() {
           </p>
         )}
 
-        {sellerId && (
-          <div style={{ marginTop: "18px" }}>
+        <div style={{ marginTop: "18px", display: "flex", gap: "12px" }}>
+          {!isOwnListing && user && listing.status === 'active' && (
+            <button
+              onClick={handleExpressInterest}
+              disabled={offerLoading || !!offerMessage}
+              style={{
+                padding: "12px 24px",
+                borderRadius: "6px",
+                border: "none",
+                background: offerMessage ? "#28a745" : "#007bff",
+                color: "white",
+                cursor: offerLoading || offerMessage ? "not-allowed" : "pointer",
+                fontWeight: "bold",
+                opacity: offerLoading || offerMessage ? 0.7 : 1
+              }}
+            >
+              {offerLoading ? "Sending..." : offerMessage ? "Interest Sent!" : "I'm Interested"}
+            </button>
+          )}
+
+          {sellerId && (
             <Link to={`/seller/${sellerId}`}>
               <button
                 style={{
                   padding: "10px 16px",
-                  borderRadius: "999px",
+                  borderRadius: "6px",
                   border: "1px solid #ccc",
                   background: "#fff",
                   cursor: "pointer"
@@ -103,8 +170,8 @@ export default function ListingDetail() {
                 View Seller Page
               </button>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

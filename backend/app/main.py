@@ -13,6 +13,7 @@ from app.database import engine
 from app.database import Base
 from app.auth import router as auth_router
 from app.routes.uploads import router as uploads_router #Emmanuella Obidike
+from app.routes import offers
 
  
 
@@ -46,6 +47,7 @@ app.include_router(listings_router)
 app.include_router(purchaseHistory.router)
 app.include_router(uploads_router) #Emmanuella Obidike
 app.include_router(seller.router) # new - mkp
+app.include_router(offers.router)
 
 @app.get("/")
 def root():

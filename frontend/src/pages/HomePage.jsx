@@ -171,11 +171,20 @@ export default function HomePage() {
               </button>
             </Link>
           )}
-          <Link to="/my-sold">
-            <button className="top-tab">
-              Sold Items
-            </button>
-          </Link>
+          {user && (
+            <>
+              <Link to="/offers-received">
+                <button className="top-tab">
+                  Offers Received
+                </button>
+              </Link>
+              <Link to="/offers-sent">
+                <button className="top-tab">
+                  Offers Sent
+                </button>
+              </Link>
+            </>
+          )}
           <button className="top-tab" onClick={() => alert('Cart clicked!')}>Cart</button>
           <button className="top-tab" onClick={() => setActiveTab('Contact Us')}>Contact</button>
           {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}

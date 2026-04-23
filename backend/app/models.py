@@ -100,3 +100,24 @@ class Transactions(Base):
     
     def __repr__(self):
         return f"<Transaction(transaction_id={self.transaction_id}, buyer_email={self.buyer_email}, listing_id={self.listing_id}, transaction_timestamp={self.transaction_timestamp})>"
+
+# Offers model for buyer interest and seller response system
+class Offers(Base):
+    __tablename__ = "offers"
+    
+    offer_id = Column(Integer, primary_key=True, index=True)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    buyer_email = Column(String, ForeignKey("users.email"), nullable=False)
+    seller_email = Column(String, ForeignKey("users.email"), nullable=False)
+    status = Column(String, default="pending")  # pending, accepted, completed
+    seller_message = Column(String, nullable=True)  # pickup location/instructions
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    # Relationships
+    buyer = relationship("User", foreign_keys=[buyer_email])
+    seller = relationship("User", foreign_keys=[seller_email]) 
+    listing = relationship("Listing", foreign_keys=[listing_id])
+    
+    def __repr__(self):
+        return f"<Offer(offer_id={self.offer_id}, listing_id={self.listing_id}, buyer_email={self.buyer_email}, status={self.status})>"
