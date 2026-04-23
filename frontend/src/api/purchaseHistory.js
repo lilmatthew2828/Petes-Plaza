@@ -2,11 +2,11 @@
 import { apiCall } from './client'; 
 
 export const getPurchaseHistory = () => {
-  return apiCall('/purchase-history/'); //Emmanuella Obidike - Added slash to match backend route
+  return apiCall('/api/purchase-history/'); //Emmanuella Obidike - Added slash to match backend route
 };
 
 export const purchaseItem = (listingId) => {
-  return apiCall(`/purchase-history/purchase/${listingId}`, { //Emmanuella Obidike - Added slash to match backend route
+  return apiCall(`/api/purchase-history/purchase/${listingId}`, { //Emmanuella Obidike - Added slash to match backend route
     method: 'POST'
   });
 };
