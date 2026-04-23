@@ -1,6 +1,6 @@
-// Emmanuella Obidike - API Client Using VITE_BACKEND_URL for All Requests
+// Emmanuella Obidike - API Client Using VITE_api_URL for All Requests
 
-const API_URL = import.meta.env.VITE_BACKEND_URL; // Always use backend URL
+const API_URL = import.meta.env.VITE_API_URL; // Always use api URL
 
 export async function apiCall(endpoint, options = {}) {
   const {
