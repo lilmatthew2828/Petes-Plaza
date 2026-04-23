@@ -7,7 +7,7 @@ import { apiCall } from "./client";
  * Register a new user
  */
 export async function register(payload) {
-  return apiCall("/auth/register", {
+  return apiCall("/api/auth/register", {
     method: "POST",
     credentials: "include", //Emmanuella Obidike - include credentials for session cookie
     body: payload,
@@ -18,7 +18,7 @@ export async function register(payload) {
  * Login with email or username
  */
 export async function login(payload) {
-  return apiCall("/auth/login", {
+  return apiCall("/api/auth/login", {
     method: "POST",
     body: payload,
   });
@@ -39,7 +39,7 @@ export async function adminLogin(payload) {
  * Logout and revoke session
  */
 export async function logout() {
-  return apiCall("/auth/logout", {
+  return apiCall("/api/auth/logout", {
     method: "POST",
   });
 }
@@ -48,7 +48,7 @@ export async function logout() {
  * Get current authenticated user
  */
 export async function getMe() {
-  return apiCall("/auth/me", {
+  return apiCall("/api/auth/me", {
     method: "GET",
   });
 }
