@@ -181,7 +181,7 @@ def update_listing(db: Session, listing_id: int, payload: schemas.ListingUpdate,
     db.refresh(listing)
     return listing
 
-# Delete listing with ownership check
+# Mark listing as deleted instead of removing it so we keep a record in the database
 def delete_listing(db: Session, listing_id: int, current_user: User):
     listing = get_listing_or_404(db, listing_id)
 
@@ -191,8 +191,11 @@ def delete_listing(db: Session, listing_id: int, current_user: User):
             detail="403 Forbidden --> Logged in but not the owner",
         )
 
-    db.delete(listing)
+    # Soft delete — preserve the row for record-keeping
+    listing.status = "deleted"
     db.commit()
+    db.refresh(listing)
+    return listing
 
 def _is_owner(listing: Listing, current_user: User) -> bool:
     # Support whichever ownership field exists in your model
