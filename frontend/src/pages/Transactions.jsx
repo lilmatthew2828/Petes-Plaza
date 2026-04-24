@@ -15,9 +15,7 @@ export default function Transactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch(`${API_URL}/admin/transactions`, {
-          credentials: "include" // Emmanuella Obidike - Added credentials for cookie-based authentication
-        });
+        const res = await fetch(`${API_URL}/admin/transactions`);
         if (!res.ok) throw new Error('Failed to fetch transactions');
         const data = await res.json();
         setTransactions(data);

@@ -2,15 +2,14 @@
 //The function uploads an image file to the FastAPI backend
 // The backend then uploads it to S3 and return an image_key
 
-const API_URL = import.meta.env.VITE_BACKEND_URL; // Use VITE_BACKEND_URL from .env production file
+const API_URL = import.meta.env.VITE_API_URL
 export async function uploadImage(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(`${API_URL}/upload-image`, { // updated url
+  const res = await fetch(`${API_URL}/uploads/upload-image`, {
     method: "POST",
     body: formData,
-    credentials: "include", // Include cookies for authentication 
   });
 
   // check for error first

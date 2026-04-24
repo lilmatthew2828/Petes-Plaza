@@ -85,9 +85,7 @@ export default function Register() {
           style={{ backgroundImage: `url(${hamptonCampus})` }}
         ></div>
         <div className="branding-content">
-          <h1 className="site-title">
-            Pete’s <span>Plaza</span>
-          </h1>
+          <h1>Pete's Plaza</h1>
           <p className="branding-slogan">"By Pirates, For Pirates."</p>
         </div>
       </div>

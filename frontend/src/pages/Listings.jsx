@@ -21,8 +21,7 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-  fetch(`${API_URL}/listings`, {
-    credentials: "include"  })  // Emmanuella Obidike - Added credentials for cookie-based authentication
+  fetch(`${API_URL}/listings`)
     .then((res) => {
       if (!res.ok) {
         throw new Error("Server response not OK");

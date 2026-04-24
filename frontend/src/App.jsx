@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import NavBar from "./components/NavBar"; //Emmanuella Obidike - Corrected import path for NavBar
+import NavBar from "./components/navBar";
 import PurchaseHistory from './pages/PurchaseHistory';
 import ProtectedRoute from "./components/ProtectedRoute";
 import SellerOffers from "./pages/SellerOffers";

@@ -57,10 +57,10 @@ export default function AdminDashboard() {
         `/api/admin/listings/${listingId}/moderate`,
         {
           method: 'POST',
-          credentials: 'include', // Emmanuella Obidike - Added credentials for authentication in production
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action }),
-        });
+        }
+      )
 
       if (!res.ok) {
         const error = await res.json()
@@ -91,14 +91,11 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (listingId) => {
-    try { // Emmanuella Obidike - Added credentials for authentication in production
+    try {
       const res = await fetch(
         `/api/admin/listings/${listingId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include'
-        }
-      );
+        { method: 'DELETE' }
+      )
 
       if (!res.ok) {
         const error = await res.json()
@@ -124,26 +121,15 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        const metricsRes = await fetch('/api/admin/metrics', {
-          credentials: 'include' // Emmanuella Obidike - Added credentials for authentication in production
-        });// This endpoint should return an object like { total_users: number, total_listings: number, active_listings: number } for the top metrics cards
-        
-        const listingsRes = await fetch('/api/admin/listings', {
-          credentials: 'include'
-        }); // This endpoint should return a list of all listings with their status for the admin table. This routes to the same endpoint as the homepage. The difference is that the homepage only shows active listings, while this endpoint returns all listings for moderation purposes.
-        
-        const userGrowthRes = await fetch('/api/admin/user_growth', {
-          credentials: 'include'
-        }); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for user signups over the last 30 days
+        const metricsRes = await fetch('/api/admin/metrics'); // This endpoint should return an object like { total_users: number, total_listings: number, active_listings: number } for the top metrics cards
+        const listingsRes = await fetch('/api/admin/listings'); // This endpoint should return a list of all listings with their status for the admin table. This routes to the same endpoint as the homepage. The difference is that the homepage only shows active listings, while this endpoint returns all listings for moderation purposes.
+        const userGrowthRes = await fetch('/api/admin/user_growth'); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for user signups over the last 30 days
         if (!metricsRes.ok || !listingsRes.ok) {
           throw new Error('Failed to fetch admin data');
         }
-        
-        const usersRes = await fetch('/api/admin/active_user_emails', {
-          credentials: 'include'
-        }); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for daily active users over the last 30 days
+        const usersRes = await fetch('/api/admin/active_user_emails'); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for daily active users over the last 30 days
         let usersData = [];
+
         if (usersRes.ok) {
           usersData = await usersRes.json();
           setAllUsers(usersData);
@@ -157,9 +143,7 @@ export default function AdminDashboard() {
         //The user growth graph should have the plot points of the last 30 days of user signups. even if the value of a day is 0
         setUserGrowth(userGrowthData);
         const fetchActiveUsers = async () => {
-          const res = await fetch('/api/admin/active_users', {
-            credentials: 'include' } // Emmanuella Obidike
-          );
+          const res = await fetch('/api/admin/active_users');
           if (!res.ok) return;
           const data = await res.json();
           setActiveUsers(data);
@@ -317,11 +301,10 @@ export default function AdminDashboard() {
       };
 
       const res = await fetch('/api/admin/transactions', {
-      method: 'POST',
-      credentials: 'include', // Emmanuella Obidike
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(transactionPayload)
-    });
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transactionPayload)
+      });
 
       if (!res.ok) {
         throw new Error('Failed to create transaction');

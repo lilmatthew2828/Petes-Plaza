@@ -34,15 +34,8 @@
 
 .branding-content h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 3.8rem; /* Emmanuella Obidike - Increased font size for better visual impact */
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-  color: white;
-}
-
-.branding-content h1 span {
-  color: #fbbf24; /* gold */ 
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
 }
 
 /* Right: Form Styling with Floating Logo */

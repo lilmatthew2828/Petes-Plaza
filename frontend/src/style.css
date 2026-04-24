@@ -8,7 +8,7 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%); /* Emmanuella Obidike - subtle gradient background */
+  background: #f3f4f6;
   color: #111827;
 }
 
@@ -23,9 +23,8 @@ body {
 /* ====== TOP BAR ====== */
 .topbar {
   padding: 16px 12px;
-  border-bottom: 1px solid #e5e7eb; /* Emmanuella Obidike */
-  background: #e0f2fe;  /* Emmanuella Obidike  */
-  color: #111827; /* Emmanuella Obidike */
+  border-bottom: 2px solid #d1d5db;
+  background: #ffffff;
 }
 
 
@@ -35,13 +34,12 @@ body {
 }
 
 .pill {
-  border: 1px solid #d1d5db; /* Emmanuella Obidike */
-  background: #ffffff; /* Emmanuella Obidike */
+  border: 2px solid #d1d5db;
+  background: #fff;
   padding: 8px 12px;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 600; /* Emmanuella Obidike */
-  color: #111827; /* Emmanuella Obidike */
+  font-weight: bold;
 }
 
 .pill:hover { background: #f9fafb; }
@@ -63,8 +61,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border-bottom: 1px solid #e5e7eb; /* Emmanuella Obidike */
-  background: white; /* Emmanuella Obidike */
+  border-bottom: 2px solid #d1d5db;
 }
 
 .brand {
@@ -162,6 +159,13 @@ body {
   background: #ffffff;
 }
 
+.cards {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .card {
   border: 2px solid #d1d5db;
   border-radius: 16px;
@@ -179,13 +183,11 @@ body {
   font-weight: bold;
 }
 
-.img { 
-  width: 100%; /* Emmanuella Obidike */
-  height: 180px; /* Emmanuella Obidike */
-  object-fit: cover; /* Emmanuella Obidike */
+.img {
+  height: 90px;
   border-radius: 12px;
+  background: #e5e7eb;
 }
- 
 .page-image {
   width: 100%;
   max-height: 220px;

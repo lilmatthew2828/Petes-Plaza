@@ -20,16 +20,14 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <h1 className="navbar-brand"> 
-          Pete’s <span>Plaza</span>
-        </h1>
+        <h1 className="navbar-brand">Petes Plaza</h1>
         <div className="navbar-right">
           {user ? (
             <>
               <span className="navbar-user">Welcome, {user.username}</span>
               <button className="navbar-logout" onClick={handleLogout}>
                 Logout
-              </button> 
+              </button>
             </>
           ) : (
             <>
