@@ -1,4 +1,4 @@
-// Jania Southall - PurchaseHistory component to display user's past purchases.
+// Jania Southall - Purchase History component to display user's past purchases.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPurchaseHistory } from '../api/purchaseHistory';
@@ -14,22 +14,22 @@ const PurchaseHistory = () => {
     fetchPurchaseHistory();
   }, []);
 
+  const handleContactSeller = (item) => {
+    const subject = encodeURIComponent(`Question about: ${item.title}`);
+    const body = encodeURIComponent(
+      `Hi ${item.seller_name},\n\n` +
+      `I purchased "${item.title}" from you on ${
+        item.purchased_at ? new Date(item.purchased_at).toLocaleDateString() : 'Unknown date'
+      }.\n\n` +
+      `I wanted to reach out about:\n` +
+      `[Please describe your question or concern here]\n\n` +
+      `Transaction ID: ${item.transaction_id || item.id}\n\n` +
+      `Thanks!`
+    );
 
-const handleContactSeller = (item) => {
-  const subject = encodeURIComponent(`Question about: ${item.title}`);
-  const body = encodeURIComponent(
-    `Hi ${item.seller_name},\n\n` +
-    `I purchased "${item.title}" from you on ${new Date(item.purchased_at).toLocaleDateString()}.\n\n` +
-    `I wanted to reach out about:\n` +
-    `[Please describe your question or concern here]\n\n` +
-    `Transaction ID: ${item.id}\n\n` +
-    `Thanks!`
-  );
-  
-  // Open email client
-  window.location.href = `mailto:${item.seller_email}?subject=${subject}&body=${body}`;
-};
-
+    // Open email client
+    window.location.href = `mailto:${item.seller_email}?subject=${subject}&body=${body}`;
+  };
 
   const fetchPurchaseHistory = async () => {
     try {
@@ -39,12 +39,11 @@ const handleContactSeller = (item) => {
       console.log('Purchase history response:', response);
       
       // Handle different response structures
-      const data = response?.data || response || [];
+      const data = response || []; // Emmanuella Obidike
       setPurchases(Array.isArray(data) ? data : []);
       setError('');
     } catch (err) {
       console.error('Purchase history error:', err);
-      console.error('Error details:', err.response?.data);
       setError('Failed to load purchase history');
       setPurchases([]); 
     } finally {
@@ -57,9 +56,7 @@ const handleContactSeller = (item) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
   };
 
@@ -67,7 +64,7 @@ const handleContactSeller = (item) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(price);
+    }).format(price || 0);
   };
 
   if (loading) {
@@ -101,26 +98,42 @@ const handleContactSeller = (item) => {
       ) : (
         <div className="purchases-list">
           {purchases.map((purchase) => (
-            <div key={purchase.id} className="purchase-item">
+            <div
+              key={purchase.transaction_id || purchase.id}
+              className="purchase-item"
+            >
               <div className="purchase-image">
                 {purchase.image_url ? (
-                  <img 
-                    src={purchase.image_url || '/assets/images/placeholder.png'} 
+                  <img
+                    src={purchase.image_url}
                     alt={purchase.title}
-                    onError={e => e.target.src = '/assets/images/placeholder.png'}
+                    onError={(e) =>
+                      (e.target.src = '/assets/images/placeholder.png')
+                    }
                   />
                 ) : (
                   <div className="no-image">No Image</div>
                 )}
               </div>
-              
+
               <div className="purchase-details">
-                <h3 className="purchase-title">{purchase.title || 'Unknown Item'}</h3>
-                <p className="purchase-description">{purchase.description || 'No description available'}</p>
+                <h3 className="purchase-title">
+                  {purchase.title || 'Unknown Item'}
+                </h3>
+
+                <p className="purchase-description">
+                  {purchase.description || 'No description available'}
+                </p>
+
                 <div className="purchase-info">
-                  <span className="price">{formatPrice(purchase.price || 0)}</span>
-                  <span className="seller">Sold by: {purchase.seller_name || 'Unknown seller'}</span>
+                  <span className="price">
+                    {formatPrice(purchase.price)}
+                  </span>
+                  <span className="seller">
+                    Sold by: {purchase.seller_name || 'Unknown seller'}
+                  </span>
                 </div>
+
                 <div className="purchase-date">
                   Purchased on {formatDate(purchase.purchased_at)}
                 </div>
@@ -130,9 +143,9 @@ const handleContactSeller = (item) => {
                 <Link to={`/listings/${purchase.listing_id}`}>
                   <button className="pill">View Item</button>
                 </Link>
-                
-                <button 
-                  className="pill contact-seller-btn" 
+
+                <button
+                  className="pill contact-seller-btn"
                   onClick={() => handleContactSeller(purchase)}
                 >
                   Contact Seller

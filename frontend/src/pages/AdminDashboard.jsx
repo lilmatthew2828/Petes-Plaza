@@ -42,6 +42,7 @@ export default function AdminDashboard() {
   const [allUsers, setAllUsers] = useState([]);
   const [buyerEmail, setBuyerEmail] = useState('');
   const [emailSearch, setEmailSearch] = useState('');
+  const API_URL = import.meta.env.VITE_API_URL;
   const showMessage = (text) => {
     setMessage(text);                // show the message
     setTimeout(() => setMessage(''), 7000);  // clear after 7 seconds
@@ -54,7 +55,7 @@ export default function AdminDashboard() {
   const handleModerate = async (listingId, action) => {
     try {
       const res = await fetch(
-        `/api/admin/listings/${listingId}/moderate`,
+        `${API_URL}/api/admin/listings/${listingId}/moderate`,
         {
           method: 'POST',
           credentials: 'include', // Emmanuella Obidike - Added credentials for authentication in production
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
   const handleDelete = async (listingId) => {
     try { // Emmanuella Obidike - Added credentials for authentication in production
       const res = await fetch(
-        `/api/admin/listings/${listingId}`,
+        `${API_URL}/api/admin/listings/${listingId}`,
         {
           method: 'DELETE',
           credentials: 'include'
@@ -125,22 +126,22 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         
-        const metricsRes = await fetch('/api/admin/metrics', {
+        const metricsRes = await fetch(`${API_URL}/api/admin/metrics`, {
           credentials: 'include' // Emmanuella Obidike - Added credentials for authentication in production
         });// This endpoint should return an object like { total_users: number, total_listings: number, active_listings: number } for the top metrics cards
         
-        const listingsRes = await fetch('/api/admin/listings', {
+        const listingsRes = await fetch(`${API_URL}/api/admin/listings`, {
           credentials: 'include'
         }); // This endpoint should return a list of all listings with their status for the admin table. This routes to the same endpoint as the homepage. The difference is that the homepage only shows active listings, while this endpoint returns all listings for moderation purposes.
         
-        const userGrowthRes = await fetch('/api/admin/user_growth', {
+        const userGrowthRes = await fetch(`${API_URL}/api/admin/user_growth`, {
           credentials: 'include'
         }); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for user signups over the last 30 days
         if (!metricsRes.ok || !listingsRes.ok) {
           throw new Error('Failed to fetch admin data');
         }
         
-        const usersRes = await fetch('/api/admin/active_user_emails', {
+        const usersRes = await fetch(`${API_URL}/api/admin/active_users`, {
           credentials: 'include'
         }); // This endpoint should return an array of { date: 'YYYY-MM-DD', count: number } for daily active users over the last 30 days
         let usersData = [];
@@ -157,7 +158,7 @@ export default function AdminDashboard() {
         //The user growth graph should have the plot points of the last 30 days of user signups. even if the value of a day is 0
         setUserGrowth(userGrowthData);
         const fetchActiveUsers = async () => {
-          const res = await fetch('/api/admin/active_users', {
+          const res = await fetch(`${API_URL}/api/admin/active_users`, {
             credentials: 'include' } // Emmanuella Obidike
           );
           if (!res.ok) return;
@@ -298,7 +299,7 @@ export default function AdminDashboard() {
   if (loading) return <div className="page"><p>Loading...</p></div>;
   if (error) return <div className="error">Error: {error}</div>;
   const filteredUsers = allUsers.filter(user =>
-    user.email.toLowerCase().includes(emailSearch.toLowerCase())
+    (user.email || "").toLowerCase().includes(emailSearch.toLowerCase())
   );
   const handleConfirmSold = async () => {
     if (!buyerEmail || !selectedListing) {
@@ -316,7 +317,7 @@ export default function AdminDashboard() {
         transaction_timestamp: new Date().toISOString()
       };
 
-      const res = await fetch('/api/admin/transactions', {
+      const res = await fetch(`${API_URL}/api/admin/transactions`, {
       method: 'POST',
       credentials: 'include', // Emmanuella Obidike
       headers: { 'Content-Type': 'application/json' },

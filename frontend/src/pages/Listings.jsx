@@ -1,5 +1,8 @@
 const API_URL = import.meta.env.VITE_API_URL;
-if (!API_URL) console.warn("VITE_API_URL is not defined!");
+if (!API_URL) {
+  throw new Error("VITE_API_URL is not defined");
+}
+
 //Emmanuella Obidike
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -21,8 +24,9 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-  fetch(`${API_URL}/listings`, {
-    credentials: "include"  })  // Emmanuella Obidike - Added credentials for cookie-based authentication
+  fetch(`${API_URL}/api/listings`, {
+    credentials: "include"  
+  })  // Emmanuella Obidike - Added credentials for cookie-based authentication
     .then((res) => {
       if (!res.ok) {
         throw new Error("Server response not OK");
@@ -74,7 +78,7 @@ export default function Listings() {
       }
     }
 
-    const response = await fetch(`${API_URL}/listings/new`, {
+    const response = await fetch(`${API_URL}/api/listings`, {
       method: "POST",
       credentials: "include",
       headers: {

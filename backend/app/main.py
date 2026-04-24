@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import admin
-from app.routes import listings
 from app.routes.wishlist import router as wishlist_router  #Matthew Kilpatrick
-from app.routes.listings import listings_router
+from app.routes.listings import router as listings_router #emmanuella obidike
 from app.routes import listings, admin, purchaseHistory
 from app.routes import seller
 
@@ -42,7 +41,6 @@ app.include_router(auth_router)
 app.include_router(admin.router)
 app.include_router(listings.router)
 app.include_router(wishlist_router)
-app.include_router(listings_router)
 app.include_router(purchaseHistory.router)
 app.include_router(uploads_router) #Emmanuella Obidike
 app.include_router(seller.router) # new - mkp

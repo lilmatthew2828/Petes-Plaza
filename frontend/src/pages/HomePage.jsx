@@ -157,6 +157,7 @@ export default function HomePage() {
 
   return (
     <div className="homepage">
+      <div className="page-container">
       <header className="topbar">
         <div className="logo-container">
           <img src="/assets/images/logo.png" alt="Logo" className="logo" />
@@ -281,6 +282,7 @@ export default function HomePage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

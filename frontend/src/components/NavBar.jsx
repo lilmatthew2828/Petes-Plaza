@@ -19,6 +19,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
+      <div className="page-container"> 
       <div className="navbar-container">
         <h1 className="navbar-brand"> 
           Pete’s <span>Plaza</span>
@@ -39,6 +40,7 @@ export default function Navbar() {
             </>
           )}
         </div>
+      </div>
       </div>
     </nav>
   );

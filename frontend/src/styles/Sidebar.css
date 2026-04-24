@@ -1,17 +1,16 @@
 /* Sidebar Container */
-.sidebar {
-  width: 240px; /* Emmanuella Obidike */
-  padding: 1.8rem 1.2rem; /* Emmanuella Obidike */
+.app-sidebar {
+  width: 200px;
+  padding: 1.5rem 1rem;
   background: linear-gradient(180deg, #fff7e6, #fffbe6);
   border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* Emmanuella Obidike */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 1rem;
   font-family: 'Segoe UI', sans-serif;
   position: sticky;
   top: 1rem;
-  border: 1px solid rgba(0,0,0,0.06);
 }
 
 /* Sidebar Header */
