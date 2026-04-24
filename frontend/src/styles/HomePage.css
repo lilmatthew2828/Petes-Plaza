@@ -1,6 +1,6 @@
 /* Layout */
 .homepage {
-    background: #fff;
+    background: #f4f6fb; /* Emmanuella Obidike */
     font-family: 'Segoe UI', sans-serif;
     color: #222;
 }
@@ -62,7 +62,7 @@
 
 .page-header p {
   font-size: 1.05rem;
-  color: #4f5d6b;
+  color: #2c3e50; /* Emmanuella Obidike */
   max-width: 760px;
   line-height: 1.7;
   padding: 0.9rem 1.2rem;

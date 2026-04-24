@@ -16,7 +16,7 @@ body {
 
 .topbar {
   padding: 16px 12px;
-  border-bottom: 2px solid #d1d5db;
+  border-bottom: 2px solid #fbbf24; /* Emmanuella Obidike - gold accent */ 
   background: #ffffff;
 }
 
@@ -208,10 +208,16 @@ body {
   flex-wrap: wrap;
 }
 
-.site-title {
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
+.site-title { /* Emmanuella Obidike */
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #1f2937;
+  text-align: left;
+}
+
+.site-title span { /* Emmanuella Obidike - gold accent*/
+  color: #fbbf24; 
 }
 
 .modal {

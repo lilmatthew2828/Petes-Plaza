@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     
     # Cookie settings
     session_cookie_name: str = "session_id"
-    session_cookie_secure: bool = environment == "production"
-    session_cookie_httponly: bool = True
-    session_cookie_samesite: str = "lax"
+    session_cookie_secure: bool = True # Emmanuella Obidike - Set to True in production for secure cookies
+    session_cookie_httponly: bool = True # Emmanuella Obidike - Prevent JavaScript access to cookies
+    session_cookie_samesite: str = "none"
     
     # CORS
     cors_origins: list = [
@@ -32,7 +32,8 @@ class Settings(BaseSettings):
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8000",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8000",
+    "d1e9eyfsfmaf97.cloudfront.net" # Emmanuella Obidike - Frontend (CloudFront) deployment URL 
     ]
     
     class Config:
