@@ -61,9 +61,11 @@ class UserOut(BaseModel):
     Schema for user response.
     does not includes password_hash.
     """
+    id: int = Field(..., description="User ID")
     email: str = Field(..., description="User email")
     username: str = Field(..., description="Username")
     student_id: int = Field(..., description="Student ID")
+    is_admin : bool = Field(..., description="Whether user is admin")
     created_at: datetime = Field(..., description="Account creation timestamp")
     
     class Config:
@@ -216,3 +218,45 @@ class UserListResponse(BaseModel):
         orm_mode = True
         from_attributes = True
 
+# --- Announcements Feature Schemas ---
+from typing import Literal
+from datetime import datetime
+
+class AnnouncementBase(BaseModel):
+    title: str
+    body: str
+    recipient_type: Literal["admins", "users", "all"]
+    announcement_type: Literal["event", "update", "notice"]
+    send_at: datetime
+
+class AnnouncementCreate(AnnouncementBase):
+    announcer_id: int
+
+class AnnouncementUpdate(BaseModel):
+    title: str | None = None
+    body: str | None = None
+    recipient_type: Literal["admins", "users", "all"] | None = None
+    announcement_type: Literal["event", "update", "notice"] | None = None
+    send_at: datetime | None = None
+
+class AnnouncementOut(AnnouncementBase):
+    id: int
+    announcer_id: int
+    created_at: datetime
+    updated_at: datetime
+    is_sent: bool
+    class Config:
+        from_attributes = True
+
+class AnnouncementDeliveryOut(BaseModel):
+    id: int
+    announcement_id: int
+    user_id: int
+    is_read: bool
+    read_at: datetime | None
+    delivered_at: datetime
+    announcement: 'AnnouncementOut'
+    class Config:
+        from_attributes = True
+
+AnnouncementDeliveryOut.model_rebuild()

@@ -11,6 +11,7 @@ from app.routes import seller
 from app.config import settings
 from app.database import engine
 from app.database import Base
+from app.routes.announcements import router as announcements_router
 from app.auth import router as auth_router
 from app.routes.uploads import router as uploads_router #Emmanuella Obidike
 from app.routes import offers
@@ -42,6 +43,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(admin.router)
 app.include_router(listings.router)
+app.include_router(announcements_router)
 app.include_router(wishlist_router)
 app.include_router(listings_router)
 app.include_router(purchaseHistory.router)

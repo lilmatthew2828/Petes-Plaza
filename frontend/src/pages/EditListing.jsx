@@ -181,14 +181,25 @@ export default function EditListing() {
           disabled={loading || saving}
         />
 
-        <input
+        <select
           name="category"
           value={form.category}
           onChange={onChange}
-          placeholder="Category"
           required
           disabled={loading || saving}
-        />
+          style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
+          <option value="">Select a category</option>
+          <option value="T-Shirts">T-Shirts</option>
+          <option value="Jeans">Jeans</option>
+          <option value="Sweatshirts">Sweatshirts</option>
+          <option value="Shoes">Shoes</option>
+          <option value="Appliances">Appliances</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Vehicles">Vehicles</option>
+          <option value="Other">Other</option>
+        </select>
 
         <div style={{ display: "flex", gap: 8 }}>
           <button type="submit" disabled={saving || loading || deleting}>

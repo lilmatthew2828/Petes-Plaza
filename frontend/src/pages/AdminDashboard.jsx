@@ -111,10 +111,19 @@ export default function AdminDashboard() {
     }
   };
   const handleViewDetails = (listingId) => {
-    // For simplicity, we'll just alert the listing ID. In a real implementation, this would open a modal with the listing details fetched from the backend.
-    //This should go to the ListingDetails.jsx page for that listing.
+    //This should go to the listings page with the listing details. For now it just shows an alert.
+    // it should not open a new tab but rather navigate within the same tab.
+     //Why does it only work once? 
+    //Heres the fix to make sure it works every time
+    try {      
+      const listing = listings.find(l => l.id === listingId);
+      if (!listing) throw new Error('Listing not found');
+      // Navigate to the listing detail page using the listing ID
+      window.location.href = `/listings/${listingId}`;
+    } catch (err) {
+        alert(err.message);
+    }
 
-    //alert(`View details for listing ID: ${listingId}`);
   };
 
   useEffect(() => { // Fetch admin metrics and listings data from backend API when component mounts
@@ -363,7 +372,7 @@ export default function AdminDashboard() {
           <div className="card">
             <h3>Active Listings</h3>
             <span style={{ fontSize: 32, fontWeight: 700 }}>{metrics.active_listings}</span>
-            <span style={{ display: 'block', marginTop: 8, color: '#2563eb', fontSize: 14, cursor: 'pointer' }}>View All &gt;</span>
+      
           </div>
         </div>
 

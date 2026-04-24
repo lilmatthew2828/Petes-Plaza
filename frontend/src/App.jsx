@@ -11,7 +11,7 @@ import AdminLogin from "./pages/AdminLogin";
 import Register from "./pages/Register";
 import HomePage from "./pages/HomePage";
 import EditListing from "./pages/EditListing";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminRoutes from "./routes/AdminRoutes";
 
 import "./App.css";
 import Listings from "./pages/Listings";
@@ -70,10 +70,10 @@ function App() {
           }
         />
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <ProtectedRoute adminOnly>
-                <AdminDashboard />
+                <AdminRoutes />
               </ProtectedRoute>
             }
           />
