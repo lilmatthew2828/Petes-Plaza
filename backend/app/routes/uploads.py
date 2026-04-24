@@ -3,6 +3,9 @@ from fastapi import APIRouter, UploadFile, File
 from app.aws_s3 import s3_client, AWS_S3_BUCKET
 import uuid
 import mimetypes
+import os
+import shutil
+
 
 # Create a router so we can add routes to our API
 router = APIRouter(prefix="/api/uploads", tags=["uploads"]) # All routes in this file will be under /api/uploads

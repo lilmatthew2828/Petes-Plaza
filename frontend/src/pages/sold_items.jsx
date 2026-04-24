@@ -67,16 +67,37 @@ export default function MySoldListings() {
  {/* LIST */}
       <div>
         {soldListings.map((item) => (
-          <div 
-            key={item.id} 
-            style={{ 
-              marginBottom: "20px", 
-              padding: "15px", 
-              border: "1px solid #ddd", 
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9"
+        <div 
+          key={item.id} 
+          style={{ 
+            marginBottom: "20px", 
+            padding: "15px", 
+            border: "1px solid #ddd", 
+            borderRadius: "8px",
+            backgroundColor: "#f9f9f9",
+            display: "flex",
+            gap: "15px",
+            alignItems: "center"
+          }}
+        >
+
+          {/* IMAGE */}
+          <img
+            src={
+              item.image_key
+                ? `https://petes-plaza-bucket.s3.amazonaws.com/${item.image_key}`
+                : "/assets/images/placeholder.png"
+            }
+            alt={item.title}
+            style={{
+              width: "120px",
+              height: "120px",
+              objectFit: "cover",
+              borderRadius: "8px"
             }}
-          >
+          />
+          {/* TEXT */}
+          <div>
             <h3>{item.title}</h3>
             <p><strong>Price:</strong> ${item.price}</p>
             <p><strong>Description:</strong> {item.description}</p>
@@ -84,8 +105,10 @@ export default function MySoldListings() {
             <p><strong>Sold to:</strong> {item.buyer_email}</p>
             <p><strong>Sold on:</strong> {new Date(item.sold_at).toLocaleDateString()}</p>
           </div>
-        ))}
-      </div>
+
+        </div>
+      ))}
     </div>
+    </div> 
   );
 }

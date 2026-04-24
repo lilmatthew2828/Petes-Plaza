@@ -9,12 +9,26 @@ Jania Southall - CSS styles for the NavBar component, including layout, colors, 
 }
 
 .navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+ /* Emmanuella Obidike - Graients color for the product name in the navbar */
+.navbar-brand {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+
+  /* GRADIENT TEXT */
+  background: linear-gradient(90deg, #60a5fa, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* fallback for non-webkit (just in case) */
+  background-clip: text;
+  color: transparent;
 }
 
 .navbar-brand {

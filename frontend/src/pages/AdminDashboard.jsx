@@ -1,4 +1,3 @@
-
 /* 
 All the different html elements definitions
 div - A container element that can be used to group other elements together. It is often used for layout purposes.

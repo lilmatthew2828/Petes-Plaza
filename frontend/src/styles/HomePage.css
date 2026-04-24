@@ -39,14 +39,19 @@
 
 /* Main Layout */
 .main-layout {
-    display: flex;
-    gap: 2rem;
-    padding: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .main-content {
     flex: 1;
+    min-width: 0;
 }
+
 
 .page-header {
   margin-bottom: 2rem;
@@ -187,11 +192,13 @@
 /* Sidebar */
 .sidebar {
     width: 180px;
+    flex-shrink: 0;
     padding: 1rem;
     background: #fdf5e6;
     border-radius: 12px;
     height: fit-content;
 }
+
 
 .sidebar-header {
     font-weight: bold;
@@ -308,10 +315,10 @@
 }
 
 .top-tabs {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .top-tab {

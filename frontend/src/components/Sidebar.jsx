@@ -5,7 +5,7 @@ const CATEGORIES = ['T-Shirts', 'Jeans', 'Sweatshirts', 'Shoes', 'Appliances', '
 
 export default function Sidebar({ selectedCategory, onSelectCategory }) {
   return (
-    <aside className="sidebar">
+    <aside className="app-sidebar">
       <div className="sidebar-header">Categories</div>
       <div className="category-list">
         <button
