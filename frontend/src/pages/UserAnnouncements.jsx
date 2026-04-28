@@ -108,7 +108,7 @@ export default function UserAnnouncements({ userId }) {
         )}
       </button>
       {open && (
-        <div style={{ position: "absolute", top: 40, right: 0, background: "#fff", border: "1px solid #ccc", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", width: 400, zIndex: 100 }}>
+        <div style={{ position: "fixed", top: 80, right: 20, background: "#fff", border: "1px solid #ccc", borderRadius: 8, boxShadow: "0 2px 18px rgba(0,0,0,0.18)", width: 400, maxWidth: "calc(100vw - 40px)", zIndex: 9999 }}>
           <div style={{ padding: 16, borderBottom: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <strong>Announcements</strong>
             <button className="btn" onClick={() => setOpen(false)}>Close</button>

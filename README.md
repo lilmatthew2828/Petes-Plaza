@@ -48,7 +48,7 @@ cd Petes-Plaza/backend
 # Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate  # macOS/Linux
-# or: .venv\Scripts\activate  # Windows
+# or: .venv/Scripts/activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
