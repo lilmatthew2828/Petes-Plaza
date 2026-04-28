@@ -27,21 +27,33 @@ ADMIN_EMAIL_DOMAIN = "petesplaza.com"
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
-    """
-    Extract session token from cookie and return current user.
-    Returns None if no valid session.
+    auth_header = request.headers.get("Authorization")
     
-    Usage:
-        @router.get("/protected")
-        def protected(user: User = Depends(get_current_user)):
-            if not user:
-                raise HTTPException(status_code=401)
-    """
-    token = request.cookies.get(settings.session_cookie_name)
-    if not token:
-        return None
+    # TRAP 1: Did the proxy strip the header?
+    if not auth_header:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="DEBUG TRAP 1: FastAPI received NO Authorization header from CloudFront/Beanstalk."
+        )
+        
+    # TRAP 2: Is the formatting weird?
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=f"DEBUG TRAP 2: Header formatting is wrong. Received: {auth_header}"
+        )
+        
+    token = auth_header.split(" ")[1]
+    user = get_session_user(db, token)
     
-    return get_session_user(db, token)
+    # TRAP 3: Is the token missing from the database?
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail=f"DEBUG TRAP 3: Header received perfectly, but the token does not exist in the database yet!"
+        )
+        
+    return user
 
 
 def require_login(current_user: User = Depends(get_current_user)) -> User:
@@ -132,28 +144,40 @@ def login(payload: LoginIn, db: Session = Depends(get_db)):
     else:
         created_at = str(created_at)
 
-    response = JSONResponse(
-        content={
+    # response = JSONResponse(
+    #     content={
+    #         "email": user.email,
+    #         "username": user.username,
+    #         "student_id": user.student_id,
+    #         "created_at": created_at,
+    #     },
+    #     status_code=200,
+    # )
+    
+    # # Set HttpOnly cookie
+    # response.set_cookie(
+    #     key=settings.session_cookie_name,
+    #     value=session_token,
+    #     httponly=settings.session_cookie_httponly,
+    #     secure=settings.session_cookie_secure,
+    #     samesite=settings.session_cookie_samesite,
+    #     path="/",
+    #     max_age=7 * 24 * 60 * 60,  # 7 days
+    # )
+    
+    # return response
+    return JSONResponse(
+    content={
+        "token": session_token, 
+        "user": {
             "email": user.email,
             "username": user.username,
             "student_id": user.student_id,
             "created_at": created_at,
-        },
-        status_code=200,
-    )
-    
-    # Set HttpOnly cookie
-    response.set_cookie(
-        key=settings.session_cookie_name,
-        value=session_token,
-        httponly=settings.session_cookie_httponly,
-        secure=settings.session_cookie_secure,
-        samesite=settings.session_cookie_samesite,
-        path="/",
-        max_age=7 * 24 * 60 * 60,  # 7 days
-    )
-    
-    return response
+        }
+    },
+    status_code=200,
+)
 
 
 @router.post("/admin/login", status_code=200)
@@ -181,28 +205,41 @@ def admin_login(payload: LoginIn, db: Session = Depends(get_db)):
     else:
         created_at = str(created_at)
 
-    response = JSONResponse(
-        content={
+    # response = JSONResponse(
+    #     content={
+    #         "email": user.email,
+    #         "username": user.username,
+    #         "student_id": user.student_id,
+    #         "created_at": created_at,
+    #         "is_admin": True,
+    #     },
+    #     status_code=200,
+    # )
+
+    # response.set_cookie(
+    #     key=settings.session_cookie_name,
+    #     value=session_token,
+    #     httponly=settings.session_cookie_httponly,
+    #     secure=settings.session_cookie_secure,
+    #     samesite=settings.session_cookie_samesite,
+    #     path="/",
+    #     max_age=7 * 24 * 60 * 60,
+    # )
+
+    # return response
+    return JSONResponse(
+    content={
+        "token": session_token, 
+        "user": {
             "email": user.email,
             "username": user.username,
             "student_id": user.student_id,
             "created_at": created_at,
             "is_admin": True,
-        },
-        status_code=200,
-    )
-
-    response.set_cookie(
-        key=settings.session_cookie_name,
-        value=session_token,
-        httponly=settings.session_cookie_httponly,
-        secure=settings.session_cookie_secure,
-        samesite=settings.session_cookie_samesite,
-        path="/",
-        max_age=7 * 24 * 60 * 60,
-    )
-
-    return response
+        }
+    },
+    status_code=200,
+)
 
 
 @router.post("/logout", status_code=204)

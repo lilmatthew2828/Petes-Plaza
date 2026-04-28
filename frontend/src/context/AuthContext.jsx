@@ -16,11 +16,20 @@ export function AuthProvider({ children }) {
   async function checkAuth() {
     setLoading(true);
     try {
+      // Small optimization: If there's no token, don't even bother pinging the server
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       const currentUser = await authApi.getMe();
       setUser(currentUser);
     } catch (err) {
-      // 401 = not logged in (normal)
+      // 401 = not logged in or token expired (normal)
       if (err?.status === 401) {
+        localStorage.removeItem("token"); // Clean up the dead token!
         setUser(null);
       } else {
         setUser(null);
@@ -35,8 +44,14 @@ export function AuthProvider({ children }) {
     setError(null);
     setLoading(true);
     try {
-      // 1) perform login (should set cookie)
-      await authApi.login(payload);
+      // 1) perform login and capture the response
+      const response = await authApi.login(payload);
+
+      // NEW: Save the token to the browser's memory!
+      // (Assuming your backend now returns { token: "...", ... })
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
+      }
 
       // 2) fetch the actual user from /auth/me
       const currentUser = await authApi.getMe();
@@ -50,6 +65,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }
+
   /*
   Anthony Powell - Lines 56 - 71
   Admin login context method - Similar to regular login but calls adminLogin API and has different error messaging. 
@@ -58,7 +74,13 @@ export function AuthProvider({ children }) {
     setError(null);
     setLoading(true);
     try {
-      await authApi.adminLogin(payload);
+      const response = await authApi.adminLogin(payload);
+      
+      // NEW: Save the admin token!
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
+      }
+
       const currentUser = await authApi.getMe();
       setUser(currentUser);
       return currentUser;
@@ -75,9 +97,13 @@ export function AuthProvider({ children }) {
     setError(null);
     setLoading(true);
     try {
-      await authApi.register(payload);
+      const response = await authApi.register(payload);
 
-      // If register also logs them in via cookie, fetch /me
+      // NEW: If your register route automatically logs them in and returns a token, save it!
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
+      }
+
       const currentUser = await authApi.getMe();
       setUser(currentUser);
       return currentUser;
@@ -94,12 +120,15 @@ export function AuthProvider({ children }) {
     setError(null);
     setLoading(true);
     try {
+      // Tell the server to revoke the session
       await authApi.logout();
-      setUser(null);
     } catch (err) {
-      setError(err?.message || "Logout failed");
-      throw err;
+      console.warn("Server logout failed or token already invalid", err);
+      // We don't throw the error here, because we STILL want to wipe local storage below.
     } finally {
+      // NEW: Destroy the token on logout no matter what happens with the server!
+      localStorage.removeItem("token");
+      setUser(null);
       setLoading(false);
     }
   }

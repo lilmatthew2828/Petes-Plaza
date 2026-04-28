@@ -7,11 +7,10 @@ export async function apiCall(endpoint, options = {}) {
     method = "GET",
     body,
     headers = {},
-    credentials = "include",
+    credentials = "omit", // Switched to 'omit' since we are using Bearer tokens now, bypassing cookie CORS issues!
     ...rest
   } = options;
 
-  // if endpoint already absolute return as-is
   // Avoid double /api prefix if endpoint already starts with /api
   let normalized;
   if (endpoint.startsWith("http")) {
@@ -24,6 +23,11 @@ export async function apiCall(endpoint, options = {}) {
     normalized = `${API_URL}/${endpoint}`;
   }
 
+  // 1. GRAB THE TOKEN BEFORE THE REQUEST
+  const token = localStorage.getItem('token');
+  const authHeader = token ? { "Authorization": `Bearer ${token}` } : {};
+
+  // 2. BUNDLE EVERYTHING INTO THE CONFIG
   const config = {
     method,
     credentials,
@@ -32,7 +36,8 @@ export async function apiCall(endpoint, options = {}) {
       ...(body !== undefined && method !== "GET" && method !== "HEAD"
         ? { "Content-Type": "application/json" }
         : {}),
-      ...headers,
+      ...authHeader, // Inject the token here!
+      ...headers,    // Keep any custom headers passed into the function
     },
   };
 
@@ -40,6 +45,7 @@ export async function apiCall(endpoint, options = {}) {
     config.body = JSON.stringify(body);
   }
 
+  // 3. SEND THE REQUEST WITH THE TOKEN
   const response = await fetch(normalized, config);
 
   if (response.status === 204) return null;
