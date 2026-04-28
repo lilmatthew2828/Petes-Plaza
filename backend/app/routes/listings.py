@@ -1,6 +1,6 @@
 # Anthony Powell
 # FastAPI routing + dependency injection helpers
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, status
 # SQLAlchemy session type
 from sqlalchemy.orm import Session
 
@@ -91,22 +91,26 @@ def patch_listing(
     return services.update_listing(db, listing_id, payload, current_user)
 
 
-@router.delete("/{listing_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{listing_id}", status_code=status.HTTP_200_OK)
 def remove_listing(
     listing_id: int,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_login),
 ):
     """
-    Delete a listing.
+    Soft-delete a listing by marking its status as 'deleted'.
     Ownership enforcement is in service layer:
     - 404 if listing does not exist
     - 403 if logged in user is not owner
 
-    Returns 204 No Content on success.
+    Returns 200 with the updated listing on success.
     """
-    services.delete_listing(db, listing_id, current_user)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    updated = services.delete_listing(db, listing_id, current_user)
+    return {
+        "id": updated.id,
+        "status": updated.status,
+        "message": "Listing marked as deleted and will no longer appear publicly."
+    }
 
 
 # EMMANUELLA OBIDIKE

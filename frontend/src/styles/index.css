@@ -296,3 +296,8 @@ body {
   .cards { grid-template-columns: 1fr; }
   .topbar { flex-wrap: wrap; }
 }
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}

@@ -3,13 +3,15 @@ import { AuthProvider } from "./context/AuthContext";
 import NavBar from "./components/navBar";
 import PurchaseHistory from './pages/PurchaseHistory';
 import ProtectedRoute from "./components/ProtectedRoute";
+import SellerOffers from "./pages/SellerOffers";
+import BuyerOffers from "./pages/BuyerOffers";
 
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
 import Register from "./pages/Register";
 import HomePage from "./pages/HomePage";
 import EditListing from "./pages/EditListing";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminRoutes from "./routes/AdminRoutes";
 
 import "./App.css";
 import Listings from "./pages/Listings";
@@ -32,6 +34,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
+
 
           {/* Protected Routes */}
           <Route
@@ -67,10 +70,10 @@ function App() {
           }
         />
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <ProtectedRoute adminOnly>
-                <AdminDashboard />
+                <AdminRoutes />
               </ProtectedRoute>
             }
           />
@@ -98,6 +101,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route 
+            path="/offers-received" 
+            element={
+              <ProtectedRoute>
+                <SellerOffers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/offers-sent" 
+            element={
+              <ProtectedRoute>
+                <BuyerOffers />
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Listings routes */}
           <Route path="/listings" element={<ProtectedRoute><Listings /></ProtectedRoute>} />
@@ -112,6 +131,7 @@ function App() {
           
           {/* Redirect unknown routes to Welcome */}
           <Route path="*" element={<Navigate to="/home" replace />} />
+
         </Routes>
       </AuthProvider>
     </Router>

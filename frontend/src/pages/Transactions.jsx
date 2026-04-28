@@ -1,11 +1,23 @@
 // Daye Karibi-Whyte - React component for admin transactions page navigation
-const API_URL = import.meta.env.VITE_API_URL;
-if (!API_URL) console.warn("VITE_API_URL is not defined!");
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import '../styles/admin.css';
 
+const API_URL = import.meta.env.VITE_API_URL
+
+// Normalize API_URL to avoid double /api/api
+function apiUrl(path) {
+  let url = API_URL;
+  if (url.endsWith("/")) url = url.slice(0, -1);
+  if (path.startsWith("/")) return url + path;
+  return url + "/" + path;
+}
+
+if (!API_URL) console.warn("VITE_API_URL is not defined!");
+
 export default function Transactions() {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,12 +26,21 @@ export default function Transactions() {
   // Fetch transactions from backend
   useEffect(() => {
     const fetchTransactions = async () => {
+      const url = apiUrl('/admin/transactions');
+      console.log("[Transactions] Fetching from:", url);
       try {
-        const res = await fetch(`${API_URL}/admin/transactions`);
-        if (!res.ok) throw new Error('Failed to fetch transactions');
+        const res = await fetch(url);
+        console.log("[Transactions] Response status:", res.status, res.ok);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("[Transactions] Response error:", errorText);
+          throw new Error(`Failed to fetch transactions: ${res.status} ${errorText}`);
+        }
         const data = await res.json();
+        console.log("[Transactions] Data received:", data);
         setTransactions(data);
       } catch (err) {
+        console.error("[Transactions] Catch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -70,30 +91,50 @@ export default function Transactions() {
       </div>
 
       {/* Main content */}
-      <div style={{ flex: 1, padding: '32px 40px' }}>
-        <h2 style={{ marginBottom: 24 }}>Transactions</h2>
-        <table className="admin-table" style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Listing ID</th>
-              <th>Buyer Email</th>
-              <th>Seller Email</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(tx => (
-              <tr key={tx.transaction_id}>
-                <td>{tx.transaction_id}</td>
-                <td>{tx.listing_id}</td>
-                <td>{tx.buyer_email}</td>
-                <td>{tx.seller_email}</td>
-                <td>{new Date(tx.transaction_timestamp).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={{ flex: 1, padding: '32px 40px', marginLeft: 60 }}>
+        <h2 style={{ fontWeight: 800, fontSize: '2.2rem', color: '#1e293b', fontFamily: 'Inter, sans-serif', letterSpacing: '-1px', marginBottom: 32 }}>Transactions</h2>
+        {transactions.length === 0 ? (
+          <div style={{ textAlign: 'center', marginTop: 48, marginBottom: 24 }}>
+            <span style={{ fontSize: 48, color: '#2563eb', display: 'block', marginBottom: 16 }}>💳</span>
+            <h3 style={{ color: '#1e293b', fontWeight: 700, fontSize: '1.4rem', marginBottom: 8 }}>No transactions yet</h3>
+            <p style={{ color: '#64748b', fontSize: 16 }}>When users make purchases, they will appear here.</p>
+          </div>
+        ) : (
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)', overflowX: 'auto' }}>
+            <table className="admin-table" style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Listing ID</th>
+                  <th>Buyer Email</th>
+                  <th>Seller Email</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map(tx => (
+                  <tr key={tx.transaction_id}>
+                    <td>{tx.transaction_id}</td>
+                    <td>{tx.listing_id}</td>
+                    <td>{tx.buyer_email}</td>
+                    <td>{tx.seller_email}</td>
+                    <td>{new Date(tx.transaction_timestamp).toLocaleDateString()} {new Date(tx.transaction_timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td>
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ padding: '8px 16px', fontSize: 14, fontWeight: 600 }}
+                        onClick={() => navigate(`/listings/${tx.listing_id}`)}
+                      >
+                        View Listing
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

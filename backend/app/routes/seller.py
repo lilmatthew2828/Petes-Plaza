@@ -66,7 +66,7 @@ def get_seller_transactions(seller_email: str, db: Session = Depends(get_db)):
                 "id": tx.transaction_id,
                 "listing_id": tx.listing_id,
                 "buyer_email": tx.buyer_email,
-                "amount": None,  # not stored in DB
+                "amount": db.query(Listing).filter(Listing.id == tx.listing_id).first().price if db.query(Listing).filter(Listing.id == tx.listing_id).first() else 0,
                 "status": "completed",
                 "created_at": tx.transaction_timestamp,
             }

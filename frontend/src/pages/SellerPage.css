@@ -57,9 +57,10 @@
 .seller-image {
   width: 100%;
   height: 180px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
   margin-bottom: 10px;
+  background-color: #f9fafb;
 }
 
 .price {
