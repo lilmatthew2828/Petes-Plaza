@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     
     # Cookie settings
     session_cookie_name: str = "session_id"
-    session_cookie_secure: bool = environment == "production"
+    session_cookie_secure: bool = True
     session_cookie_httponly: bool = True
-    session_cookie_samesite: str = "lax"
+    session_cookie_samesite: str = "none"
     
     # CORS
     cors_origins: list = [
