@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     "http://127.0.0.1:8000",
     "d1e9eyfsfmaf97.cloudfront.net", # Emmanuella Obidike - Frontend (CloudFront) host URL 
     "http://petes-plaza.us-east-1.elasticbeanstalk.com", # Emmanuella Obidike - Backend deployment URL 
-    "http://petes-plaza-frontend.s3-website-us-east-1.amazonaws.com"  # Emmanuella Obidike - frontend deployment URL
+    "http://petes-plaza-frontend.s3-website-us-east-1.amazonaws.com",  # Emmanuella Obidike - frontend deployment URL
     "http://petes-plaza-bucket.s3-website-us-east-1.amazonaws.com", # Emmanuella Obidike -s3 URL
 
     ]
