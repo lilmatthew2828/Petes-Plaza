@@ -42,8 +42,8 @@
 import { apiCall } from "./client";
 
 export async function fetchWishlist(username) {
-  // Matches: GET /api/wishlist/:username
-  return apiCall(`/wishlist/${username}`, { method: "GET" }); 
+  // Use a template literal to inject the username into the path
+  return apiCall(`/wishlist/${username}`, { method: "GET" });
 }
 
 export async function addToWishlist(username, listingId) {

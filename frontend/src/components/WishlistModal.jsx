@@ -11,22 +11,28 @@ export default function WishlistModal({ open, onClose }) {
   // ... other state
 
   useEffect(() => {
-    if (!open || !user?.username) return; // Don't fetch if no user
+    // 1. Only run if the modal is open AND we actually have a user
+    if (!open || !user || !user.username) {
+      return; 
+    }
 
     (async () => {
       setStatus("loading");
+      setError("");
       try {
-        // Pass the username here!
+        // 2. Now we are guaranteed that user.username is not undefined
         const data = await fetchWishlist(user.username);
-        // Your backend returns { ok: true, items: [...] }, so use data.items
+        
+        // 3. Backend returns { ok: true, items: [...] }, so we need data.items
         setItems(data.items || []); 
         setStatus("idle");
       } catch (e) {
+        console.error("Wishlist error:", e);
         setStatus("error");
         setError(e.message || "Failed to load wishlist");
       }
     })();
-  }, [open, user]);
+  }, [open, user]); // Adding 'user' to the dependency array is critical
 
   const handleRemove = async (id) => {
     try {
