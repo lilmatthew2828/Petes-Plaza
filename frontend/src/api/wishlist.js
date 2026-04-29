@@ -41,14 +41,23 @@
  //Matthew Kilpatrick
 import { apiCall } from "./client";
 
-export async function fetchWishlist() {
-  return apiCall("/wishlist", { method: "GET" }); // -> /api/wishlist
+export async function fetchWishlist(username) {
+  // Matches: GET /api/wishlist/:username
+  return apiCall(`/wishlist/${username}`, { method: "GET" }); 
 }
 
-export async function addToWishlist(listingId) {
-  return apiCall(`/wishlist/${listingId}`, { method: "POST" }); // -> /api/wishlist/:id
+export async function addToWishlist(username, listingId) {
+  // Matches: POST /api/wishlist/add
+  return apiCall("/wishlist/add", { 
+    method: "POST",
+    body: JSON.stringify({ username, listingId })
+  });
 }
 
-export async function removeFromWishlist(listingId) {
-  return apiCall(`/wishlist/${listingId}`, { method: "DELETE" }); // -> /api/wishlist/:id
+export async function removeFromWishlist(username, listingId) {
+  // Matches: POST /api/wishlist/remove
+  return apiCall("/wishlist/remove", { 
+    method: "POST",
+    body: JSON.stringify({ username, listingId })
+  });
 }

@@ -27,8 +27,21 @@ const PurchaseHistory = () => {
       `Thanks!`
     );
 
-    // Open email client
-    window.location.href = `mailto:${item.seller_email}?subject=${subject}&body=${body}`;
+    const mailtoUrl = `mailto:${item.seller_email}?subject=${subject}&body=${body}`;
+
+    // Create a temporary hidden link element
+    const link = document.createElement('a');
+    link.href = mailtoUrl;
+    
+    // This target="_blank" is a secret weapon—it tells the browser 
+    // to handle this in a new context, which often bypasses the 
+    // referrer policy block on the main window.
+    link.target = "_blank"; 
+    
+    // Append, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const fetchPurchaseHistory = async () => {

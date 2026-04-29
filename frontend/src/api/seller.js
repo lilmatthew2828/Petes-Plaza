@@ -1,5 +1,5 @@
 // New - Matthew Kp
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL || ""; // Use VITE_API_URL from .env or default to empty string
 
 export async function getSellerPage(sellerId) {
   const response = await fetch(`${API_BASE}/api/sellers/${sellerId}`);

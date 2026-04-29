@@ -2,33 +2,36 @@
 import React, { useEffect, useState } from "react";
 import { fetchWishlist, removeFromWishlist } from "../api/wishlist";
 
+// Add useAuth to your imports
+import { useAuth } from "../context/AuthContext"; 
+
 export default function WishlistModal({ open, onClose }) {
+  const { user } = useAuth(); // Get the logged in user
   const [items, setItems] = useState([]);
-  const [status, setStatus] = useState("idle"); // idle | loading | error
-  const [error, setError] = useState("");
+  // ... other state
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !user?.username) return; // Don't fetch if no user
 
     (async () => {
       setStatus("loading");
-      setError("");
       try {
-        const data = await fetchWishlist();
-        setItems(data);
+        // Pass the username here!
+        const data = await fetchWishlist(user.username);
+        // Your backend returns { ok: true, items: [...] }, so use data.items
+        setItems(data.items || []); 
         setStatus("idle");
       } catch (e) {
         setStatus("error");
         setError(e.message || "Failed to load wishlist");
       }
     })();
-  }, [open]);
-
-  if (!open) return null;
+  }, [open, user]);
 
   const handleRemove = async (id) => {
     try {
-      await removeFromWishlist(id);
+      // Pass both username and id
+      await removeFromWishlist(user.username, id);
       setItems((prev) => prev.filter((x) => x.id !== id));
     } catch (e) {
       alert(e.message);

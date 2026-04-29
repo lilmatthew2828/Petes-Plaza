@@ -39,7 +39,7 @@ export default function Users() {
   const suspendUser = async (email) => {
     if (!window.confirm(`Suspend user ${email}?`)) return;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/suspend/${email}`, {
+      const res = await fetch(`${API_URL}/admin/suspend/${email}`, {
         method: 'PUT'
       });
       if (!res.ok) throw new Error('Failed to suspend user');

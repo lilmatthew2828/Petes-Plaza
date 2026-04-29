@@ -1,4 +1,5 @@
 // EMMANUELLA OBIDIKE
+import { apiCall } from "../api/client"; // Adjust the path if needed
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -15,16 +16,13 @@ export default function MySoldListings() {
     const fetchSoldListings = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/listings/my-sold", {
-          credentials: "include",
+        // apiCall automatically adds the Bearer token from localStorage
+        const data = await apiCall("/listings/my-sold", { 
+          method: "GET" 
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch sold items");
-        }
-
-        const data = await res.json();
-        setSoldListings(data);
+        // apiCall usually returns the parsed JSON directly
+        setSoldListings(data); 
       } catch (err) {
         console.error(err);
         setError(err.message);
