@@ -1,48 +1,55 @@
- //Matthew Kilpatrick
+// Matthew Kilpatrick & Gemini Fix
 import React, { useEffect, useState } from "react";
 import { fetchWishlist, removeFromWishlist } from "../api/wishlist";
-
-// Add useAuth to your imports
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 
 export default function WishlistModal({ open, onClose }) {
-  const { user } = useAuth(); // Get the logged in user
+  const { user } = useAuth();
+  
+  // State Definitions
   const [items, setItems] = useState([]);
-  // ... other state
+  const [status, setStatus] = useState("idle"); // Fixed: added missing state
+  const [error, setError] = useState("");      // Fixed: added missing state
 
   useEffect(() => {
     // 1. Only run if the modal is open AND we actually have a user
-    if (!open || !user || !user.username) {
-      return; 
+    if (!open || !user) {
+      return;
     }
 
-    (async () => {
+    const loadData = async () => {
       setStatus("loading");
       setError("");
       try {
-        // 2. Now we are guaranteed that user.username is not undefined
-        const data = await fetchWishlist(user.username);
-        
-        // 3. Backend returns { ok: true, items: [...] }, so we need data.items
-        setItems(data.items || []); 
+        // 2. Call our production-proof fetch function
+        const data = await fetchWishlist();
+
+        // 3. FastAPI returns the array directly: [ {id: 1, ...}, {id: 2, ...} ]
+        setItems(data || []);
         setStatus("idle");
       } catch (e) {
         console.error("Wishlist error:", e);
         setStatus("error");
         setError(e.message || "Failed to load wishlist");
       }
-    })();
-  }, [open, user]); // Adding 'user' to the dependency array is critical
+    };
+
+    loadData();
+  }, [open, user]);
 
   const handleRemove = async (id) => {
     try {
-      // Pass both username and id
-      await removeFromWishlist(user.username, id);
+      // 4. Matches Python: DELETE /api/wishlist/{listing_id}
+      await removeFromWishlist(id);
+      
+      // Update UI immediately after successful deletion
       setItems((prev) => prev.filter((x) => x.id !== id));
     } catch (e) {
       alert(e.message);
     }
   };
+
+  if (!open) return null;
 
   return (
     <div
@@ -58,7 +65,7 @@ export default function WishlistModal({ open, onClose }) {
 
         <h2 style={{ marginTop: 0 }}>My Wishlist</h2>
 
-        {status === "loading" && <p>Loading...</p>}
+        {status === "loading" && <p>Loading treasure...</p>}
         {status === "error" && <p style={{ color: "crimson" }}>{error}</p>}
 
         {status !== "loading" && items.length === 0 && (
@@ -86,6 +93,7 @@ export default function WishlistModal({ open, onClose }) {
   );
 }
 
+// Keeping your existing styles below
 const styles = {
   backdrop: {
     position: "fixed",
@@ -129,5 +137,6 @@ const styles = {
     borderRadius: 999,
     padding: "8px 12px",
     cursor: "pointer",
+    background: "#f0f0f0",
   },
 };

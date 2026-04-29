@@ -7,9 +7,12 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     proxy: {
+      // One rule to rule them all: 
+      // Send all /api calls (listings AND wishlist) to FastAPI
       '/api': {
-        target: 'http://localhost:8000', // FastAPI port
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
+        secure: false,
       },
     },
   },

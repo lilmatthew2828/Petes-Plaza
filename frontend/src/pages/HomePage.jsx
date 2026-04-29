@@ -9,6 +9,7 @@ import WishlistModal from '../components/WishlistModal';
 import { fetchWishlist, addToWishlist, removeFromWishlist } from "../api/wishlist";
 import '../styles/HomePage.css';
 import { deleteListing } from "../api/listings";
+import { apiCall } from "../api/client";
 
 
 const PLACEHOLDER_IMAGE = '/assets/images/placeholder.png';
@@ -35,7 +36,7 @@ const CATEGORIES = [
 const normalizeLegacyCategory = (category) => {
   if (!category) return 'Other';
   const categoryLower = category.toLowerCase();
-  
+
   if (categoryLower.includes('shirt') || categoryLower.includes('tee') || categoryLower.includes('clothing') || categoryLower.includes('clothes')) return 'T-Shirts';
   if (categoryLower.includes('jean')) return 'Jeans';
   if (categoryLower.includes('sweatshirt') || categoryLower.includes('hoodie') || categoryLower.includes('sweater')) return 'Sweatshirts';
@@ -44,7 +45,7 @@ const normalizeLegacyCategory = (category) => {
   if (categoryLower.includes('furniture') || categoryLower.includes('table') || categoryLower.includes('chair')) return 'Furniture';
   if (categoryLower.includes('accessory') || categoryLower.includes('accessories') || categoryLower.includes('bag') || categoryLower.includes('hat')) return 'Accessories';
   if (categoryLower.includes('vehicle') || categoryLower.includes('car') || categoryLower.includes('bike') || categoryLower.includes('transportation')) return 'Vehicles';
-  
+
   return 'Other';
 };
 
@@ -68,13 +69,13 @@ export default function HomePage() {
 
   const filteredListings = selectedCategory
     ? listings.filter((item) => {
-        const normalizedCategory = normalizeLegacyCategory(item.category);
-        const matches = normalizedCategory === selectedCategory;
-        if (!matches && item.category) {
-          console.log(`[HomePage] Filter: "${item.category}" -> "${normalizedCategory}" !== "${selectedCategory}" for "${item.title}"`);
-        }
-        return matches;
-      })
+      const normalizedCategory = normalizeLegacyCategory(item.category);
+      const matches = normalizedCategory === selectedCategory;
+      if (!matches && item.category) {
+        console.log(`[HomePage] Filter: "${item.category}" -> "${normalizedCategory}" !== "${selectedCategory}" for "${item.title}"`);
+      }
+      return matches;
+    })
     : listings
 
   const handleTabClick = (tab) => {
@@ -99,11 +100,8 @@ export default function HomePage() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/listings', { credentials: "include" }); // Emmanuella Obidike 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        console.log("[HomePage] Fetched listings:", data);
-        console.log("[HomePage] Sample listing categories:", data.slice(0, 3).map(l => ({ id: l.id, title: l.title, category: l.category })));
+        // apiCall handles the /api and the Bearer token automatically
+        const data = await apiCall('/listings');
         setListings(data);
       } catch (err) {
         console.error(err);
@@ -116,15 +114,22 @@ export default function HomePage() {
   }, [location.key]);
 
   useEffect(() => {
+    if (!user) {
+      setWishlistIds(new Set());
+      return;
+    }
+
     const loadWishlist = async () => {
-      if (!user) return setWishlistIds(new Set());
       try {
-        const items = await fetchWishlist();
-        setWishlistIds(new Set(items.map(x => x.id)));
+        // No username needed here anymore!
+        const data = await fetchWishlist();
+        // FastAPI returns the list directly: [ {item1}, {item2} ]
+        setWishlistIds(new Set(data.map(x => x.id)));
       } catch (e) {
-        console.log("Wishlist load skipped:", e.message);
+        console.error("Wishlist load skipped:", e.message);
       }
     };
+
     loadWishlist();
   }, [user]);
 
@@ -164,7 +169,7 @@ export default function HomePage() {
     } finally { setLoadingFor(id, false); }
   };
 
-    const canManageListing = (listing) => {
+  const canManageListing = (listing) => {
     if (!user) return false;
     if (user.is_admin) return true;
     return (listing.seller_email || "") === (user.email || "").toLowerCase();
@@ -182,144 +187,144 @@ export default function HomePage() {
   return (
     <div className="homepage">
       <div className="page-container">
-      <header className="topbar">
-        <div className="logo-container">
-          <img src="/assets/images/logo.png" alt="Logo" className="logo" />
-        </div>
-        <div className="top-tabs">
-          <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
-          {user && (
-            <Link to="/purchase-history">
+        <header className="topbar">
+          <div className="logo-container">
+            <img src="/assets/images/logo.png" alt="Logo" className="logo" />
+          </div>
+          <div className="top-tabs">
+            <button className="top-tab" onClick={() => setShowWishlist(true)}>Wishlist</button>
+            {user && (
+              <Link to="/purchase-history">
+                <button className="top-tab">
+                  Purchase History
+                </button>
+              </Link>
+            )}
+            {user && (
+              <>
+                <Link to="/offers-received">
+                  <button className="top-tab">
+                    Offers Received
+                  </button>
+                </Link>
+                <Link to="/offers-sent">
+                  <button className="top-tab">
+                    Offers Sent
+                  </button>
+                </Link>
+              </>
+            )}
+            <Link to="/my-sold">
               <button className="top-tab">
-                Purchase History
+                Sold Items
               </button>
             </Link>
-          )}
-          {user && (
-            <>
-              <Link to="/offers-received">
-                <button className="top-tab">
-                  Offers Received
-                </button>
-              </Link>
-              <Link to="/offers-sent">
-                <button className="top-tab">
-                  Offers Sent
-                </button>
-              </Link>
-            </>
-          )}
-          <Link to="/my-sold">
-            <button className="top-tab">
-              Sold Items
-            </button>
-          </Link>
-          {user && <UserAnnouncements userId={user.id} />}
-          {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
-        </div>
-      </header>
-
-      <div className="main-layout">
-        <Sidebar selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
-
-        <main className="main-content">
-          <div className="hero-banner">
-            <img
-              src="/assets/images/pete.png"
-              alt="Pete the Pirate"
-              className="hero-image"
-            />
+            {user && <UserAnnouncements userId={user.id} />}
+            {user?.is_admin && <Link to="/admin"><button className="top-tab admin-tab">Admin</button></Link>}
           </div>
+        </header>
 
-          <div className="page-header-row">
-            <div className="page-header">
-              <h1>{pageTitle}</h1>
-              <p>{pageDesc}</p>
+        <div className="main-layout">
+          <Sidebar selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+
+          <main className="main-content">
+            <div className="hero-banner">
+              <img
+                src="/assets/images/pete.png"
+                alt="Pete the Pirate"
+                className="hero-image"
+              />
             </div>
 
-            <button className="create-listing-btn" onClick={handleCreateListing}>
-              Create a Listing
-            </button>
-          </div>
+            <div className="page-header-row">
+              <div className="page-header">
+                <h1>{pageTitle}</h1>
+                <p>{pageDesc}</p>
+              </div>
 
-          {error && <div className="error">{error}</div>}
-          {loading && <p>Loading listings...</p>}
+              <button className="create-listing-btn" onClick={handleCreateListing}>
+                Create a Listing
+              </button>
+            </div>
 
-          <div className="cards-grid">
-            {filteredListings
-              .filter(listing => listing.status === 'active')
-              .map(listing => {
-                const imgSrc = listing.image_url || PLACEHOLDER_IMAGE;
-                return (
-                  <div key={listing.id} className="card">
-                    <img src={imgSrc} alt={listing.title} onError={e => e.target.src = PLACEHOLDER_IMAGE} />
-                    <h3>{listing.title}</h3>
-                    <p>${Number(listing.price).toFixed(2)} • {listing.category}</p>
-                    <div className="card-actions">
-                      <Link to={`/listings/${listing.id}`}>
-                        <button className="pill">View Listing</button>
-                      </Link>
+            {error && <div className="error">{error}</div>}
+            {loading && <p>Loading listings...</p>}
 
-                      {canManageListing(listing) && (
-                        <Link to={`/listings/${listing.id}/edit`}>
-                          <button className="pill">Edit</button>
+            <div className="cards-grid">
+              {filteredListings
+                .filter(listing => listing.status === 'active')
+                .map(listing => {
+                  const imgSrc = listing.image_url || PLACEHOLDER_IMAGE;
+                  return (
+                    <div key={listing.id} className="card">
+                      <img src={imgSrc} alt={listing.title} onError={e => e.target.src = PLACEHOLDER_IMAGE} />
+                      <h3>{listing.title}</h3>
+                      <p>${Number(listing.price).toFixed(2)} • {listing.category}</p>
+                      <div className="card-actions">
+                        <Link to={`/listings/${listing.id}`}>
+                          <button className="pill">View Listing</button>
                         </Link>
-                      )}
 
-                      {listing.seller_email && (
-                        <Link to={`/seller/${listing.seller_email}`}>
-                          <button className="pill">View Seller</button>
-                        </Link>
-                      )}
+                        {canManageListing(listing) && (
+                          <Link to={`/listings/${listing.id}/edit`}>
+                            <button className="pill">Edit</button>
+                          </Link>
+                        )}
 
-                      {canManageListing(listing) && (
+                        {listing.seller_email && (
+                          <Link to={`/seller/${listing.seller_email}`}>
+                            <button className="pill">View Seller</button>
+                          </Link>
+                        )}
+
+                        {canManageListing(listing) && (
+                          <button
+                            className="pill"
+                            onClick={() => handleDeleteListing(listing.id)}
+                          >
+                            Delete Listing
+                          </button>
+                        )}
+
                         <button
-                          className="pill"
-                          onClick={() => handleDeleteListing(listing.id)}
+                          className="wishlist-btn pill"
+                          disabled={wishlistLoadingIds.has(listing.id)}
+                          onClick={() =>
+                            isWishlisted(listing.id)
+                              ? handleRemoveWishlist(listing.id)
+                              : handleAddWishlist(listing.id)
+                          }
                         >
-                          Delete Listing
+                          <Icon
+                            path={mdiTreasureChest}
+                            size={0.8}
+                            className={`treasure-icon ${isWishlisted(listing.id) ? 'active' : ''}`}
+                          />
+                          {wishlistLoadingIds.has(listing.id)
+                            ? (isWishlisted(listing.id) ? 'Removing...' : 'Adding...')
+                            : (isWishlisted(listing.id) ? 'Wishlisted' : 'Add to Wishlist')
+                          }
                         </button>
-                      )}
-
-                      <button
-                        className="wishlist-btn pill"
-                        disabled={wishlistLoadingIds.has(listing.id)}
-                        onClick={() =>
-                          isWishlisted(listing.id)
-                            ? handleRemoveWishlist(listing.id)
-                            : handleAddWishlist(listing.id)
-                        }
-                      >
-                        <Icon
-                          path={mdiTreasureChest}
-                          size={0.8}
-                          className={`treasure-icon ${isWishlisted(listing.id) ? 'active' : ''}`}
-                        />
-                        {wishlistLoadingIds.has(listing.id) 
-                          ? (isWishlisted(listing.id) ? 'Removing...' : 'Adding...')
-                          : (isWishlisted(listing.id) ? 'Wishlisted' : 'Add to Wishlist')
-                        }
-                      </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-          </div>
-        </main>
-      </div>
-
-      <WishlistModal open={showWishlist} onClose={() => setShowWishlist(false)} />
-
-      {showAuthModal && (
-        <div className="modal-backdrop" onClick={() => setShowAuthModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setShowAuthModal(false)}>×</button>
-            <h2>User Account</h2>
-            {/* Login/Signup forms go here */}
-          </div>
+                  );
+                })}
+            </div>
+          </main>
         </div>
-      )}
-    </div>
+
+        <WishlistModal open={showWishlist} onClose={() => setShowWishlist(false)} />
+
+        {showAuthModal && (
+          <div className="modal-backdrop" onClick={() => setShowAuthModal(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <button className="close-btn" onClick={() => setShowAuthModal(false)}>×</button>
+              <h2>User Account</h2>
+              {/* Login/Signup forms go here */}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

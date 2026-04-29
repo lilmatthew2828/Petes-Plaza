@@ -41,23 +41,22 @@
  //Matthew Kilpatrick
 import { apiCall } from "./client";
 
-export async function fetchWishlist(username) {
-  // Use a template literal to inject the username into the path
-  return apiCall(`/wishlist/${username}`, { method: "GET" });
+export async function fetchWishlist() {
+  // Matches Python: @router.get("/") 
+  // Full path becomes /api/wishlist/
+  return apiCall("/wishlist/", { method: "GET" });
 }
 
-export async function addToWishlist(username, listingId) {
-  // Matches: POST /api/wishlist/add
-  return apiCall("/wishlist/add", { 
-    method: "POST",
-    body: JSON.stringify({ username, listingId })
+export async function addToWishlist(listingId) {
+  // Matches Python: @router.post("/{listing_id}")
+  return apiCall(`/wishlist/${listingId}`, { 
+    method: "POST" 
   });
 }
 
-export async function removeFromWishlist(username, listingId) {
-  // Matches: POST /api/wishlist/remove
-  return apiCall("/wishlist/remove", { 
-    method: "POST",
-    body: JSON.stringify({ username, listingId })
+export async function removeFromWishlist(listingId) {
+  // Matches Python: @router.delete("/{listing_id}")
+  return apiCall(`/wishlist/${listingId}`, { 
+    method: "DELETE" 
   });
 }

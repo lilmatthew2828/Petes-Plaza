@@ -1,6 +1,8 @@
 // Jania Southall 
 // frontend runs through Vite dev server; use proxy prefix
 const API_URL = import.meta.env.VITE_API_URL || "/api";
+// During local testing, use the full URL. 
+// Switch this back to "/api" before you deploy to AWS!
 
 export async function apiCall(endpoint, options = {}) {
   const {
