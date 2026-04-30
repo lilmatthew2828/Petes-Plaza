@@ -2,6 +2,12 @@
 
 A full-stack marketplace application for buying and selling secondhand items. Built with React, Vite, FastAPI, and PostgreSQL.
 
+Links for Deployment 
+
+"d1e9eyfsfmaf97.cloudfront.net" # Emmanuella Obidike - Frontend (CloudFront) host URL 
+"http://petes-plaza.us-east-1.elasticbeanstalk.com" # Backend deployment URL 
+"http://petes-plaza-frontend.s3-website-us-east-1.amazonaws.com/" # frontend deployment URL
+
 ## Project Structure
 
 ```
