@@ -1,11 +1,10 @@
 // Jania Southall 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getSellerOffers, respondToOffer, completeOffer } from '../api/offers';
 import { useAuth } from '../context/AuthContext';
 
 export default function SellerOffers() {
-  const { sellerEmail } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [offers, setOffers] = useState([]);
@@ -16,15 +15,15 @@ export default function SellerOffers() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    if (!user || (user.email !== sellerEmail && !user.is_admin)) {
-      navigate('/');
+    if (!user) {
+      navigate('/login');
       return;
     }
 
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const data = await getSellerOffers(sellerEmail);
+        const data = await getSellerOffers(user.email);
         setOffers(data.offers || []);
       } catch (err) {
         setError(err.message || 'Failed to load offers');
@@ -34,7 +33,7 @@ export default function SellerOffers() {
     };
 
     fetchOffers();
-  }, [sellerEmail, user, navigate]);
+  }, [user, navigate]);
 
   const handleRespond = async (offerId) => {
     if (!responseMessage.trim()) {
