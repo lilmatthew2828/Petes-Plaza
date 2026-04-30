@@ -36,7 +36,7 @@ export default function Listings() {
 
   // Get listing
   useEffect(() => {
-  fetch(`${API_URL}/api/listings`, {
+  fetch(`${API_URL}/listings`, {
     credentials: "include"  
   })  // Emmanuella Obidike - Added credentials for cookie-based authentication
     .then((res) => {
@@ -90,11 +90,15 @@ export default function Listings() {
       }
     }
 
-    const response = await fetch(`${API_URL}/api/listings`, {
+   // 1. Grab the token from storage
+    const token = localStorage.getItem("token"); 
+
+    const response = await fetch(`${API_URL}/listings`, {
       method: "POST",
-      credentials: "include",
+      credentials: "include", // You can leave this, but the Bearer token is what matters now
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` // 2. INJECT THE TOKEN HERE
       },
       body: JSON.stringify({
         listing_title,

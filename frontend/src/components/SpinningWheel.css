@@ -1,0 +1,39 @@
+.pete-loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.pete-svg {
+  width: 250px; /* Adjust size as needed */
+  height: 250px;
+}
+
+/* The grey background rope */
+.rope-bg {
+  fill: none;
+  stroke: #2a2a2a;
+  stroke-width: 12;
+}
+
+/* The golden filling rope */
+.rope-progress {
+  fill: none;
+  stroke: #ffcc00; /* Pirate Gold */
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease-out;
+  filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
+}
+
+.loading-text {
+  margin-top: 20px;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  color: #ffcc00;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}

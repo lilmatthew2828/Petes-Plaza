@@ -1,149 +1,279 @@
-// Matthew - React component for displaying a seller's page with their listings and transaction history (for admins)
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getSellerPage, getSellerTransactions } from "../api/seller";
-import { useAuth } from "../context/AuthContext";
-import "./SellerPage.css";
+// Jania Southall 
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getSellerOffers, respondToOffer, completeOffer } from '../api/offers';
+import { useAuth } from '../context/AuthContext';
 
-export default function SellerPage() {
-  const { sellerId } = useParams();
+export default function SellerOffers() {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const isAdmin = user?.is_admin === true;
-
-  const [seller, setSeller] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [showTransactions, setShowTransactions] = useState(false);
+  const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [txLoading, setTxLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [respondingTo, setRespondingTo] = useState(null);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchSellerData() {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchOffers = async () => {
       try {
         setLoading(true);
-        const data = await getSellerPage(sellerId);
-        setSeller(data.seller);
-        setListings(data.listings || []);
+        const data = await getSellerOffers(user.email);
+        setOffers(data.offers || []);
       } catch (err) {
-        setError("Could not load seller page.");
-        console.error(err);
+        setError(err.message || 'Failed to load offers');
       } finally {
         setLoading(false);
       }
+    };
+
+    fetchOffers();
+  }, [user, navigate]);
+
+  const handleRespond = async (offerId) => {
+    if (!responseMessage.trim()) {
+      alert('Please enter a pickup location/message');
+      return;
     }
 
-    fetchSellerData();
-  }, [sellerId]);
-
-  async function handleViewTransactions() {
     try {
-      setTxLoading(true);
-      const data = await getSellerTransactions(sellerId);
-      setTransactions(data.transactions || data || []);
-      setShowTransactions(true);
+      setActionLoading(true);
+      await respondToOffer(offerId, responseMessage);
+      
+      // Update offers list
+      setOffers(prev => prev.map(offer => 
+        offer.offer_id === offerId 
+          ? { ...offer, status: 'accepted', seller_message: responseMessage }
+          : offer
+      ));
+      
+      setRespondingTo(null);
+      setResponseMessage('');
     } catch (err) {
-      console.error(err);
-      setError("Could not load transaction history.");
+      alert(err.message || 'Failed to respond to offer');
     } finally {
-      setTxLoading(false);
+      setActionLoading(false);
     }
-  }
+  };
 
-  if (loading) {
-    return <div className="seller-page"><p>Loading seller page...</p></div>;
-  }
+  const handleComplete = async (offerId) => {
+    if (!confirm('Mark this transaction as completed? This will create a transaction record and mark the listing as sold.')) {
+      return;
+    }
 
-  if (error) {
-    return <div className="seller-page"><p>{error}</p></div>;
-  }
+    try {
+      setActionLoading(true);
+      await completeOffer(offerId);
+      
+      // Update offers list
+      setOffers(prev => prev.map(offer => 
+        offer.offer_id === offerId 
+          ? { ...offer, status: 'completed' }
+          : offer
+      ));
+    } catch (err) {
+      alert(err.message || 'Failed to complete transaction');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return '#ffc107';
+      case 'accepted': return '#28a745';
+      case 'completed': return '#6c757d';
+      default: return '#007bff';
+    }
+  };
+
+  if (loading) return <div style={{ padding: '60px' }}>Loading offers...</div>;
+  if (error) return <div style={{ padding: '60px', color: 'red' }}>{error}</div>;
 
   return (
-    <div className="seller-page">
-      <div className="seller-header">
-        <h1>{seller?.username || "Seller"}'s Store</h1>
-        <p>Email: {seller?.email}</p>
-      </div>
+    <div style={{ padding: '60px', maxWidth: '1000px', margin: '0 auto' }}>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          marginBottom: '20px',
+          padding: '8px 14px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          cursor: 'pointer',
+          background: '#f5f5f5'
+        }}
+      >
+        ← Back
+      </button>
 
-      <div className="seller-actions">
-        <Link to="/listings" className="back-link">← Back to Listings</Link>
-        <Link to={`/seller-offers/${seller?.email}`}>
-          <button className="admin-btn">
-            View Offers
-          </button>
-        </Link>
+      <h1 style={{ fontSize: '36px', marginBottom: '30px' }}>
+        Offers Received
+      </h1>
 
-        {isAdmin && (
-          <button className="admin-btn" onClick={handleViewTransactions}>
-            {txLoading ? "Loading..." : "View Seller Transaction History"}
-          </button>
-        )}
-      </div>
-
-      <h2 className="section-title">Products on Sale</h2>
-
-      {listings.length === 0 ? (
-        <p>This seller has no active listings right now.</p>
+      {offers.length === 0 ? (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '40px',
+          background: '#f8f9fa',
+          borderRadius: '8px'
+        }}>
+          <h3>No offers yet</h3>
+          <p>When buyers express interest in your listings, they will appear here.</p>
+        </div>
       ) : (
-        <div className="seller-grid">
-          {listings.map((listing) => (
-            <div className="seller-card" key={listing.id}>
-              <img
-                src={listing.image_url || "/listing_placeholder.png"}
-                alt={listing.title}
-                className="seller-image"
-              />
-              <h3>{listing.title}</h3>
-              <p className="price">${listing.price}</p>
-              <p>{listing.description}</p>
-              <p className="category">{listing.category}</p>
+        <div style={{ display: 'grid', gap: '20px' }}>
+          {offers.map(offer => (
+            <div 
+              key={offer.offer_id}
+              style={{
+                border: '1px solid #ddd',
+                borderRadius: '10px',
+                padding: '20px',
+                background: 'white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'flex-start',
+                marginBottom: '15px'
+              }}>
+                <div>
+                  <h3 style={{ margin: '0 0 8px 0' }}>
+                    {offer.listing_title}
+                  </h3>
+                  <p style={{ margin: '0 0 8px 0', color: '#666' }}>
+                    <strong>Price:</strong> ${offer.listing_price}
+                  </p>
+                  <p style={{ margin: '0 0 8px 0', color: '#666' }}>
+                    <strong>Buyer:</strong> {offer.buyer_name} ({offer.buyer_email})
+                  </p>
+                  <p style={{ margin: '0', color: '#666' }}>
+                    <strong>Date:</strong> {new Date(offer.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <span 
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    background: getStatusColor(offer.status),
+                    color: 'white',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  {offer.status}
+                </span>
+              </div>
 
-              <Link to={`/listings/${listing.id}`} className="details-link">
-                View Listing
-              </Link>
+              {offer.seller_message && (
+                <div style={{
+                  background: '#e7f3ff',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginBottom: '15px'
+                }}>
+                  <strong>Your Response:</strong> {offer.seller_message}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                {offer.status === 'pending' && (
+                  <>
+                    {respondingTo === offer.offer_id ? (
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flex: 1 }}>
+                        <input
+                          type="text"
+                          value={responseMessage}
+                          onChange={(e) => setResponseMessage(e.target.value)}
+                          placeholder="Enter pickup location or instructions..."
+                          style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            border: '1px solid #ddd',
+                            borderRadius: '4px'
+                          }}
+                        />
+                        <button
+                          onClick={() => handleRespond(offer.offer_id)}
+                          disabled={actionLoading}
+                          style={{
+                            padding: '8px 16px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            background: '#28a745',
+                            color: 'white',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Send
+                        </button>
+                        <button
+                          onClick={() => {
+                            setRespondingTo(null);
+                            setResponseMessage('');
+                          }}
+                          style={{
+                            padding: '8px 16px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                            background: '#fff',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setRespondingTo(offer.offer_id)}
+                        style={{
+                          padding: '8px 16px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          background: '#007bff',
+                          color: 'white',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Respond with Pickup Info
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {offer.status === 'accepted' && (
+                  <button
+                    onClick={() => handleComplete(offer.offer_id)}
+                    disabled={actionLoading}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '4px',
+                      border: 'none',
+                      background: '#28a745',
+                      color: 'white',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Mark as Completed
+                  </button>
+                )}
+
+                {offer.status === 'completed' && (
+                  <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+                    ✓ Transaction Completed
+                  </span>
+                )}
+              </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {isAdmin && showTransactions && (
-        <div className="transactions-section">
-          <h2 className="section-title">Seller Transaction History</h2>
-
-          {transactions.length === 0 ? (
-            <p>No transaction history found.</p>
-          ) : (
-            <div className="transaction-table-wrapper">
-              <table className="transaction-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Listing ID</th>
-                    <th>Buyer ID</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((tx) => (
-                    <tr key={tx.id}>
-                      <td>{tx.id}</td>
-                      <td>{tx.listing_id}</td>
-                      <td>{tx.buyer_email}</td>
-                      <td>${tx.amount}</td>
-                      <td>{tx.status}</td>
-                      <td>
-                        {tx.created_at
-                          ? new Date(tx.created_at).toLocaleString()
-                          : "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -145,12 +145,10 @@ def view_listing(listing_id: int):
     return get_single_listing(listing_id)
 
 
-# Create a new listing
-@listings_router.post("/listings/new")
+@router.post("")
 def create_new_listing(
     listing_data: ListingCreate,
-    current_user = Depends(get_current_user)
+    current_user: models.User = Depends(require_login) # <--- CHANGE THIS LINE
 ):
     return create_listing(listing_data, current_user.email)
-
 
