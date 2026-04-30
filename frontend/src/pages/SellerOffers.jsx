@@ -1,11 +1,10 @@
 // Jania Southall 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getSellerOffers, respondToOffer, completeOffer } from '../api/offers';
 import { useAuth } from '../context/AuthContext';
 
 export default function SellerOffers() {
-  const { sellerEmail } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [offers, setOffers] = useState([]);
@@ -15,17 +14,22 @@ export default function SellerOffers() {
   const [responseMessage, setResponseMessage] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
+  console.log("SellerOffers component mounted. User:", user);
+  console.log("user email:", user?.email);
   useEffect(() => {
-    if (!user || (user.email !== sellerEmail && !user.is_admin)) {
-      navigate('/');
-      return;
+    // Wait for the user context to load
+    if (!user) {
+      return; 
     }
 
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const data = await getSellerOffers(sellerEmail);
-        setOffers(data.offers || []);
+        // FIXED: Removed user.email. It now just calls getSellerOffers()
+        const data = await getSellerOffers(); 
+        
+        // Safety check for the returned data structure
+        setOffers(data.offers || data || []);
       } catch (err) {
         setError(err.message || 'Failed to load offers');
       } finally {
@@ -34,7 +38,7 @@ export default function SellerOffers() {
     };
 
     fetchOffers();
-  }, [sellerEmail, user, navigate]);
+  }, [user]); // Removed navigate from dependencies as it's not needed here
 
   const handleRespond = async (offerId) => {
     if (!responseMessage.trim()) {
@@ -63,7 +67,7 @@ export default function SellerOffers() {
   };
 
   const handleComplete = async (offerId) => {
-    if (!confirm('Mark this transaction as completed? This will create a transaction record and mark the listing as sold.')) {
+    if (!window.confirm('Mark this transaction as completed? This will create a transaction record and mark the listing as sold.')) {
       return;
     }
 

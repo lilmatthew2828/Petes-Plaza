@@ -272,7 +272,7 @@ export default function HomePage() {
                         )}
 
                         {listing.seller_email && (
-                          <Link to={`/seller/${listing.seller_email}`}>
+                          <Link to={`/sellers/${listing.seller_email}`}>
                             <button className="pill">View Seller</button>
                           </Link>
                         )}

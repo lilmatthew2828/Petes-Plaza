@@ -14,6 +14,84 @@ router = APIRouter(prefix="/api/offers", tags=["offers"])
 class RespondRequest(BaseModel):
     message: str
 
+
+# ==========================================
+# 1. SPECIFIC ROUTES (Must go first!)
+# ==========================================
+
+@router.get("/seller")  
+def get_seller_offers(
+    db: Session = Depends(get_db),
+    current_user = Depends(require_login)
+):
+    """Get all offers for a seller's listings"""
+    seller_email = current_user.email
+    
+    offers = (
+        db.query(Offers)
+        .filter(Offers.seller_email == seller_email)
+        .order_by(Offers.created_at.desc())
+        .all()
+    )
+    
+    result = []
+    for offer in offers:
+        listing = db.query(Listing).filter(Listing.id == offer.listing_id).first()
+        buyer = db.query(User).filter(User.email == offer.buyer_email).first()
+        
+        result.append({
+            "offer_id": offer.offer_id,
+            "listing_id": offer.listing_id,
+            "listing_title": listing.title if listing else "Listing Removed",
+            "listing_price": float(listing.price) if listing else 0,
+            "buyer_email": offer.buyer_email,
+            "buyer_name": buyer.username if buyer else "Unknown",
+            "status": offer.status,
+            "seller_message": offer.seller_message,
+            "created_at": offer.created_at.isoformat() if offer.created_at else None,
+            "updated_at": offer.updated_at.isoformat() if offer.updated_at else None
+        })
+    
+    return {"offers": result}
+
+@router.get("/buyer")
+def get_buyer_offers(
+    db: Session = Depends(get_db),
+    current_user = Depends(require_login)
+):
+    """Get all offers for a buyer"""
+    buyer_email = current_user.email
+    
+    offers = (
+        db.query(Offers)
+        .filter(Offers.buyer_email == buyer_email)
+        .order_by(Offers.created_at.desc())
+        .all()
+    )
+    
+    result = []
+    for offer in offers:
+        listing = db.query(Listing).filter(Listing.id == offer.listing_id).first()
+        
+        result.append({
+            "offer_id": offer.offer_id,
+            "listing_id": offer.listing_id,
+            "listing_title": listing.title if listing else "Listing Removed",
+            "listing_price": float(listing.price) if listing else 0,
+            "seller_email": offer.seller_email,
+            "status": offer.status,
+            "seller_message": offer.seller_message,
+            "created_at": offer.created_at.isoformat() if offer.created_at else None,
+            "updated_at": offer.updated_at.isoformat() if offer.updated_at else None
+        })
+    
+    return {"offers": result}
+
+
+# ==========================================
+# 2. DYNAMIC ROUTES (Must go last!)
+# ==========================================
+
 @router.post("/{listing_id}") 
 def create_offer(
     listing_id: int,
@@ -57,84 +135,10 @@ def create_offer(
     
     return {"message": "Interest expressed successfully", "offer_id": offer.offer_id}
 
-@router.get("/seller/{seller_email}")  
-def get_seller_offers(
-    seller_email: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(require_login)
-):
-    """Get all offers for a seller's listings"""
-    # Only allow sellers to see their own offers or admins
-    if current_user.email != seller_email and not getattr(current_user, 'is_admin', False):
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    offers = (
-        db.query(Offers)
-        .filter(Offers.seller_email == seller_email)
-        .order_by(Offers.created_at.desc())
-        .all()
-    )
-    
-    result = []
-    for offer in offers:
-        listing = db.query(Listing).filter(Listing.id == offer.listing_id).first()
-        buyer = db.query(User).filter(User.email == offer.buyer_email).first()
-        
-        result.append({
-            "offer_id": offer.offer_id,
-            "listing_id": offer.listing_id,
-            "listing_title": listing.title if listing else "Listing Removed",
-            "listing_price": float(listing.price) if listing else 0,
-            "buyer_email": offer.buyer_email,
-            "buyer_name": buyer.username if buyer else "Unknown",
-            "status": offer.status,
-            "seller_message": offer.seller_message,
-            "created_at": offer.created_at.isoformat() if offer.created_at else None,
-            "updated_at": offer.updated_at.isoformat() if offer.updated_at else None
-        })
-    
-    return {"offers": result}
-
-@router.get("/buyer/{buyer_email}")
-def get_buyer_offers(
-    buyer_email: str,
-    db: Session = Depends(get_db),
-    current_user = Depends(require_login)
-):
-    """Get all offers for a buyer"""
-    # Only allow buyers to see their own offers or admins
-    if current_user.email != buyer_email and not getattr(current_user, 'is_admin', False):
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    offers = (
-        db.query(Offers)
-        .filter(Offers.buyer_email == buyer_email)
-        .order_by(Offers.created_at.desc())
-        .all()
-    )
-    
-    result = []
-    for offer in offers:
-        listing = db.query(Listing).filter(Listing.id == offer.listing_id).first()
-        
-        result.append({
-            "offer_id": offer.offer_id,
-            "listing_id": offer.listing_id,
-            "listing_title": listing.title if listing else "Listing Removed",
-            "listing_price": float(listing.price) if listing else 0,
-            "seller_email": offer.seller_email,
-            "status": offer.status,
-            "seller_message": offer.seller_message,
-            "created_at": offer.created_at.isoformat() if offer.created_at else None,
-            "updated_at": offer.updated_at.isoformat() if offer.updated_at else None
-        })
-    
-    return {"offers": result}
-
 @router.patch("/{offer_id}/respond")
 def respond_to_offer(
     offer_id: int,
-    request: RespondRequest,  # Fixed: now accepts JSON body
+    request: RespondRequest,  
     db: Session = Depends(get_db),
     current_user = Depends(require_login)
 ):
@@ -151,7 +155,7 @@ def respond_to_offer(
         raise HTTPException(status_code=400, detail="Offer is no longer pending")
     
     # Update offer
-    offer.seller_message = request.message  # Fixed: access message from request object
+    offer.seller_message = request.message  
     offer.status = "accepted"
     offer.updated_at = datetime.now()
     

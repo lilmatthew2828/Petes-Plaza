@@ -94,13 +94,15 @@ function App() {
             }
           />
           <Route
-            path="/seller/:sellerId"
+            path="/sellers/:sellerId"
             element={
               <ProtectedRoute>
                 <SellerPage />
               </ProtectedRoute>
             }
           />
+{/* Private offers dashboard for the logged-in seller */}
+<Route path="/my-offers" element={<SellerOffers />} />
           <Route 
             path="/offers-received" 
             element={

@@ -7,9 +7,12 @@ export const createOffer = (listingId) => {
   });
 };
 
-export const getSellerOffers = (sellerEmail) => {
-  return apiCall(`/offers/seller/${sellerEmail}`);
-};
+// src/api/offers.js
+export async function getSellerOffers() {  // <--- NO variables inside the ()
+  return apiCall(`/offers/seller`, {       // <--- NO ${email} or /undefined here
+    method: "GET" 
+  });
+}
 
 export const getBuyerOffers = (buyerEmail) => {
   return apiCall(`/offers/buyer/${buyerEmail}`);
